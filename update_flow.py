@@ -53,8 +53,10 @@ def mkr(series, bw, lookback=500):
 weekly = close.resample('W-FRI').last()
 sig = {}
 for sym in close.columns:
-    d, df_, dc = mkr(close[sym], 14, 5, 3); w, wf, wc = mkr(weekly[sym], 5, 2, 2)
-    sig[sym] = {'Daily': d, 'Weekly': w, 'DFresh': df_, 'WFresh': wf, 'DCross': dc, 'WCross': wc}
+    d, dta, dca, dc = mkr(close[sym], 14)
+    w, wta, wca, wc = mkr(weekly[sym], 5)
+    sig[sym] = {'Daily': d, 'Weekly': w, 'DTurnAgo': dta, 'WTurnAgo': wta,
+               'DCrossAgo': dca, 'DCross': dc, 'WCrossAgo': wca, 'WCross': wc}
 sig = pd.DataFrame(sig).T
 
 rets = pd.DataFrame({p: (close.iloc[-1] / close.iloc[-1 - d] - 1) * 100 for p, d in PERIODS}).round(1)
@@ -62,3 +64,4 @@ out = uni.set_index('Symbol').join(rets, how='inner').join(sig, how='left').rena
 out['1W'] = out['1W']  # keep columns in order
 out.to_csv('flow.csv', index=False)
 print('saved', len(out), 'stocks; last price date', close.index[-1].date())
+
