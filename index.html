@@ -30,6 +30,8 @@ summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px}
 </style></head><body><main>
 <h1>CAPITAL FLOW MAP</h1>
 <div class="sub" id="sub"></div>
+<div class="bar" style="margin-bottom:8px"><input id="sq" type="text" placeholder="🔍 Search stock or sector..." style="flex:1;min-width:200px;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:14px"></div>
+<div id="sres" class="pn" style="display:none"></div>
 <div class="bar" id="tabs"></div>
 <div class="bar"><label style="position:relative;overflow:hidden">📂 Load my data (CSV)<input id="f" type="file" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer"></label><button id="pb">📋 Paste CSV instead</button></div>
 <div id="pw" style="display:none;margin-bottom:14px"><textarea id="ta" rows="6" style="width:100%;border:1px solid var(--mut);border-radius:8px;background:var(--card);color:var(--fg);padding:8px;font:12px monospace" placeholder="Open flow.csv, select all, copy, and paste the full text here"></textarea><div class="bar" style="margin-top:8px"><button id="pgo">Load pasted data</button></div></div>
@@ -81,12 +83,12 @@ function sample(){const r=seeded(7),out=[];
    for(const [p,m] of [["1W",.4],["1M",1],["3M",2.2],["6M",3.5]])o[p]=+(base*m+(r()-.5)*10*m*vol).toFixed(1);out.push(o)}))}
  return out}
 const capOf=v=>/micro/i.test(v||"")?"Micro":/mid/i.test(v||"")?"Mid":/small/i.test(v||"")?"Small":/large/i.test(v||"")?"Large":"";
-// ---- CSV: Symbol,Industry,Cap,1W,1M,3M,6M,Daily,Weekly,DFresh,WFresh,DCross,WCross  (optional row Symbol=NIFTY500 for benchmark) ----
+// ---- CSV: Symbol,Industry,Cap,1W,1M,3M,6M,Daily,Weekly,DTurnAgo,WTurnAgo,DCrossAgo,DCross,WCrossAgo,WCross  (optional row Symbol=NIFTY500 for benchmark) ----
 function splitCSV(l){const o=[];let c="",q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===","&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o}
 function parseCSV(t){const L=t.replace(/^\uFEFF/,"").trim().split(/\r?\n/),h=splitCSV(L.shift()).map(x=>x.trim());
  return L.filter(l=>l.trim()).map(l=>{const c=splitCSV(l),o={};h.forEach((k,i)=>o[k]=c[i]?.trim());return o})}
 const canon=x=>{const n=(x||"").replace(/,/g,"").trim();return Object.keys(NSDL).find(k=>k.replace(/,/g,"")===n)||(x||"").trim()};
-function load(recs){bench={};rows=[];for(const r of recs){const o={Symbol:r.Symbol||r.index||r["Unnamed: 0"]||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DFresh:r.DFresh||"",WFresh:r.WFresh||"",DCross:(r.DCross||"").toUpperCase(),WCross:(r.WCross||"").toUpperCase()};
+function load(recs){bench={};rows=[];for(const r of recs){const o={Symbol:r.Symbol||r.index||r["Unnamed: 0"]||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DTurnAgo:r.DTurnAgo!==""&&r.DTurnAgo!==undefined?+r.DTurnAgo:"",WTurnAgo:r.WTurnAgo!==""&&r.WTurnAgo!==undefined?+r.WTurnAgo:"",DCrossAgo:r.DCrossAgo!==""&&r.DCrossAgo!==undefined?+r.DCrossAgo:"",DCross:(r.DCross||"").toUpperCase(),WCrossAgo:r.WCrossAgo!==""&&r.WCrossAgo!==undefined?+r.WCrossAgo:"",WCross:(r.WCross||"").toUpperCase()};
   PERIODS.forEach(([p])=>o[p]=parseFloat(r[p]));
   if(/^NIFTY ?500$/i.test(o.Symbol))PERIODS.forEach(([p])=>bench[p]=o[p]);else if(o.Industry&&!isNaN(o[period]))rows.push(o)}
  PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.reduce((a,b)=>a+b,0)/v.length}});render()}
@@ -112,11 +114,12 @@ function renderF(){document.getElementById("sigp").style.display="none";document
 function bar(showP){return `<button class="${mode==="price"?"on":""}" data-m="price">Price return</button><button class="${mode==="fpi"?"on":""}" data-m="fpi">FPI net flow (NSDL)</button>`+(showP?PERIODS.map(([p,l])=>`<button class="${p===period?"on":""}" data-p="${p}">${l}</button>`).join(""):"")+(showP?["All",...CAPS].map(c=>`<button class="${c===cap?"on":""}" data-c="${c}">${c==="All"?"All caps":c+" cap"}</button>`).join(""):"")+(showP?[["All","All signals"],["D","Daily BUY"],["W","Weekly BUY"],["DW","Daily+Weekly BUY"]].map(([k,l])=>`<button class="${k===sig?"on":""}" data-s="${k}">${l}</button>`).join(""):"")+`<button class="${view==="top"?"on":""}" data-v="top">Top 5 sectors</button><button class="${view==="all"?"on":""}" data-v="all">All sectors</button>`}
 
 let sm="BUY",so=false;
+const ago=n=>n===""||n===undefined||n===null?"":n===0?"today":n===1?"1 bar ago":n+" bars ago";
 function why(x){const b=sm==="BUY",R=[];
- if(x.DFresh==="Y"&&x.Daily===(b?"BUY":"SELL"))R.push("Daily: line turned "+(b?"up":"down"));
- if(x.DCross===(b?"UP":"DN"))R.push("Daily: price crossed "+(b?"above":"below")+" line");
- if(x.WFresh==="Y"&&x.Weekly===(b?"BUY":"SELL"))R.push("Weekly: line turned "+(b?"up":"down"));
- if(x.WCross===(b?"UP":"DN"))R.push("Weekly: price crossed "+(b?"above":"below")+" line");
+ if(x.DTurnAgo!==""&&x.Daily===(b?"BUY":"SELL"))R.push("Daily: line turned "+(b?"up":"down")+" ("+ago(x.DTurnAgo)+")");
+ if(x.DCross===(b?"UP":"DN")&&x.DCrossAgo!=="")R.push("Daily: price crossed "+(b?"above":"below")+" line ("+ago(x.DCrossAgo)+")");
+ if(x.WTurnAgo!==""&&x.Weekly===(b?"BUY":"SELL"))R.push("Weekly: line turned "+(b?"up":"down")+" ("+ago(x.WTurnAgo)+")");
+ if(x.WCross===(b?"UP":"DN")&&x.WCrossAgo!=="")R.push("Weekly: price crossed "+(b?"above":"below")+" line ("+ago(x.WCrossAgo)+")");
  return R}
 function renderSig(all,inSet){const el=document.getElementById("sigp"),b=sm==="BUY";el.style.display="block";
  const has=all.some(x=>x.Daily||x.Weekly);
@@ -135,8 +138,10 @@ function renderShort(all){const el=document.getElementById("short");el.style.dis
   return{n,v,m1,c,score:c.filter(x=>x[1]).length}}).sort((a,b)=>b.score-a.score||b.m1-a.m1);
  const top=secs.slice(0,5);
  const st=[];top.forEach(sc=>sc.v.filter(x=>x.Daily==="BUY"&&x.Weekly==="BUY").forEach(x=>{
-  const fresh=x.DFresh==="Y"||x.DCross==="UP"||x.WFresh==="Y"||x.WCross==="UP",lead=x["1M"]>sc.m1,pos=x["3M"]>0;
-  st.push({x,sc,pts:2+(fresh?1:0)+(lead?1:0)+(pos?1:0),fresh,lead,ext:x["1M"]>25})}));
+  const dAge=Math.min(x.DTurnAgo===""?99:x.DTurnAgo, x.DCross==="UP"&&x.DCrossAgo!==""?x.DCrossAgo:99);
+  const wAge=Math.min(x.WTurnAgo===""?99:x.WTurnAgo, x.WCross==="UP"&&x.WCrossAgo!==""?x.WCrossAgo:99);
+  const fresh=dAge<=1||wAge<=1,lead=x["1M"]>sc.m1,pos=x["3M"]>0;
+  st.push({x,sc,pts:2+(fresh?1:0)+(lead?1:0)+(pos?1:0),fresh,dAge,wAge,lead,ext:x["1M"]>25})}));
  st.sort((a,b)=>b.pts-a.pts||b.sc.score-a.sc.score||b["x"]["1M"]-a["x"]["1M"]);
  const f1=v=>(v>=0?"+":"")+v.toFixed(1)+"%";
  el.innerHTML=`<h3>🎯 Shortlist — sectors &amp; stocks to research</h3>
@@ -144,25 +149,7 @@ function renderShort(all){const el=document.getElementById("short");el.style.dis
  <h4 style="margin:12px 0 4px;font-size:12px;letter-spacing:.06em;color:var(--mut)">TOP SECTORS (score out of 5)</h4>
  ${top.map((o,i)=>`<div class="sr"><span class="r">${o.score}/5</span><b>${i+1}. ${esc(o.n)}</b><small>1M avg ${f1(o.m1)} · ${o.v.length} stocks</small><small>${o.c.map(([l,ok])=>`<span style="color:var(--${ok?"gc":"rc"})">${ok?"✓":"✗"} ${l}</span>`).join(" · ")}</small></div>`).join("")||"<small>Not enough data.</small>"}
  <h4 style="margin:12px 0 4px;font-size:12px;letter-spacing:.06em;color:var(--mut)">STOCKS IN THESE SECTORS WITH DAILY + WEEKLY BUY (top 15)</h4>
- <div class="sl">${has?(st.slice(0,15).map(o=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.pts}/5</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}<small>${esc(o.sc.n)} · 1M ${f1(o.x["1M"])} · 3M ${f1(o.x["3M"])}</small><small>${["Daily BUY","Weekly BUY",o.fresh?"fresh signal ★":"",o.lead?"beats its sector":"",o.ext?"⚠ up 25%+ in 1M, may be extended":""].filter(Boolean).join(" · ")}</small></div>`).join("")||"<small>No stock has both Daily and Weekly BUY in these sectors right now.</small>"):"<small>Sample data has no signals. Load your real data to see stocks.</small>"}</div>`}
-function render(){if(mode==="fpi")return renderF();const g={};rows.forEach(r=>{if((cap==="All"||r.Cap===cap)&&!isNaN(r[period]))(g[r.Industry]??=[]).push(r)});
- const secs=Object.entries(g).filter(([,v])=>v.length>=(cap==="All"?3:2)).map(([n,v])=>[n,v,avg(v.map(x=>x[period]))]).sort((a,b)=>a[2]-b[2]);
- const all=view==="all",neg=secs.filter(x=>x[2]<0),pos=secs.filter(x=>x[2]>=0).reverse();
- const O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
- document.getElementById("out").innerHTML=O.map(([n,v],i)=>card(i+1,n,v,false)).join("")||"<div class='note'>None</div>";
- document.getElementById("in").innerHTML=I.map(([n,v],i)=>card(i+1,n,v,true)).join("")||"<div class='note'>None</div>";
- renderShort(Object.values(g).flat());renderSig(Object.values(g).flat(),new Set(I.map(x=>x[0])));
- const b=bench[period];document.getElementById("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT of sectors (left) and INTO sectors (right)`;
- document.getElementById("tabs").innerHTML=bar(true)}
-let cur=sample();
-document.getElementById("tabs").onclick=e=>{const d=e.target.dataset;if(d.p){period=d.p;load(cur)}else if(d.v){view=d.v;render()}else if(d.m){mode=d.m;render()}else if(d.c){cap=d.c;render()}else if(d.s){sig=d.s;render()}};
-const note=t=>document.getElementById("note").textContent=t;
-function useCSV(text,name){try{const recs=parseCSV(text);if(!recs.length||!("Industry" in recs[0])||!("1M" in recs[0]))throw 0;cur=recs;load(cur);note("Showing your data: "+name+" · "+recs.length+" stocks")}catch(e){note("Could not read this CSV. Use the flow.csv made by the Colab file (columns: Symbol, Industry, Cap, 1W, 1M, 3M, 6M ...).")}}
-document.getElementById("f").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>useCSV(t,f.name)).catch(()=>note("Could not open the file. Try “Paste CSV instead”."))};
-document.getElementById("pb").onclick=()=>{const w=document.getElementById("pw");w.style.display=w.style.display==="none"?"block":"none"};
-document.getElementById("pgo").onclick=()=>useCSV(document.getElementById("ta").value,"pasted data");
-load(cur);
-fetch("nsdl.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{NSDL=j.data;NSDL_DATE=j.date;FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));render()}).catch(()=>{});
-fetch("flow.csv",{cache:"no-store"}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{useCSV(t,"flow.csv");note("Live data · updated automatically after market close")}).catch(()=>{});
+ <div class="sl">${has?(st.slice(0,15).map(o=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.pts}/5</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}<small>${esc(o.sc.n)} · 1M ${f1(o.x["1M"])} · 3M ${f1(o.x["3M"])}</small><small>${["Daily BUY","Weekly BUY",o.fresh?"fresh — turned/crossed "+(o.dAge<=1?ago(o.dAge)+" (daily)":ago(o.wAge)+" (weekly)"):"",o.lead?"beats its sector":"",o.ext?"⚠ up 25%+ in 1M, may be extended":""].filter(Boolean).join(" · ")}</small></div>`).join("")||"<small>No stock has both Daily and Weekly BUY in these sectors right now.</small>"):"<small>Sample data has no signals. Load your real data to see stocks.</small>"}</div>`}
 
-</script></body></html>
+function doSearch(){
+ const q=documen
