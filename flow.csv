@@ -1,0 +1,756 @@
+Symbol,Industry,Cap,1W,1M,3M,6M,Daily,Weekly,DFresh,WFresh,DCross,WCross
+ABB,Capital Goods,Large,-3.4,-10.0,1.4,13.8,SELL,SELL,,,,
+ADANIENSOL,Power,Large,-6.1,-8.5,-16.7,37.7,SELL,SELL,,,,
+ADANIENT,Metals & Mining,Large,-4.8,-0.3,-10.3,55.5,SELL,SELL,,Y,,DN
+ADANIGREEN,Power,Large,-5.2,1.8,-20.5,44.4,SELL,SELL,,,,
+ADANIPORTS,Services,Large,-2.0,10.5,-6.6,28.3,BUY,BUY,Y,,UP,
+ADANIPOWER,Power,Large,-5.8,-1.5,-13.2,21.9,SELL,SELL,,,,
+AMBUJACEM,Construction Materials,Large,-4.3,-7.7,-13.6,-11.0,SELL,SELL,,,,
+APOLLOHOSP,Healthcare,Large,-1.4,-2.1,0.3,19.2,SELL,SELL,Y,Y,DN,DN
+ASIANPAINT,Consumer Durables,Large,-1.3,-8.9,-11.9,12.4,SELL,SELL,,,,
+DMART,Consumer Services,Large,0.5,-2.6,-9.3,-13.0,SELL,SELL,Y,,UP,
+AXISBANK,Financial Services,Large,-3.5,-7.8,-12.0,0.2,SELL,SELL,,,,
+BAJAJ-AUTO,Automobile and Auto Components,Large,-4.3,-10.4,10.3,25.9,SELL,SELL,,Y,,DN
+BAJFINANCE,Financial Services,Large,-3.6,-8.0,-4.5,18.4,SELL,SELL,,,,
+BAJAJFINSV,Financial Services,Large,-4.1,-13.5,-5.8,6.6,SELL,SELL,,,,
+BAJAJHLDNG,Financial Services,Large,-3.4,-6.7,0.0,22.3,SELL,SELL,Y,Y,DN,DN
+BANKBARODA,Financial Services,Large,-3.1,-4.8,-12.7,-6.0,SELL,SELL,,,,
+BEL,Capital Goods,Large,-2.8,-6.7,-6.7,-8.2,SELL,SELL,,,,
+BPCL,Oil Gas & Consumable Fuels,Large,-4.9,-7.9,-3.9,7.3,SELL,SELL,Y,Y,,DN
+BHARTIARTL,Telecommunication,Large,-2.4,-2.1,-4.2,0.3,SELL,SELL,,Y,,DN
+BOSCHLTD,Automobile and Auto Components,Large,-3.0,-6.3,13.6,46.8,SELL,BUY,Y,,DN,
+BRITANNIA,Fast Moving Consumer Goods,Large,-1.6,-7.9,-8.5,-9.6,SELL,SELL,,,,
+CGPOWER,Capital Goods,Large,-3.5,-5.6,-9.9,27.1,SELL,SELL,Y,Y,,DN
+CANBK,Financial Services,Large,-3.5,-6.5,-6.3,-3.5,SELL,SELL,Y,,DN,
+CHOLAFIN,Financial Services,Large,-7.5,-12.4,-9.0,20.0,SELL,SELL,,,,
+CIPLA,Healthcare,Large,0.2,-1.6,-4.8,17.4,SELL,SELL,Y,,UP,
+COALINDIA,Oil Gas & Consumable Fuels,Large,-0.6,7.3,-0.5,-2.8,BUY,BUY,,Y,,UP
+CUMMINSIND,Capital Goods,Large,-2.1,-4.8,-12.2,5.4,SELL,SELL,,,,
+DLF,Realty,Large,-1.1,-4.1,1.9,28.4,BUY,BUY,,Y,,UP
+DIVISLAB,Healthcare,Large,2.0,0.7,43.3,63.5,BUY,BUY,,,,
+DRREDDY,Healthcare,Large,2.6,7.7,-7.1,2.7,BUY,BUY,,Y,,UP
+EICHERMOT,Automobile and Auto Components,Large,-3.2,-9.6,0.2,9.2,SELL,SELL,,,,
+ETERNAL,Consumer Services,Large,-4.2,-0.1,17.1,41.4,BUY,BUY,,,,
+GAIL,Oil Gas & Consumable Fuels,Large,-0.3,-3.2,-1.4,21.3,SELL,SELL,Y,Y,DN,DN
+GODREJCP,Fast Moving Consumer Goods,Large,-1.7,-4.7,-19.9,-12.8,SELL,SELL,,,,
+GRASIM,Construction Materials,Large,-0.0,-7.2,-1.0,22.3,SELL,SELL,,,,
+HCLTECH,Information Technology,Large,-3.1,-6.2,15.4,-9.6,SELL,SELL,Y,,,
+HDFCAMC,Financial Services,Large,-6.1,-12.9,-17.3,-0.7,SELL,SELL,,,,
+HDFCBANK,Financial Services,Large,-3.8,0.3,-10.7,-3.8,SELL,SELL,Y,Y,DN,UP
+HDFCLIFE,Financial Services,Large,-6.9,-4.2,-8.9,-7.7,SELL,SELL,Y,Y,,DN
+HINDALCO,Metals & Mining,Large,-1.5,-5.6,1.5,5.1,SELL,SELL,Y,,,
+HAL,Capital Goods,Large,-1.8,-1.8,6.5,28.1,SELL,SELL,Y,Y,,DN
+HINDUNILVR,Fast Moving Consumer Goods,Large,-2.8,-4.5,-15.0,-8.1,SELL,SELL,,,,
+HINDZINC,Metals & Mining,Large,-3.4,-4.2,7.9,12.6,SELL,SELL,Y,Y,DN,DN
+HYUNDAI,Automobile and Auto Components,Large,-3.9,-8.4,4.5,19.1,SELL,SELL,,Y,,DN
+ICICIBANK,Financial Services,Large,-2.9,-10.5,-6.3,7.9,SELL,SELL,,,,
+ITC,Fast Moving Consumer Goods,Large,-0.7,3.3,-8.9,-7.4,SELL,SELL,Y,,DN,
+INDHOTEL,Consumer Services,Large,-1.9,-2.1,0.2,24.5,SELL,BUY,Y,,DN,
+IOC,Oil Gas & Consumable Fuels,Large,-3.6,-4.5,-5.4,-0.1,SELL,SELL,Y,,,
+IRFC,Financial Services,Large,-2.4,-6.3,-14.0,-15.0,SELL,SELL,,,,
+INFY,Information Technology,Large,-3.9,-12.8,-5.0,-22.3,SELL,SELL,,,,
+INDIGO,Services,Large,-2.8,-6.6,-10.2,16.6,SELL,SELL,Y,,DN,
+JSWSTEEL,Metals & Mining,Large,-0.8,-3.9,3.3,10.7,SELL,SELL,Y,,,
+JINDALSTEL,Metals & Mining,Large,-0.2,-4.6,9.2,0.2,BUY,BUY,,Y,,UP
+JIOFIN,Financial Services,Large,-5.0,-9.2,-8.4,-4.3,SELL,SELL,,,,
+KOTAKBANK,Financial Services,Large,-2.4,-4.0,1.0,12.7,SELL,SELL,Y,Y,,DN
+LTM,Information Technology,Large,-0.5,-8.8,12.5,-2.5,SELL,SELL,,,,
+LT,Construction,Large,-2.3,-6.6,-6.9,5.6,SELL,SELL,,,,
+LODHA,Realty,Large,-2.2,-6.6,11.6,61.4,SELL,SELL,,Y,,UP
+M&M,Automobile and Auto Components,Large,-2.6,-9.6,-5.6,-0.5,SELL,SELL,,,,
+MARUTI,Automobile and Auto Components,Large,-2.1,-11.9,-16.0,-4.6,SELL,SELL,,,,
+MAXHEALTH,Healthcare,Large,-6.1,-4.8,-11.9,5.2,SELL,SELL,Y,Y,DN,DN
+MAZDOCK,Capital Goods,Large,-3.9,-14.6,-16.9,-6.3,SELL,SELL,,,,
+MUTHOOTFIN,Financial Services,Large,-3.2,-7.9,-7.0,-13.0,SELL,SELL,,,,
+NTPC,Power,Large,-2.1,-0.9,-9.4,-9.8,SELL,SELL,,,,
+NESTLEIND,Fast Moving Consumer Goods,Large,-1.6,-10.4,-6.8,13.2,SELL,SELL,,,,
+ONGC,Oil Gas & Consumable Fuels,Large,-2.4,-0.2,-2.0,-19.5,SELL,SELL,Y,,DN,
+PIDILITIND,Chemicals,Large,-4.9,-11.4,-6.2,18.3,SELL,SELL,,,,
+PFC,Financial Services,Large,-6.1,-3.4,-23.0,-17.6,SELL,SELL,,,,
+POWERGRID,Power,Large,-1.5,-0.6,-8.7,-9.3,SELL,SELL,Y,,UP,
+PNB,Financial Services,Large,-4.4,-2.1,4.6,10.2,SELL,SELL,Y,Y,DN,DN
+RECLTD,Financial Services,Large,-4.0,-8.8,-19.0,-7.8,SELL,SELL,,,,
+RELIANCE,Oil Gas & Consumable Fuels,Large,-3.9,-6.7,-8.6,-11.3,SELL,SELL,,,,
+SBILIFE,Financial Services,Large,-2.4,-1.5,-4.0,-3.4,SELL,SELL,Y,,DN,
+MOTHERSON,Automobile and Auto Components,Large,-0.3,-5.5,9.5,51.3,SELL,BUY,Y,,DN,
+SHREECEM,Construction Materials,Large,-0.3,-4.6,-15.4,-4.1,SELL,SELL,,,,
+SHRIRAMFIN,Financial Services,Large,-2.8,-11.9,-7.8,10.3,SELL,SELL,,,,
+ENRIN,Capital Goods,Large,-1.0,-0.8,-9.8,22.6,SELL,SELL,Y,Y,UP,UP
+SIEMENS,Capital Goods,Large,-2.0,-6.2,6.1,25.5,SELL,SELL,,Y,,DN
+SOLARINDS,Chemicals,Large,-3.4,-4.4,3.0,46.7,SELL,SELL,,Y,,UP
+SBIN,Financial Services,Large,-2.7,-9.4,-8.7,-4.0,SELL,SELL,,,,
+SUNPHARMA,Healthcare,Large,0.1,-6.9,-0.9,9.4,SELL,SELL,,,,
+TVSMOTOR,Automobile and Auto Components,Large,-0.4,-5.0,13.7,21.6,SELL,BUY,,,,
+TATACAP,Financial Services,Large,-5.2,-12.1,-9.1,5.0,SELL,,,,,
+TCS,Information Technology,Large,-2.1,-14.1,0.2,-14.3,SELL,SELL,,,,
+TATACONSUM,Fast Moving Consumer Goods,Large,-2.0,-7.0,-12.9,-6.7,SELL,SELL,,,,
+TMCV,Capital Goods,Large,-2.1,-8.6,-2.2,12.2,SELL,,Y,,,
+TMPV,Automobile and Auto Components,Large,-7.4,-10.1,-19.7,-7.7,SELL,SELL,,,,
+TATAPOWER,Power,Large,-2.2,3.4,-4.7,-6.2,SELL,SELL,Y,Y,,DN
+TATASTEEL,Metals & Mining,Large,0.7,1.0,-0.8,-2.1,BUY,SELL,Y,Y,,UP
+TECHM,Information Technology,Large,-0.7,-5.4,11.2,9.7,SELL,SELL,,,,
+TITAN,Consumer Durables,Large,-3.5,-6.8,6.5,16.5,SELL,SELL,,Y,,UP
+TORNTPHARM,Healthcare,Large,-1.5,-4.1,4.3,22.1,SELL,SELL,Y,Y,DN,UP
+TRENT,Consumer Services,Large,-6.4,-9.5,-21.5,10.2,SELL,SELL,,,,
+ULTRACEMCO,Construction Materials,Large,-0.5,-4.4,-3.1,5.2,SELL,SELL,,,,
+UNIONBANK,Financial Services,Large,-5.0,-10.3,-0.1,1.3,SELL,SELL,,Y,,UP
+UNITDSPR,Fast Moving Consumer Goods,Large,-0.6,-6.7,2.0,14.7,SELL,SELL,Y,,DN,
+VBL,Fast Moving Consumer Goods,Large,-0.2,7.2,-15.8,6.7,BUY,SELL,,,,
+VEDL,Metals & Mining,Large,-1.4,-6.8,-6.1,-62.3,SELL,SELL,Y,,,
+WIPRO,Information Technology,Large,-3.8,-13.4,-7.2,-17.1,SELL,SELL,,,,
+ZYDUSLIFE,Healthcare,Large,4.4,4.5,10.4,40.5,BUY,BUY,,,,
+360ONE,Financial Services,Mid,-3.2,-11.5,-2.9,12.0,SELL,SELL,,,,
+3MINDIA,Diversified,Mid,-4.5,-1.9,-2.4,11.5,SELL,SELL,Y,Y,DN,DN
+ACC,Construction Materials,Mid,-2.9,-5.8,-11.0,-8.8,SELL,SELL,,,,
+AIAENG,Capital Goods,Mid,-2.1,-9.5,-19.7,4.9,SELL,SELL,,,,
+APLAPOLLO,Capital Goods,Mid,0.3,-0.6,23.5,16.3,BUY,BUY,,,,
+AUBANK,Financial Services,Mid,-4.5,-8.8,-6.2,14.1,SELL,SELL,,,,
+AWL,Fast Moving Consumer Goods,Mid,-4.4,-9.1,-4.8,-4.2,SELL,SELL,,,,
+ABBOTINDIA,Healthcare,Mid,1.7,7.1,10.1,7.8,BUY,BUY,,,,
+ATGL,Oil Gas & Consumable Fuels,Mid,-5.0,-4.2,-18.9,14.5,SELL,SELL,Y,Y,,DN
+ABCAPITAL,Financial Services,Mid,-5.0,-7.9,-4.0,26.5,SELL,SELL,Y,Y,DN,DN
+AJANTPHARM,Healthcare,Mid,0.9,-1.4,7.1,28.4,BUY,BUY,Y,,,
+ALKEM,Healthcare,Mid,-2.3,-2.3,-5.1,-0.8,SELL,SELL,Y,Y,DN,DN
+ANTHEM,Healthcare,Mid,-2.9,-3.0,12.1,31.4,SELL,SELL,Y,Y,,DN
+APARINDS,Capital Goods,Mid,-2.8,0.4,17.7,80.8,BUY,BUY,Y,,UP,
+APOLLOTYRE,Automobile and Auto Components,Mid,-2.3,-10.4,-13.4,-3.4,SELL,SELL,,,,
+ASHOKLEY,Capital Goods,Mid,-4.0,-12.1,-6.3,5.7,SELL,SELL,,,,
+ASTRAL,Capital Goods,Mid,-1.4,-10.5,0.1,-12.2,SELL,SELL,,,,
+AUROPHARMA,Healthcare,Mid,0.3,-0.6,9.3,27.9,BUY,BUY,,,,
+AIIL,Financial Services,Mid,-0.1,-2.6,4.4,30.1,BUY,SELL,,Y,,DN
+BSE,Financial Services,Mid,-2.3,-3.7,-17.4,11.1,SELL,SELL,,,,
+BAJAJHFL,Financial Services,Mid,-2.0,-3.1,-8.1,4.4,SELL,SELL,,Y,,DN
+BALKRISIND,Automobile and Auto Components,Mid,-3.0,-5.7,-3.3,4.4,SELL,SELL,,,,
+BANKINDIA,Financial Services,Mid,-4.7,-7.8,-9.9,-3.1,SELL,SELL,,,,
+MAHABANK,Financial Services,Mid,-3.2,-2.8,-12.3,26.8,SELL,SELL,Y,Y,UP,DN
+BERGEPAINT,Consumer Durables,Mid,0.1,-9.0,-12.4,8.1,SELL,SELL,,,,
+BDL,Capital Goods,Mid,-5.3,-13.2,-20.1,-6.7,SELL,SELL,,,,
+BHARATFORG,Automobile and Auto Components,Mid,-3.8,-8.2,-9.8,18.0,SELL,SELL,Y,,UP,
+BHEL,Capital Goods,Mid,-3.9,-7.6,2.1,65.5,SELL,SELL,Y,Y,,DN
+BHARTIHEXA,Telecommunication,Mid,-7.8,-8.5,-0.8,-5.1,SELL,SELL,,,,
+GROWW,Financial Services,Mid,-4.3,-5.7,-12.1,9.8,SELL,,,,,
+BIOCON,Healthcare,Mid,-3.0,-8.2,-9.5,7.4,SELL,SELL,,,,
+BLUESTARCO,Consumer Durables,Mid,1.9,6.2,-2.3,2.2,BUY,BUY,Y,Y,UP,UP
+CRISIL,Financial Services,Mid,-0.1,-5.5,11.9,23.5,SELL,BUY,Y,Y,UP,UP
+COCHINSHIP,Capital Goods,Mid,-5.7,-13.2,-13.7,-0.3,SELL,SELL,,,,
+COFORGE,Information Technology,Mid,-0.7,-9.8,24.5,47.9,SELL,BUY,,Y,,UP
+COLPAL,Fast Moving Consumer Goods,Mid,-2.5,-3.9,-11.6,0.8,SELL,SELL,Y,,,
+CONCOR,Services,Mid,-4.2,-12.4,-5.8,2.3,SELL,SELL,,Y,,DN
+COROMANDEL,Chemicals,Mid,-4.0,-2.1,-6.9,-0.5,SELL,SELL,Y,Y,UP,DN
+DABUR,Fast Moving Consumer Goods,Mid,-1.5,0.4,-13.4,-7.2,SELL,SELL,,,,
+DALBHARAT,Construction Materials,Mid,-4.6,-10.5,-4.9,-7.1,SELL,SELL,,,,
+DIXON,Consumer Durables,Mid,3.8,-8.5,9.8,37.0,SELL,SELL,,,,
+ENDURANCE,Automobile and Auto Components,Mid,-0.1,-6.2,1.5,20.0,SELL,SELL,,,,
+ESCORTS,Capital Goods,Mid,-1.8,-8.4,-5.9,-2.4,SELL,SELL,,,,
+EXIDEIND,Automobile and Auto Components,Mid,-5.4,-7.6,-2.6,36.5,SELL,SELL,,Y,,DN
+NYKAA,Consumer Services,Mid,-2.7,-7.2,3.3,31.9,SELL,SELL,Y,Y,DN,DN
+FEDERALBNK,Financial Services,Mid,-1.3,-9.5,-2.1,22.0,SELL,SELL,,,,
+FORTIS,Healthcare,Mid,-7.6,-8.7,-14.9,5.1,SELL,SELL,,,,
+GVT&D,Capital Goods,Mid,-4.1,-6.2,-13.3,9.4,SELL,SELL,Y,,,
+GMRAIRPORT,Services,Mid,-3.8,1.1,-15.3,6.5,SELL,SELL,Y,,,
+GICRE,Financial Services,Mid,-5.0,-5.1,-6.4,-11.1,SELL,SELL,Y,Y,,DN
+GLAXO,Healthcare,Mid,-0.8,-6.5,18.0,26.5,BUY,BUY,Y,,UP,
+GLENMARK,Healthcare,Mid,-5.7,-6.4,5.8,11.1,SELL,SELL,Y,Y,DN,DN
+MEDANTA,Healthcare,Mid,-5.3,-4.8,4.8,40.9,SELL,SELL,Y,Y,DN,DN
+GODFRYPHLP,Fast Moving Consumer Goods,Mid,-3.5,-9.7,-11.2,1.0,SELL,SELL,,,,
+GODREJIND,Diversified,Mid,-3.0,-5.9,-11.9,26.7,SELL,SELL,,,,
+GODREJPROP,Realty,Mid,-2.6,-17.8,-15.5,10.3,SELL,SELL,,,,
+FLUOROCHEM,Chemicals,Mid,-2.0,-6.2,10.8,37.4,SELL,SELL,,Y,,DN
+HDBFS,Financial Services,Mid,-5.5,-6.6,-13.9,10.5,SELL,SELL,,Y,,DN
+HAVELLS,Consumer Durables,Mid,-2.3,-14.5,-10.4,-9.5,SELL,SELL,,,,
+HEROMOTOCO,Automobile and Auto Components,Mid,-0.7,-2.1,11.2,8.0,SELL,SELL,Y,Y,UP,UP
+HEXT,Information Technology,Mid,-5.0,-13.6,-13.7,10.0,SELL,SELL,,,,
+HINDPETRO,Oil Gas & Consumable Fuels,Mid,-4.7,-6.1,-9.6,10.8,SELL,SELL,Y,,,
+POWERINDIA,Capital Goods,Mid,-4.3,-11.0,-11.0,18.7,SELL,SELL,,,,
+HONAUT,Capital Goods,Mid,-0.8,-5.0,-14.4,25.9,SELL,SELL,,,,
+HUDCO,Financial Services,Mid,-3.0,-8.1,-18.0,1.0,SELL,SELL,,,,
+ICICIGI,Financial Services,Mid,2.4,-3.3,-14.0,-10.0,SELL,SELL,Y,,UP,
+ICICIAMC,Financial Services,Mid,1.3,4.2,-5.0,12.7,BUY,,,,,
+ICICIPRULI,Financial Services,Mid,-7.8,-13.3,-9.6,-10.6,SELL,SELL,,,,
+IDFCFIRSTB,Financial Services,Mid,-6.1,-6.8,1.1,33.5,SELL,SELL,Y,Y,,DN
+ITCHOTELS,Consumer Services,Mid,0.3,-0.6,-10.1,8.1,SELL,SELL,Y,,DN,
+INDIANB,Financial Services,Mid,-5.0,-11.1,-2.0,-6.2,SELL,SELL,,,,
+IRCTC,Consumer Services,Mid,-3.6,-5.8,-10.4,-11.4,SELL,SELL,,,,
+IREDA,Financial Services,Mid,3.2,-1.7,-10.9,-0.4,BUY,SELL,Y,,UP,
+INDUSTOWER,Telecommunication,Mid,-4.0,-5.6,-0.8,-10.4,SELL,SELL,Y,,DN,
+INDUSINDBK,Financial Services,Mid,-6.1,-11.8,-4.9,15.4,SELL,SELL,,,,
+NAUKRI,Consumer Services,Mid,-4.2,-4.9,22.1,26.0,SELL,BUY,Y,,,
+IPCALAB,Healthcare,Mid,-2.7,-1.8,13.2,30.8,SELL,BUY,Y,,DN,
+JKCEMENT,Construction Materials,Mid,-2.5,-3.0,-9.7,-3.4,SELL,SELL,Y,,UP,
+JSWENERGY,Power,Mid,-4.4,-4.9,-12.4,1.1,SELL,SELL,,,,
+JSWINFRA,Services,Mid,-5.5,2.1,6.0,44.4,BUY,BUY,,,,
+JSL,Metals & Mining,Mid,0.2,6.1,8.2,4.2,BUY,BUY,,,,
+JUBLFOOD,Consumer Services,Mid,-4.8,-5.8,8.6,5.0,SELL,SELL,Y,Y,UP,DN
+KPRMILL,Textiles,Mid,-2.0,-6.7,-6.7,32.7,SELL,SELL,Y,Y,DN,DN
+KEI,Capital Goods,Mid,-1.7,-21.7,-14.8,11.1,SELL,SELL,,,,
+KPITTECH,Information Technology,Mid,-4.6,-13.7,-8.9,-26.9,SELL,SELL,,,,
+KALYANKJIL,Consumer Durables,Mid,-2.5,-5.1,47.0,44.7,SELL,SELL,,Y,,DN
+LTF,Financial Services,Mid,-10.4,-14.9,-13.4,14.8,SELL,SELL,Y,Y,,DN
+LTTS,Information Technology,Mid,-4.0,-12.4,-0.2,-4.5,SELL,SELL,,,,
+LGEINDIA,Consumer Durables,Mid,3.0,1.0,9.3,30.0,BUY,,,,,
+LICHSGFIN,Financial Services,Mid,-0.3,4.7,4.0,11.1,BUY,BUY,,,,
+LAURUSLABS,Healthcare,Mid,0.4,5.2,31.8,93.4,BUY,BUY,,,,
+LENSKART,Consumer Services,Mid,-5.5,-1.4,23.2,34.7,SELL,,Y,,DN,
+LICI,Financial Services,Mid,-1.6,-4.7,-7.9,10.9,SELL,SELL,Y,,UP,
+LINDEINDIA,Chemicals,Mid,-0.9,-1.9,-12.8,-14.0,SELL,SELL,,,,
+LLOYDSME,Metals & Mining,Mid,-0.1,3.4,2.4,33.8,BUY,BUY,Y,Y,UP,UP
+LUPIN,Healthcare,Mid,-3.0,-5.4,-13.1,-8.3,SELL,SELL,,,,
+MRF,Automobile and Auto Components,Mid,-1.4,-8.0,-6.7,-2.5,SELL,SELL,,,,
+M&MFIN,Financial Services,Mid,-6.4,-11.5,6.1,18.3,SELL,SELL,,,,
+MANKIND,Healthcare,Mid,1.4,4.0,1.2,25.9,BUY,BUY,,Y,,UP
+MARICO,Fast Moving Consumer Goods,Mid,-3.3,-2.1,-5.8,5.9,SELL,SELL,Y,,,
+MFSL,Financial Services,Mid,-10.4,-11.5,-13.9,-4.9,SELL,SELL,Y,Y,DN,DN
+MOTILALOFS,Financial Services,Mid,-0.1,-3.6,5.1,46.8,BUY,BUY,,,,
+MPHASIS,Information Technology,Mid,-2.4,-9.0,1.1,2.7,SELL,SELL,,,,
+MCX,Financial Services,Mid,1.8,-2.4,13.9,36.2,BUY,BUY,,,,
+NHPC,Power,Mid,-3.4,-4.3,-8.6,-2.3,SELL,SELL,Y,Y,,DN
+NLCINDIA,Power,Mid,-2.7,-2.8,-17.5,-6.7,SELL,SELL,,,,
+NMDC,Metals & Mining,Mid,-3.5,-12.2,-9.5,-0.9,SELL,SELL,,,,
+NTPCGREEN,Power,Mid,-1.7,2.5,-4.9,-5.6,BUY,BUY,,Y,,UP
+NATIONALUM,Metals & Mining,Mid,-1.9,-9.5,4.2,-13.4,SELL,SELL,,,,
+NAM-INDIA,Financial Services,Mid,-6.3,-7.4,-10.5,32.3,SELL,SELL,,,,
+OBEROIRLTY,Realty,Mid,-2.5,-3.7,-3.4,19.7,SELL,SELL,Y,Y,DN,UP
+OIL,Oil Gas & Consumable Fuels,Mid,-0.4,-3.6,10.9,-3.0,SELL,SELL,Y,Y,DN,DN
+PAYTM,Financial Services,Mid,-7.5,-2.3,38.2,66.7,SELL,BUY,Y,,DN,
+OFSS,Information Technology,Mid,-2.9,-14.9,-2.9,57.0,SELL,SELL,,Y,,DN
+POLICYBZR,Financial Services,Mid,-39.3,-41.5,-34.8,-23.2,SELL,SELL,Y,Y,,DN
+PIIND,Chemicals,Mid,-3.8,-2.2,-10.8,-16.9,SELL,SELL,,,,
+PAGEIND,Textiles,Mid,0.0,3.8,-12.9,10.5,BUY,SELL,Y,Y,,UP
+PATANJALI,Fast Moving Consumer Goods,Mid,-7.2,8.7,-8.7,-18.9,BUY,BUY,,,,
+PERSISTENT,Information Technology,Mid,-1.4,-5.4,15.9,1.6,SELL,SELL,,,,
+PETRONET,Oil Gas & Consumable Fuels,Mid,1.7,-4.7,4.1,13.7,SELL,BUY,Y,,DN,
+PHOENIXLTD,Realty,Mid,-0.6,2.3,-3.4,27.5,BUY,BUY,,Y,,UP
+POLYCAB,Capital Goods,Mid,-1.8,-13.2,-14.9,19.8,SELL,SELL,,,,
+PREMIERENE,Capital Goods,Mid,-1.6,-13.9,-15.0,-2.6,SELL,SELL,,,,
+PRESTIGE,Realty,Mid,-1.9,-11.1,-13.2,26.1,SELL,SELL,,,,
+RADICO,Fast Moving Consumer Goods,Mid,-0.0,-0.8,12.2,69.9,SELL,BUY,Y,,DN,
+RVNL,Construction,Mid,-5.6,-5.1,-15.6,-23.3,SELL,SELL,,,,
+SBICARD,Financial Services,Mid,-7.0,-8.4,-2.3,-7.5,SELL,SELL,,Y,,DN
+SJVN,Power,Mid,-4.5,-6.9,-16.5,-10.1,SELL,SELL,,,,
+SRF,Chemicals,Mid,-3.8,-4.6,-12.6,1.3,SELL,SELL,,,,
+SCHAEFFLER,Automobile and Auto Components,Mid,-3.6,-2.7,-4.9,4.6,SELL,SELL,Y,Y,DN,DN
+SAIL,Metals & Mining,Mid,5.7,-5.7,9.4,18.6,BUY,BUY,Y,Y,,UP
+SUNDARMFIN,Financial Services,Mid,-8.3,-4.0,-4.5,-3.5,SELL,SELL,Y,Y,DN,DN
+SUPREMEIND,Capital Goods,Mid,0.4,-2.4,6.0,-4.0,SELL,SELL,Y,Y,UP,DN
+SUZLON,Capital Goods,Mid,-8.1,-16.8,-31.5,-3.1,SELL,SELL,,,,
+SWIGGY,Consumer Services,Mid,-10.7,-10.0,1.9,-7.9,SELL,SELL,Y,,,
+TATACOMM,Telecommunication,Mid,-2.6,-4.4,-15.0,19.9,SELL,SELL,,Y,,DN
+TATAELXSI,Information Technology,Mid,-2.1,-11.9,-14.2,-24.4,SELL,SELL,,,,
+TATAINVEST,Financial Services,Mid,-7.5,-1.8,-5.5,8.7,SELL,SELL,Y,Y,,DN
+NIACL,Financial Services,Mid,-10.4,-12.2,-9.8,37.4,SELL,SELL,,,,
+THERMAX,Capital Goods,Mid,-4.1,-14.7,-32.0,1.4,SELL,SELL,,,,
+TORNTPOWER,Power,Mid,-0.3,2.2,-10.9,-6.4,SELL,SELL,,,,
+TIINDIA,Automobile and Auto Components,Mid,-6.4,-13.4,-22.0,-6.1,SELL,SELL,,,,
+UNOMINDA,Automobile and Auto Components,Mid,-5.1,-8.8,3.8,13.6,SELL,SELL,,Y,,DN
+UPL,Chemicals,Mid,-4.6,-5.0,-8.4,-9.1,SELL,SELL,,,,
+UBL,Fast Moving Consumer Goods,Mid,-0.9,-8.0,-10.7,-18.4,SELL,SELL,,,,
+VMM,Consumer Services,Mid,-3.6,-9.4,-17.5,-7.1,SELL,SELL,Y,,DN,
+IDEA,Telecommunication,Mid,-5.9,-6.3,-7.3,56.5,SELL,SELL,Y,Y,,UP
+VOLTAS,Consumer Durables,Mid,1.6,-6.4,-13.4,-9.2,SELL,SELL,,,,
+WAAREEENER,Capital Goods,Mid,-2.9,-7.0,-15.8,-21.1,SELL,SELL,,,,
+YESBANK,Financial Services,Mid,-8.8,-7.4,-12.8,18.4,SELL,SELL,Y,,,
+ACMESOLAR,Power,Small,-4.6,8.8,11.2,59.3,BUY,BUY,,,,
+AADHARHFC,Financial Services,Small,-5.9,-7.9,-19.5,-1.8,SELL,SELL,,,,
+AARTIIND,Chemicals,Small,-3.0,-8.1,-0.0,17.9,SELL,SELL,Y,,,
+AAVAS,Financial Services,Small,-4.0,-0.1,-16.2,10.7,SELL,SELL,Y,,,
+ACE,Capital Goods,Small,-1.4,10.5,20.7,50.1,BUY,BUY,,,,
+ACUTAAS,Healthcare,Small,2.2,4.0,-11.0,55.8,SELL,BUY,Y,Y,,UP
+ABFRL,Consumer Services,Small,-5.7,-10.9,-25.0,-19.5,SELL,SELL,,,,
+ABLBL,Consumer Services,Small,-5.2,-11.7,-21.7,-17.6,SELL,SELL,,,,
+ABREL,Realty,Small,-1.8,-13.0,-17.0,3.2,SELL,SELL,,,,
+ABSLAMC,Financial Services,Small,-4.5,-6.7,-15.6,9.7,SELL,SELL,,Y,,DN
+CPPLUS,Capital Goods,Small,2.7,5.1,7.8,108.4,BUY,BUY,Y,Y,,UP
+AEGISLOG,Oil Gas & Consumable Fuels,Small,-7.3,4.4,0.4,125.3,SELL,BUY,Y,,DN,
+AEGISVOPAK,Oil Gas & Consumable Fuels,Small,-2.6,9.2,25.2,73.2,BUY,BUY,Y,,UP,
+AFCONS,Construction,Small,-4.5,-13.0,-20.4,-11.8,SELL,SELL,,,,
+AFFLE,Information Technology,Small,-5.0,-5.3,3.8,6.4,SELL,SELL,,Y,,DN
+ABDL,Fast Moving Consumer Goods,Small,11.0,16.3,6.8,71.1,BUY,BUY,,,,
+ARE&M,Automobile and Auto Components,Small,-2.3,-13.2,-9.7,7.0,SELL,SELL,,,,
+AMBER,Consumer Durables,Small,-1.7,-9.7,-7.1,9.5,SELL,SELL,,,,
+ANANDRATHI,Financial Services,Small,-2.3,-3.4,7.0,33.0,SELL,SELL,Y,Y,,DN
+ANANTRAJ,Realty,Small,-0.4,0.6,13.2,34.7,SELL,BUY,Y,,DN,
+ANGELONE,Financial Services,Small,-6.3,-3.7,-19.9,15.1,SELL,SELL,Y,,,
+ANURAS,Chemicals,Small,-1.3,-6.2,-7.0,-6.4,SELL,SELL,,,,
+APTUS,Financial Services,Small,-3.1,-5.7,-18.8,18.8,SELL,SELL,,,,
+ASAHIINDIA,Automobile and Auto Components,Small,-2.6,-1.1,6.0,14.6,SELL,SELL,Y,Y,DN,DN
+ASTERDM,Healthcare,Small,-0.4,-1.1,-5.5,13.6,SELL,SELL,,,,
+ATHERENERG,Automobile and Auto Components,Small,-7.6,-16.9,24.8,87.2,SELL,SELL,Y,Y,,DN
+ATUL,Chemicals,Small,-1.8,-5.1,-5.8,-3.2,SELL,SELL,,,,
+BEML,Capital Goods,Small,-5.5,3.0,6.8,34.7,SELL,BUY,Y,,DN,
+BLS,Consumer Services,Small,-2.7,-7.3,-11.8,-16.9,SELL,SELL,,,,
+BALRAMCHIN,Fast Moving Consumer Goods,Small,2.2,-2.6,19.1,38.1,BUY,BUY,Y,,UP,
+BANDHANBNK,Financial Services,Small,-1.4,11.4,-10.4,25.6,BUY,BUY,,Y,,UP
+BATAINDIA,Consumer Durables,Small,-1.7,-9.0,-6.9,-1.0,SELL,SELL,,,,
+BAYERCROP,Chemicals,Small,-3.3,-8.3,-11.1,-22.4,SELL,SELL,,,,
+BELRISE,Automobile and Auto Components,Small,-0.2,5.4,2.8,28.4,BUY,BUY,,,,
+BIKAJI,Fast Moving Consumer Goods,Small,-1.9,-13.2,-17.0,-13.2,SELL,SELL,Y,,,
+BSOFT,Information Technology,Small,-3.5,-6.8,-2.3,-25.8,SELL,SELL,,,,
+BLUEDART,Services,Small,-3.2,-5.9,-5.4,-5.3,SELL,SELL,,,,
+BLUEJET,Healthcare,Small,-4.7,-3.1,-1.3,57.0,SELL,SELL,Y,Y,,DN
+BBTC,Fast Moving Consumer Goods,Small,-5.5,-8.2,-11.2,-2.2,SELL,SELL,Y,Y,,DN
+FIRSTCRY,Consumer Services,Small,6.5,2.2,-17.6,-16.9,BUY,SELL,Y,,UP,
+BRIGADE,Realty,Small,-5.9,-11.5,16.2,12.9,SELL,SELL,,Y,,DN
+MAPMYINDIA,Information Technology,Small,-7.2,-15.6,-6.2,-2.0,SELL,SELL,,,,
+CCL,Fast Moving Consumer Goods,Small,-2.1,-4.6,-13.1,-5.7,SELL,SELL,,,,
+CESC,Power,Small,-5.8,-8.2,-18.2,-9.2,SELL,SELL,,,,
+CIEINDIA,Automobile and Auto Components,Small,-2.9,-3.0,-20.0,-15.7,SELL,SELL,,,,
+CANFINHOME,Financial Services,Small,-2.5,-6.9,-15.3,-9.2,SELL,SELL,,,,
+CANHLIFE,Financial Services,Small,-4.2,-5.9,3.9,1.8,SELL,,Y,,,
+CAPLIPOINT,Healthcare,Small,0.6,11.2,10.3,79.1,BUY,BUY,,,,
+CGCL,Financial Services,Small,-6.5,-2.6,9.7,50.2,SELL,SELL,Y,Y,DN,DN
+CARBORUNIV,Capital Goods,Small,2.6,12.3,9.1,45.9,BUY,BUY,,,,
+CARTRADE,Consumer Services,Small,0.1,-2.7,6.2,71.7,SELL,BUY,Y,,DN,
+CASTROLIND,Oil Gas & Consumable Fuels,Small,3.3,9.5,13.2,17.3,BUY,BUY,,,,
+CEATLTD,Automobile and Auto Components,Small,-4.6,-5.1,-13.9,-2.7,SELL,SELL,Y,Y,DN,DN
+CEMPRO,Construction,Small,-7.0,0.1,-14.3,128.2,SELL,SELL,Y,,DN,
+CENTRALBK,Financial Services,Small,-3.4,0.2,-6.9,-7.5,SELL,SELL,Y,Y,DN,DN
+CDSL,Financial Services,Small,-4.6,-8.3,-3.9,9.4,SELL,SELL,,Y,,DN
+CHALET,Consumer Services,Small,-2.7,-6.0,1.5,16.6,SELL,SELL,Y,Y,DN,DN
+CHAMBLFERT,Chemicals,Small,-0.5,1.7,-11.5,-6.7,SELL,SELL,,,,
+CHENNPETRO,Oil Gas & Consumable Fuels,Small,3.2,5.0,32.1,45.2,BUY,BUY,Y,,UP,
+CHOICEIN,Financial Services,Small,-1.2,-3.7,-3.7,18.5,SELL,SELL,Y,,,
+CHOLAHLDNG,Financial Services,Small,-4.7,-6.4,-17.5,-0.3,SELL,SELL,,,,
+CUB,Financial Services,Small,-5.9,-6.7,-0.9,19.6,SELL,SELL,Y,Y,,DN
+CLEAN,Chemicals,Small,-6.3,-4.6,0.9,10.5,SELL,SELL,Y,Y,,DN
+COHANCE,Healthcare,Small,2.1,1.3,2.1,50.4,BUY,BUY,,Y,,UP
+CAMS,Financial Services,Small,-3.9,-13.5,-14.5,3.3,SELL,SELL,,,,
+CONCORDBIO,Healthcare,Small,-7.6,-2.1,10.7,38.9,SELL,SELL,Y,Y,,DN
+CRAFTSMAN,Automobile and Auto Components,Small,-0.0,-5.3,14.4,56.3,SELL,SELL,Y,Y,,DN
+CREDITACC,Financial Services,Small,-9.0,-9.4,-19.9,4.9,SELL,SELL,,,,
+CROMPTON,Consumer Durables,Small,-3.3,-9.0,-20.7,-6.3,SELL,SELL,,,,
+CYIENT,Information Technology,Small,0.5,-7.7,23.3,34.8,BUY,BUY,,,,
+DCMSHRIRAM,Diversified,Small,-6.0,-9.4,-9.4,-18.3,SELL,SELL,,,,
+DOMS,Fast Moving Consumer Goods,Small,-3.2,-9.0,-13.0,-13.6,SELL,SELL,,,,
+DATAPATTNS,Capital Goods,Small,-4.8,-5.6,-8.1,40.1,SELL,SELL,,,,
+DEEPAKFERT,Chemicals,Small,-0.5,-5.2,-19.3,35.3,SELL,SELL,,,,
+DEEPAKNTR,Chemicals,Small,-4.7,-12.1,-1.7,12.2,SELL,SELL,,,,
+DELHIVERY,Services,Small,-3.5,-8.9,-18.4,-2.5,SELL,SELL,,,,
+DEVYANI,Consumer Services,Small,-10.1,-6.4,13.6,34.7,SELL,SELL,Y,Y,,DN
+LALPATHLAB,Healthcare,Small,3.1,1.8,19.6,48.9,BUY,BUY,,,,
+DUMMYHEG,Metals & Mining,Small,,,,,,,,,,
+EIDPARRY,Fast Moving Consumer Goods,Small,1.0,-12.1,-4.5,-13.0,SELL,SELL,,,,
+EIHOTEL,Consumer Services,Small,-0.1,7.5,-6.3,5.8,BUY,SELL,Y,Y,UP,DN
+ELECON,Capital Goods,Small,12.8,15.2,-12.2,22.6,BUY,BUY,Y,Y,,UP
+ELGIEQUIP,Capital Goods,Small,-1.2,-4.1,1.7,26.0,SELL,SELL,Y,Y,DN,DN
+EMAMILTD,Fast Moving Consumer Goods,Small,-1.5,5.6,-7.8,-3.5,BUY,SELL,,Y,,UP
+EMCURE,Healthcare,Small,-2.1,4.5,4.4,25.2,SELL,BUY,Y,,DN,
+EMMVEE,Capital Goods,Small,-6.6,-1.1,-12.2,46.3,SELL,,Y,,,
+ENGINERSIN,Construction,Small,4.4,20.6,34.8,57.5,BUY,BUY,,,,
+ERIS,Healthcare,Small,-5.5,-7.4,-17.0,-9.3,SELL,SELL,,,,
+FACT,Chemicals,Small,-4.8,-7.4,-13.3,-1.8,SELL,SELL,Y,,,
+FINCABLES,Capital Goods,Small,-1.5,16.8,28.9,82.6,BUY,BUY,,,,
+FSL,Services,Small,-6.2,-4.5,5.9,16.1,SELL,SELL,Y,Y,,DN
+FIVESTAR,Financial Services,Small,-4.0,-5.8,-7.0,40.3,SELL,SELL,Y,Y,DN,DN
+FORCEMOT,Automobile and Auto Components,Small,-1.8,-2.9,-12.1,-19.5,SELL,SELL,,,,
+GABRIEL,Automobile and Auto Components,Small,-9.5,-7.4,7.4,52.2,SELL,SELL,Y,Y,DN,UP
+GALLANTT,Capital Goods,Small,-1.1,-4.9,-20.6,-2.9,SELL,SELL,,,,
+GRSE,Capital Goods,Small,-6.9,-12.7,-19.2,-0.7,SELL,SELL,,,,
+GILLETTE,Fast Moving Consumer Goods,Small,-1.1,-5.4,-8.2,-7.7,SELL,SELL,,,,
+GLAND,Healthcare,Small,1.0,2.1,21.4,75.8,BUY,BUY,,,,
+GODIGIT,Financial Services,Small,5.5,-0.9,-18.5,-20.5,SELL,SELL,Y,,UP,
+GPIL,Capital Goods,Small,-3.7,-7.9,-12.4,-18.6,SELL,SELL,,,,
+GRANULES,Healthcare,Small,0.9,5.2,5.8,42.3,BUY,BUY,Y,,UP,
+GRAPHITE,Capital Goods,Small,-3.3,13.9,28.9,26.9,BUY,BUY,,,,
+GRAVITA,Metals & Mining,Small,-6.1,-18.4,-12.9,13.5,SELL,SELL,,,,
+GESHIP,Services,Small,6.8,20.0,11.0,10.4,BUY,BUY,,,,
+GMDCLTD,Metals & Mining,Small,-6.2,-6.1,-13.2,-9.2,SELL,SELL,,,,
+HBLENGINE,Capital Goods,Small,4.1,21.6,-2.9,19.8,BUY,BUY,,,,
+HEGAM,Capital Goods,Small,3.3,-67.0,-53.7,-56.0,SELL,SELL,,,,
+HFCL,Telecommunication,Small,-4.6,-15.2,3.2,194.5,SELL,SELL,,,,
+HSCL,Chemicals,Small,0.3,1.8,1.3,50.0,SELL,SELL,,,,
+HINDCOPPER,Metals & Mining,Small,-6.3,-9.0,-3.4,-3.5,SELL,SELL,,,,
+HOMEFIRST,Financial Services,Small,-9.1,-5.3,-8.2,15.5,SELL,SELL,Y,Y,DN,DN
+HONASA,Fast Moving Consumer Goods,Small,-5.0,-6.4,-3.6,48.9,SELL,SELL,Y,Y,DN,DN
+IDBI,Financial Services,Small,1.1,-7.8,-0.7,20.5,SELL,SELL,,,,
+IFCI,Financial Services,Small,-6.7,-21.0,-7.7,35.2,SELL,SELL,,,,
+IIFL,Financial Services,Small,-4.1,-8.4,14.2,36.2,SELL,SELL,Y,Y,DN,UP
+IRB,Construction,Small,-5.7,-12.4,-20.6,-21.8,SELL,SELL,,,,
+IRCON,Construction,Small,-5.2,-12.8,-22.7,-16.7,SELL,SELL,,,,
+ITI,Telecommunication,Small,-3.5,-9.8,-18.4,-4.1,SELL,SELL,,,,
+INDGN,Healthcare,Small,4.0,0.7,20.2,30.9,BUY,BUY,,,,
+INDIACEM,Construction Materials,Small,-9.9,-17.2,-19.8,-14.5,SELL,SELL,,,,
+INDIAMART,Consumer Services,Small,-0.4,-7.2,-14.2,-17.0,SELL,SELL,,,,
+IEX,Financial Services,Small,-2.8,-8.9,-11.2,-6.7,SELL,SELL,,,,
+IOB,Financial Services,Small,-2.0,-3.6,-9.2,-4.6,SELL,SELL,,,,
+IGL,Oil Gas & Consumable Fuels,Small,-2.6,-5.1,-8.3,-2.4,SELL,SELL,,,,
+INOXWIND,Capital Goods,Small,-7.0,2.9,-19.5,-9.0,SELL,SELL,Y,,,
+INTELLECT,Information Technology,Small,-3.4,-8.1,-16.3,-3.9,SELL,SELL,,,,
+IGIL,Services,Small,-2.4,-6.5,-11.1,0.3,SELL,SELL,Y,,UP,
+IKS,Information Technology,Small,-4.2,3.3,-2.5,33.4,SELL,BUY,Y,,DN,
+JBMA,Automobile and Auto Components,Small,-4.0,-8.6,-19.9,1.5,SELL,SELL,,,,
+JKTYRE,Automobile and Auto Components,Small,-2.5,-10.8,-18.1,-12.3,SELL,SELL,,,,
+JMFINANCIL,Financial Services,Small,-0.5,-1.8,-2.8,6.2,SELL,SELL,Y,Y,DN,UP
+JSWCEMENT,Construction Materials,Small,-3.9,-11.0,-17.4,-2.9,SELL,SELL,,,,
+JSWDULUX,Consumer Durables,Small,-0.9,-1.8,-3.2,5.5,SELL,SELL,Y,Y,DN,DN
+JAINREC,Metals & Mining,Small,-2.0,3.1,-20.3,-38.4,SELL,,Y,,DN,
+JPPOWER,Power,Small,-5.1,-6.7,-14.1,2.2,SELL,SELL,,,,
+J&KBANK,Financial Services,Small,-3.9,-5.0,-14.8,23.5,SELL,SELL,,,,
+JINDALSAW,Capital Goods,Small,-3.4,-10.6,5.3,45.7,SELL,SELL,,Y,,DN
+JUBLINGREA,Chemicals,Small,5.8,-3.2,-2.3,13.2,SELL,SELL,,,,
+JUBLPHARMA,Healthcare,Small,-2.1,18.9,8.3,25.6,BUY,BUY,,,,
+JWL,Capital Goods,Small,-2.6,-7.4,-16.4,-13.2,SELL,SELL,,,,
+JYOTICNC,Capital Goods,Small,-2.0,6.8,36.3,37.4,BUY,BUY,,,,
+KAJARIACER,Consumer Durables,Small,1.3,-3.2,0.1,23.7,SELL,SELL,Y,Y,DN,UP
+KPIL,Construction,Small,-1.7,-1.7,0.5,25.5,SELL,SELL,Y,Y,DN,DN
+KARURVYSYA,Financial Services,Small,-0.5,-8.4,9.2,17.7,SELL,SELL,,Y,,DN
+KAYNES,Capital Goods,Small,4.4,-2.1,14.2,2.0,BUY,SELL,Y,Y,UP,UP
+KEC,Construction,Small,-1.6,-7.5,-24.4,-26.4,SELL,SELL,,,,
+KFINTECH,Financial Services,Small,-3.4,-10.6,1.1,-2.8,SELL,SELL,,Y,,DN
+KIRLOSENG,Capital Goods,Small,1.6,4.8,-5.0,59.3,BUY,BUY,Y,Y,UP,UP
+KIMS,Healthcare,Small,-1.6,2.9,-7.2,24.1,SELL,SELL,Y,Y,DN,DN
+LTFOODS,Fast Moving Consumer Goods,Small,-3.3,-8.6,7.5,5.7,SELL,SELL,Y,Y,DN,DN
+LATENTVIEW,Information Technology,Small,-4.6,-11.4,-14.3,-23.4,SELL,SELL,,,,
+THELEELA,Consumer Services,Small,-0.0,-5.9,12.7,29.1,BUY,BUY,Y,,UP,
+LEMONTREE,Consumer Services,Small,-3.7,-2.6,-13.0,-4.4,SELL,SELL,Y,,,
+MMTC,Services,Small,-4.6,-8.7,-16.0,2.8,SELL,SELL,,,,
+MGL,Oil Gas & Consumable Fuels,Small,-1.0,-1.2,-6.1,12.6,SELL,SELL,Y,,DN,
+MANAPPURAM,Financial Services,Small,-1.2,-7.2,-2.1,23.9,SELL,SELL,Y,,UP,
+MRPL,Oil Gas & Consumable Fuels,Small,5.7,2.0,15.9,-4.6,BUY,BUY,Y,Y,UP,UP
+MEESHO,Consumer Services,Small,-11.1,4.0,11.9,45.7,SELL,,Y,,DN,
+MINDACORP,Automobile and Auto Components,Small,-1.4,-5.2,-4.6,34.9,SELL,SELL,,,,
+MSUMI,Automobile and Auto Components,Small,-1.6,-6.0,-15.4,-5.4,SELL,SELL,,,,
+NATCOPHARM,Healthcare,Small,3.2,-0.0,-9.8,-18.0,SELL,SELL,,,,
+NBCC,Construction,Small,-1.7,-6.6,-21.4,-2.4,SELL,SELL,,,,
+NCC,Construction,Small,-3.8,-12.8,-12.8,-7.3,SELL,SELL,,,,
+NSLNISP,Metals & Mining,Small,-0.7,-8.6,-3.9,18.8,SELL,SELL,Y,,,
+NH,Healthcare,Small,-4.3,-5.5,-9.0,11.2,SELL,SELL,Y,Y,DN,DN
+NAVA,Power,Small,-0.0,-3.1,-10.4,-0.8,SELL,SELL,,,,
+NAVINFLUOR,Chemicals,Small,-0.1,-2.8,10.2,43.3,BUY,BUY,,,,
+NETWEB,Information Technology,Small,-4.2,-11.1,4.1,46.4,SELL,SELL,,,,
+NEULANDLAB,Healthcare,Small,-5.1,-7.0,12.9,72.4,SELL,SELL,,Y,,DN
+NEWGEN,Information Technology,Small,-4.4,-10.4,-0.4,8.8,SELL,SELL,,,,
+NIVABUPA,Financial Services,Small,-10.0,-10.5,-15.7,0.2,SELL,SELL,,,,
+NUVAMA,Financial Services,Small,-2.0,-6.3,-9.7,45.1,SELL,SELL,,,,
+NUVOCO,Construction Materials,Small,-1.1,5.1,6.1,14.4,BUY,BUY,Y,Y,UP,UP
+OLAELEC,Automobile and Auto Components,Small,-1.8,-9.8,-18.5,30.9,SELL,SELL,Y,,DN,
+OLECTRA,Automobile and Auto Components,Small,-4.8,-9.2,-24.6,13.6,SELL,SELL,Y,,,
+ONESOURCE,Healthcare,Small,-0.1,4.5,-6.0,13.0,BUY,SELL,,Y,,DN
+PCBL,Chemicals,Small,-4.2,5.1,6.1,30.5,BUY,BUY,,,,
+PGEL,Consumer Durables,Small,-3.3,-13.4,-10.3,10.7,SELL,SELL,,,,
+PNBHOUSING,Financial Services,Small,-0.8,-2.8,6.6,43.5,SELL,SELL,,Y,,DN
+PTCIL,Capital Goods,Small,-0.8,-0.7,25.5,49.1,BUY,BUY,Y,,UP,
+PVRINOX,Media Entertainment & Publication,Small,-10.9,-1.5,20.7,26.2,SELL,SELL,Y,Y,DN,DN
+PARADEEP,Chemicals,Small,-0.0,-2.7,10.9,34.9,BUY,BUY,,,,
+PFIZER,Healthcare,Small,-1.1,-15.6,-9.5,-17.8,SELL,SELL,,,,
+PWL,Consumer Services,Small,-7.3,8.7,-5.2,40.5,SELL,,Y,,DN,
+PINELABS,Financial Services,Small,-13.1,4.7,7.5,12.4,SELL,,Y,,DN,
+PIRAMALFIN,Financial Services,Small,-4.2,-8.1,-3.0,20.6,SELL,,Y,,DN,
+PPLPHARMA,Healthcare,Small,-0.4,-2.4,24.3,47.2,SELL,BUY,Y,,UP,
+POLYMED,Healthcare,Small,-3.5,-6.8,-5.1,23.2,SELL,SELL,Y,Y,UP,DN
+POONAWALLA,Financial Services,Small,-6.5,-4.9,-3.4,12.2,SELL,SELL,Y,Y,DN,DN
+PFOCUS,Media Entertainment & Publication,Small,-10.9,10.9,30.9,-3.8,BUY,BUY,,,,
+RRKABEL,Capital Goods,Small,1.4,-14.4,4.7,88.4,SELL,SELL,,,,
+RBLBANK,Financial Services,Small,-3.9,6.9,14.7,35.5,BUY,BUY,,,,
+RHIM,Capital Goods,Small,1.2,4.0,-4.2,6.1,BUY,BUY,,Y,,UP
+RITES,Construction,Small,-4.5,-9.8,-11.9,3.9,SELL,SELL,,,,
+RAILTEL,Telecommunication,Small,-2.4,-6.6,-18.0,-1.8,SELL,SELL,,,,
+RAINBOW,Healthcare,Small,-4.5,-3.4,-3.6,19.1,SELL,SELL,,Y,,DN
+RKFORGE,Automobile and Auto Components,Small,-0.1,-3.8,24.5,42.5,BUY,BUY,Y,,UP,
+REDINGTON,Services,Small,-1.3,13.2,48.3,105.8,BUY,BUY,,,,
+RPOWER,Power,Small,-4.8,-10.0,-24.9,-12.1,SELL,SELL,,,,
+SBFC,Financial Services,Small,-5.2,-13.3,-6.0,3.8,SELL,SELL,,,,
+SAGILITY,Information Technology,Small,-6.6,-9.5,3.5,2.3,SELL,SELL,Y,Y,DN,DN
+SAILIFE,Healthcare,Small,-1.0,8.5,28.0,65.1,BUY,BUY,,,,
+SAMMAANCAP,Financial Services,Small,-2.9,-5.5,-20.5,-6.0,SELL,SELL,,,,
+SAPPHIRE,Consumer Services,Small,-9.7,-8.6,15.8,39.1,SELL,SELL,Y,Y,DN,DN
+SARDAEN,Metals & Mining,Small,-1.0,-0.1,-0.0,-3.7,SELL,SELL,,,,
+SAREGAMA,Media Entertainment & Publication,Small,-2.1,2.7,-0.3,53.7,SELL,SELL,Y,Y,DN,DN
+SCHNEIDER,Capital Goods,Small,-1.7,-2.1,-17.9,31.8,SELL,SELL,Y,,DN,
+SCI,Services,Small,-3.0,-5.5,-9.9,19.7,SELL,SELL,,,,
+SHYAMMETL,Capital Goods,Small,-1.7,-1.7,12.2,36.3,BUY,BUY,,,,
+SIGNATURE,Realty,Small,1.2,0.3,1.1,3.0,SELL,SELL,Y,Y,UP,UP
+SOBHA,Realty,Small,-0.4,-2.3,-14.2,6.5,SELL,SELL,,,,
+SONACOMS,Automobile and Auto Components,Small,0.2,-0.3,22.3,63.7,BUY,BUY,,,,
+SONATSOFTW,Information Technology,Small,-5.6,-8.0,-0.1,17.9,SELL,SELL,,,,
+STARHEALTH,Financial Services,Small,0.1,-3.9,-7.3,16.1,SELL,SELL,,,,
+SUMICHEM,Chemicals,Small,-5.9,-16.8,-2.2,12.5,SELL,SELL,,,,
+SUNTV,Media Entertainment & Publication,Small,8.2,13.8,4.1,-10.0,BUY,BUY,Y,Y,,UP
+SPLPETRO,Chemicals,Small,-1.0,17.4,21.7,18.2,BUY,BUY,,,,
+SWANCORP,Chemicals,Small,-4.8,-1.7,-7.7,-8.2,SELL,SELL,Y,,DN,
+SYNGENE,Healthcare,Small,-1.4,-7.1,-15.4,-4.6,SELL,SELL,,,,
+SYRMA,Capital Goods,Small,-1.7,19.1,22.5,115.2,BUY,BUY,,,,
+TBOTEK,Consumer Services,Small,-1.8,-4.1,9.6,53.0,SELL,BUY,Y,,DN,
+TATACHEM,Chemicals,Small,-7.5,-3.0,-9.5,-2.9,SELL,SELL,Y,Y,,DN
+TATATECH,Information Technology,Small,-2.5,-16.0,-2.1,30.9,SELL,SELL,,,,
+TTML,Telecommunication,Small,-2.9,-10.4,-19.7,-4.9,SELL,SELL,,,,
+TECHNOE,Construction,Small,-0.4,2.7,-7.2,-3.9,BUY,SELL,,Y,,DN
+TEGA,Capital Goods,Small,-0.5,29.9,23.4,19.3,BUY,BUY,,,,
+TEJASNET,Telecommunication,Small,-5.4,-12.7,-18.9,16.5,SELL,SELL,,,,
+TENNIND,Automobile and Auto Components,Small,-5.3,-4.7,-16.8,-5.1,SELL,,Y,,,
+RAMCOCEM,Construction Materials,Small,-5.1,-4.7,-10.9,-9.2,SELL,SELL,,,,
+TIMKEN,Capital Goods,Small,-1.5,-0.6,-10.3,-6.4,SELL,SELL,Y,,DN,
+TITAGARH,Capital Goods,Small,-2.0,-0.0,-7.4,33.0,SELL,SELL,Y,,,
+TARIL,Capital Goods,Small,-3.7,-13.8,-24.3,-1.0,SELL,SELL,,,,
+TRAVELFOOD,Consumer Services,Small,-2.2,-6.7,-9.5,-5.3,SELL,SELL,,,,
+TRIDENT,Textiles,Small,-1.0,-6.1,-15.3,-3.9,SELL,SELL,,,,
+TRITURBINE,Capital Goods,Small,-1.2,-5.6,-17.9,18.4,SELL,SELL,,,,
+UCOBANK,Financial Services,Small,-2.3,-6.9,-14.6,-1.4,SELL,SELL,,,,
+UTIAMC,Financial Services,Small,-4.0,1.5,-2.7,-2.3,SELL,SELL,Y,Y,DN,UP
+URBANCO,Consumer Services,Small,-6.9,-2.9,23.0,33.2,SELL,,Y,,DN,
+USHAMART,Capital Goods,Small,-4.4,1.8,1.9,26.2,BUY,BUY,,,,
+VTL,Textiles,Small,-3.0,-6.5,-18.0,0.5,SELL,SELL,,,,
+VIJAYA,Healthcare,Small,-0.9,-0.9,7.6,67.7,BUY,BUY,,,,
+WELCORP,Capital Goods,Small,0.6,14.9,83.4,225.6,BUY,BUY,,,,
+WELSPUNLIV,Textiles,Small,1.9,15.0,35.3,94.7,BUY,BUY,,,,
+WHIRLPOOL,Consumer Durables,Small,22.8,10.3,9.8,9.4,BUY,BUY,Y,Y,,UP
+WOCKPHARMA,Healthcare,Small,-0.6,15.3,11.3,70.8,BUY,BUY,,,,
+ZFCVINDIA,Automobile and Auto Components,Small,-2.3,-8.9,-4.9,-0.7,SELL,SELL,,,,
+ZEEL,Media Entertainment & Publication,Small,-4.4,-18.2,-28.6,3.2,SELL,SELL,,,,
+ZENTEC,Capital Goods,Small,-2.2,-8.0,-7.6,19.8,SELL,SELL,,,,
+ZENSARTECH,Information Technology,Small,0.2,-5.8,-5.0,-18.3,SELL,SELL,,,,
+ZYDUSWELL,Fast Moving Consumer Goods,Small,-0.1,-2.0,-12.3,17.6,SELL,SELL,,,,
+ECLERX,Services,Small,-6.9,-9.4,28.9,23.9,SELL,SELL,Y,Y,,DN
+ASKAUTOLTD,Automobile and Auto Components,Micro,-6.1,-5.6,37.3,43.2,SELL,BUY,Y,,DN,
+AXISCADES,Capital Goods,Micro,9.3,23.7,23.0,26.9,BUY,BUY,,,,
+AARTIDRUGS,Healthcare,Micro,3.4,6.9,14.5,24.8,BUY,BUY,,,,
+AARTIPHARM,Healthcare,Micro,6.1,11.2,34.8,45.5,BUY,BUY,,,,
+AVL,Consumer Services,Micro,-6.3,-2.1,-8.0,28.1,SELL,SELL,Y,Y,DN,DN
+ADVENZYMES,Healthcare,Micro,-4.4,-3.6,-9.2,4.5,SELL,SELL,,,,
+AEQUS,Capital Goods,Micro,4.9,4.3,10.6,106.3,BUY,,,,,
+AETHER,Chemicals,Micro,5.3,2.3,26.1,56.8,BUY,BUY,,,,
+AHLUCONT,Construction,Micro,-3.6,-9.2,-34.3,-19.0,SELL,SELL,,,,
+AKUMS,Healthcare,Micro,1.2,5.3,28.9,64.6,BUY,BUY,,,,
+APLLTD,Healthcare,Micro,0.9,1.5,5.1,31.1,BUY,BUY,,,,
+ALIVUS,Healthcare,Micro,-2.7,-4.6,15.7,35.6,SELL,BUY,Y,,DN,
+ALKYLAMINE,Chemicals,Micro,-3.2,-10.0,-1.3,37.5,SELL,SELL,,,,
+ALOKINDS,Textiles,Micro,-2.3,-15.6,-46.0,-42.4,SELL,SELL,,,,
+APOLLO,Capital Goods,Micro,-0.2,5.1,-7.7,105.8,BUY,BUY,,Y,,UP
+ACI,Chemicals,Micro,4.7,-0.1,-8.8,-16.6,SELL,SELL,Y,,DN,
+ARVINDFASN,Consumer Services,Micro,-3.4,-10.5,-14.4,-7.2,SELL,SELL,,,,
+ARVIND,Textiles,Micro,2.4,-0.9,-3.1,50.8,SELL,BUY,Y,,DN,
+ASHAPURMIN,Metals & Mining,Micro,-4.1,-8.4,-22.0,5.6,SELL,SELL,,,,
+ASHOKA,Construction,Micro,-3.1,-9.8,-18.0,-3.1,SELL,SELL,,,,
+ASTRAMICRO,Capital Goods,Micro,1.0,-1.8,-8.9,71.7,SELL,SELL,,,,
+ATLANTAELE,Capital Goods,Micro,-3.6,-12.3,-9.1,33.2,SELL,,,,,
+AURIONPRO,Information Technology,Micro,-5.3,-8.7,-27.0,-16.3,SELL,SELL,,,,
+AVALON,Capital Goods,Micro,-6.2,-2.4,28.7,147.0,BUY,BUY,,,,
+AVANTIFEED,Fast Moving Consumer Goods,Micro,-1.1,-9.7,-20.5,-37.9,SELL,SELL,,,,
+CCAVENUE,Financial Services,Micro,-4.2,2.7,-11.2,4.5,SELL,SELL,Y,Y,DN,DN
+AWFIS,Services,Micro,-6.8,-4.0,-18.7,-3.8,SELL,SELL,,,,
+AZAD,Capital Goods,Micro,6.1,2.9,42.0,90.5,BUY,BUY,Y,,UP,
+BAJAJELEC,Consumer Durables,Micro,-3.6,-4.0,-4.7,-9.9,SELL,SELL,,,,
+BALAMINES,Chemicals,Micro,0.9,-7.1,-2.8,103.5,SELL,SELL,Y,,DN,
+BALUFORGE,Capital Goods,Micro,-2.3,-21.7,5.0,14.9,SELL,SELL,,,,
+BANCOINDIA,Automobile and Auto Components,Micro,-2.4,-4.2,-11.9,15.0,SELL,SELL,,,,
+BIRLACORPN,Construction Materials,Micro,2.4,-4.0,-13.5,-4.6,SELL,SELL,,,,
+BBOX,Information Technology,Micro,0.0,8.4,-17.9,71.9,BUY,BUY,,,,
+BLACKBUCK,Services,Micro,-0.8,3.6,11.7,7.3,BUY,BUY,Y,,UP,
+BLUESTONE,Consumer Durables,Micro,-18.3,-7.0,33.3,77.9,SELL,,Y,,,
+BORORENEW,Capital Goods,Micro,-4.2,-9.6,-27.0,9.6,SELL,SELL,,,,
+CMSINFO,Services,Micro,-2.6,-5.1,-16.1,-17.9,SELL,SELL,,,,
+CORONA,Healthcare,Micro,-7.6,-1.6,0.4,35.2,SELL,,Y,,DN,
+CSBBANK,Financial Services,Micro,-4.2,-6.6,-8.7,-13.0,SELL,SELL,Y,Y,DN,DN
+CAMPUS,Consumer Durables,Micro,-0.2,-6.8,-9.3,-7.7,SELL,SELL,,,,
+CRAMC,Financial Services,Micro,-1.5,-13.4,-11.4,-2.1,SELL,,,,,
+CAPILLARY,Information Technology,Micro,1.9,12.9,9.7,13.1,BUY,,,,,
+CELLO,Consumer Durables,Micro,3.4,-6.0,-9.9,-17.8,SELL,SELL,Y,,DN,
+CENTURYPLY,Consumer Durables,Micro,-2.3,-10.2,-10.0,-5.9,SELL,SELL,,,,
+CERA,Consumer Durables,Micro,-6.5,-10.2,-19.6,11.3,SELL,SELL,,,,
+CRIZAC,Consumer Services,Micro,-3.0,3.7,-14.2,-11.3,SELL,SELL,Y,Y,UP,UP
+CUPID,Fast Moving Consumer Goods,Micro,3.1,-5.1,38.6,204.1,SELL,BUY,Y,,UP,
+DCBBANK,Financial Services,Micro,-6.8,-6.7,5.2,24.1,SELL,SELL,Y,Y,DN,DN
+DATAMATICS,Information Technology,Micro,2.2,0.7,-4.8,11.6,SELL,SELL,Y,Y,DN,UP
+DIACABS,Capital Goods,Micro,-6.4,-0.1,65.0,176.7,SELL,BUY,Y,,DN,
+DBL,Construction,Micro,-4.1,0.5,-7.0,0.1,SELL,SELL,Y,Y,DN,DN
+AGARWALEYE,Healthcare,Micro,0.9,-3.0,4.4,19.3,SELL,SELL,,Y,,DN
+DUMMYINGL1,Healthcare,Micro,,,,,,,,,,
+DUMMYINGL2,Fast Moving Consumer Goods,Micro,,,,,,,,,,
+DUMMYINXGN,Construction,Micro,,,,,,,,,,
+DUMMYTRVN,Capital Goods,Micro,,,,,,,,,,
+DYNAMATECH,Capital Goods,Micro,3.7,8.4,24.6,38.4,BUY,BUY,,,,
+EPL,Capital Goods,Micro,-1.3,-10.9,1.1,9.2,SELL,SELL,,,,
+EDELWEISS,Financial Services,Micro,-4.2,7.4,10.4,29.1,BUY,BUY,,,,
+EMIL,Consumer Services,Micro,1.0,7.7,42.1,105.4,BUY,BUY,,,,
+ELECTCAST,Capital Goods,Micro,4.1,-9.0,-1.7,-3.9,BUY,BUY,Y,Y,UP,UP
+ELLEN,Chemicals,Micro,2.2,13.3,39.2,84.5,BUY,BUY,,,,
+EMBDL,Realty,Micro,-4.5,-10.1,-12.3,28.3,SELL,SELL,Y,,DN,
+ENTERO,Consumer Services,Micro,-3.4,-1.7,49.0,42.5,BUY,BUY,,,,
+EIEL,Utilities,Micro,-4.7,-2.7,-16.1,14.0,SELL,SELL,Y,,DN,
+EQUITASBNK,Financial Services,Micro,-8.2,-9.5,-13.6,23.3,SELL,SELL,,,,
+ETHOSLTD,Consumer Durables,Micro,-6.2,-15.5,-2.1,10.1,SELL,SELL,,,,
+EUREKAFORB,Consumer Durables,Micro,-5.3,-16.8,-25.7,-22.9,SELL,SELL,,,,
+FEDFINA,Financial Services,Micro,-2.3,-5.5,-2.1,9.1,SELL,SELL,,,,
+FIEMIND,Automobile and Auto Components,Micro,1.0,-5.5,-13.4,-1.4,SELL,SELL,,,,
+FINPIPE,Capital Goods,Micro,-1.1,-2.4,-12.7,-3.2,SELL,SELL,,,,
+UTLSOLAR,Capital Goods,Micro,-6.0,-11.4,17.5,102.0,SELL,,Y,,DN,
+GHCL,Chemicals,Micro,-4.4,-8.2,-7.9,-9.1,SELL,SELL,,,,
+GMMPFAUDLR,Capital Goods,Micro,0.9,41.5,91.4,73.6,BUY,BUY,,,,
+GMRP&UI,Power,Micro,6.3,12.1,1.1,2.5,BUY,BUY,Y,Y,,UP
+GRWRHITECH,Capital Goods,Micro,7.0,-4.4,-1.6,84.2,BUY,SELL,Y,,UP,
+GODREJAGRO,Fast Moving Consumer Goods,Micro,-2.1,4.0,17.8,14.6,SELL,BUY,Y,,DN,
+GOKEX,Textiles,Micro,-1.6,-12.4,-22.0,12.5,SELL,SELL,,,,
+GOKULAGRO,Fast Moving Consumer Goods,Micro,-2.4,-11.6,2.0,11.6,SELL,SELL,,,,
+GREAVESCOT,Capital Goods,Micro,16.8,17.9,1.8,78.0,BUY,BUY,,Y,,UP
+GRINDWELL,Capital Goods,Micro,-1.4,-5.3,-11.0,39.3,SELL,SELL,Y,,DN,
+GAEL,Fast Moving Consumer Goods,Micro,2.3,-9.1,-2.6,14.7,SELL,SELL,,Y,,UP
+GNFC,Chemicals,Micro,4.0,12.3,20.8,61.9,BUY,BUY,,,,
+GPPL,Services,Micro,-3.0,-2.0,6.9,12.8,SELL,BUY,Y,,DN,
+GSFC,Chemicals,Micro,0.3,-0.4,-1.8,3.7,SELL,SELL,Y,Y,DN,UP
+HGINFRA,Construction,Micro,0.5,-8.9,-20.6,-7.1,SELL,SELL,,,,
+HAPPSTMNDS,Information Technology,Micro,-1.9,-24.4,-11.8,-21.0,SELL,SELL,,,,
+HCG,Healthcare,Micro,-3.2,-5.8,6.4,30.9,SELL,BUY,Y,,DN,
+HEMIPROP,Services,Micro,-3.4,-10.6,-17.8,-2.4,SELL,SELL,,,,
+HERITGFOOD,Fast Moving Consumer Goods,Micro,-2.6,11.8,21.7,30.5,BUY,BUY,,,,
+HCC,Construction,Micro,-4.8,-13.4,-19.3,34.0,SELL,SELL,,,,
+IFBIND,Consumer Durables,Micro,0.3,-8.6,-5.7,28.0,SELL,SELL,,,,
+IIFLCAPS,Financial Services,Micro,-0.2,2.2,1.7,32.0,BUY,BUY,,,,
+INOXINDIA,Capital Goods,Micro,-2.9,-2.9,8.6,66.9,SELL,BUY,Y,,UP,
+INDIAGLYCO,Fast Moving Consumer Goods,Micro,18.1,-73.9,-72.1,-66.5,SELL,SELL,,,,
+INDIASHLTR,Financial Services,Micro,-4.0,-2.2,-17.7,-15.6,SELL,SELL,,,,
+IMFA,Metals & Mining,Micro,-2.9,-7.7,-10.0,-2.8,SELL,SELL,,,,
+INDIGOPNTS,Consumer Durables,Micro,-3.9,-4.4,2.3,43.5,SELL,SELL,Y,Y,UP,UP
+ICIL,Textiles,Micro,-0.7,-5.1,1.4,80.8,BUY,BUY,,,,
+INOXGREEN,Services,Micro,-1.9,0.7,-16.0,16.3,SELL,SELL,,,,
+IONEXCHANG,Utilities,Micro,-2.5,15.1,0.8,21.0,BUY,BUY,,,,
+JAIBALAJI,Metals & Mining,Micro,-1.5,-12.2,-6.5,9.5,SELL,SELL,Y,,DN,
+JKLAKSHMI,Construction Materials,Micro,-3.0,-7.2,-12.8,-15.3,SELL,SELL,,,,
+JKPAPER,Forest Materials,Micro,-5.1,-0.3,14.8,21.1,SELL,SELL,Y,Y,DN,DN
+JAMNAAUTO,Automobile and Auto Components,Micro,6.9,14.0,-0.8,19.2,BUY,BUY,,Y,,UP
+JSFB,Financial Services,Micro,-6.5,-7.2,4.1,33.8,SELL,SELL,Y,Y,UP,UP
+JAYNECOIND,Capital Goods,Micro,-2.2,-10.3,-2.3,11.7,SELL,SELL,,,,
+JSLL,Consumer Services,Micro,-4.9,-3.2,-13.9,-18.5,SELL,SELL,Y,,DN,
+JLHL,Healthcare,Micro,-6.5,-13.1,-11.6,4.6,SELL,SELL,,,,
+JUSTDIAL,Consumer Services,Micro,-4.1,-7.8,17.9,27.1,SELL,SELL,Y,Y,DN,DN
+JYOTHYLAB,Fast Moving Consumer Goods,Micro,-4.6,-9.1,-4.6,-9.5,SELL,SELL,,,,
+KNRCON,Construction,Micro,-1.8,-2.6,-10.6,-2.5,SELL,SELL,,,,
+KPIGREEN,Power,Micro,3.6,18.0,-10.7,-7.2,BUY,BUY,,Y,,UP
+KRBL,Fast Moving Consumer Goods,Micro,-1.1,-7.7,2.6,26.8,SELL,SELL,Y,Y,,UP
+KRN,Capital Goods,Micro,-2.5,-10.8,13.5,59.6,SELL,SELL,,Y,,DN
+KSB,Capital Goods,Micro,-0.7,0.8,-14.0,-2.4,BUY,SELL,Y,,UP,
+KANSAINER,Consumer Durables,Micro,-1.4,-7.4,-16.0,1.1,SELL,SELL,,,,
+KTKBANK,Financial Services,Micro,-3.2,-2.8,21.8,43.3,SELL,BUY,Y,,DN,
+KSCL,Fast Moving Consumer Goods,Micro,6.4,-2.8,-18.6,-10.9,SELL,SELL,Y,Y,DN,UP
+KIRLOSBROS,Capital Goods,Micro,-0.3,-6.8,-7.4,26.6,SELL,SELL,,,,
+KIRLPNU,Capital Goods,Micro,-3.3,-4.4,-26.3,25.9,SELL,SELL,,,,
+KITEX,Textiles,Micro,-3.4,-8.9,-28.2,-25.5,SELL,SELL,,,,
+LXCHEM,Chemicals,Micro,-0.1,6.8,9.6,51.0,BUY,BUY,,,,
+IXIGO,Consumer Services,Micro,-4.5,-4.3,-28.1,-6.4,SELL,SELL,,,,
+LLOYDSENGG,Capital Goods,Micro,14.2,13.2,17.9,133.2,BUY,BUY,,Y,,UP
+LLOYDSENT,Metals & Mining,Micro,10.4,7.4,5.5,70.9,BUY,BUY,Y,Y,,UP
+LUMAXTECH,Automobile and Auto Components,Micro,-4.6,-2.9,33.0,25.5,BUY,BUY,,,,
+MOIL,Metals & Mining,Micro,-0.8,-2.6,-12.9,-17.7,SELL,SELL,,,,
+MSTCLTD,Services,Micro,-3.8,-3.2,4.6,78.5,BUY,BUY,Y,,UP,
+MTARTECH,Capital Goods,Micro,-2.5,-0.6,-5.4,95.7,SELL,BUY,Y,Y,UP,UP
+MAHSCOOTER,Financial Services,Micro,-6.9,-8.2,-3.8,10.7,SELL,SELL,Y,Y,DN,DN
+MAHSEAMLES,Capital Goods,Micro,1.6,8.5,18.9,22.3,BUY,BUY,,,,
+MANORAMA,Fast Moving Consumer Goods,Micro,-1.7,-0.6,18.9,54.1,SELL,BUY,Y,,,
+MARKSANS,Healthcare,Micro,3.6,7.2,29.4,105.6,BUY,BUY,,,,
+MASTEK,Information Technology,Micro,-1.8,-11.9,-3.7,3.0,SELL,SELL,,,,
+MEDPLUS,Consumer Services,Micro,0.0,-2.5,-19.7,-21.6,SELL,SELL,,,,
+METROPOLIS,Healthcare,Micro,-4.2,-2.5,4.3,34.9,SELL,SELL,Y,Y,DN,DN
+MIDHANI,Capital Goods,Micro,1.6,1.9,-1.9,44.2,BUY,BUY,Y,Y,UP,UP
+BECTORFOOD,Fast Moving Consumer Goods,Micro,-2.9,-6.5,17.7,12.1,SELL,SELL,,,,
+NEOGEN,Chemicals,Micro,2.9,11.2,24.3,104.9,BUY,BUY,,,,
+NESCO,Services,Micro,-1.3,1.4,-4.9,-0.6,SELL,SELL,Y,Y,UP,DN
+NFL,Chemicals,Micro,-2.8,-6.5,-12.6,-5.1,SELL,SELL,,,,
+NAZARA,Media Entertainment & Publication,Micro,5.3,4.6,27.7,66.0,BUY,BUY,,,,
+NETWORK18,Media Entertainment & Publication,Micro,-4.3,-5.4,-22.2,-13.9,SELL,SELL,,,,
+OPTIEMUS,Telecommunication,Micro,13.4,40.0,59.3,158.6,BUY,BUY,,,,
+ORIENTCEM,Construction Materials,Micro,-4.2,-8.9,-13.5,-10.4,SELL,SELL,,,,
+ORKLAINDIA,Fast Moving Consumer Goods,Micro,-5.2,-9.2,-12.8,-10.6,SELL,,,,,
+OSWALPUMPS,Capital Goods,Micro,-1.5,-7.8,-35.5,-13.4,SELL,SELL,,,,
+PNGJL,Consumer Durables,Micro,-2.7,-0.3,3.9,2.3,SELL,SELL,,,,
+PCJEWELLER,Consumer Durables,Micro,-2.1,20.9,34.9,61.9,BUY,BUY,,,,
+PNCINFRA,Construction,Micro,-6.2,-30.4,-44.5,-24.7,SELL,SELL,,,,
+PTC,Power,Micro,0.2,3.3,-0.8,6.4,SELL,SELL,Y,,DN,
+PARAS,Capital Goods,Micro,-3.5,-7.4,-1.2,109.0,SELL,SELL,,Y,,DN
+PARKHOSPS,Healthcare,Micro,-4.2,-4.7,-5.2,38.4,SELL,,Y,,DN,
+PGIL,Textiles,Micro,8.3,5.1,24.7,75.1,BUY,BUY,,,,
+PICCADIL,Fast Moving Consumer Goods,Micro,-2.1,-5.1,-3.4,11.8,SELL,SELL,,,,
+POWERMECH,Construction,Micro,-1.3,-4.3,-11.9,27.5,SELL,SELL,Y,,DN,
+PRAJIND,Capital Goods,Micro,-2.4,-9.9,-12.9,-6.2,SELL,SELL,,,,
+PRICOLLTD,Automobile and Auto Components,Micro,-2.2,-6.5,21.1,41.8,SELL,BUY,Y,,DN,
+PRSMJOHNSN,Construction Materials,Micro,-4.7,-0.6,-4.6,-10.6,SELL,SELL,Y,Y,DN,DN
+PRIVISCL,Chemicals,Micro,4.5,5.7,-1.8,25.2,BUY,BUY,Y,Y,UP,UP
+PRUDENT,Financial Services,Micro,-8.8,-15.5,3.5,38.8,SELL,SELL,Y,Y,DN,DN
+PURVA,Realty,Micro,-4.8,-3.1,-4.1,16.7,SELL,SELL,Y,,DN,
+QPOWER,Capital Goods,Micro,6.3,10.5,34.8,82.1,BUY,BUY,,,,
+QUESS,Services,Micro,-5.2,-10.5,21.7,95.5,SELL,BUY,Y,,DN,
+RAIN,Chemicals,Micro,-1.6,10.6,14.9,92.0,BUY,BUY,,Y,,UP
+RALLIS,Chemicals,Micro,-1.2,-3.7,-12.2,-13.9,SELL,SELL,,,,
+RCF,Chemicals,Micro,1.5,-2.6,-16.7,-3.8,SELL,SELL,,,,
+RATEGAIN,Information Technology,Micro,-0.9,-11.5,-12.2,68.2,SELL,SELL,,,,
+RATNAMANI,Capital Goods,Micro,0.3,5.3,12.8,24.3,BUY,BUY,,,,
+RTNINDIA,Consumer Services,Micro,-5.6,-14.4,-24.7,-10.7,SELL,SELL,,,,
+RTNPOWER,Power,Micro,-3.7,-9.3,-26.2,-17.7,SELL,SELL,,,,
+RAYMONDLSL,Textiles,Micro,1.9,0.4,-14.8,-14.4,SELL,SELL,Y,,UP,
+REDTAPE,Consumer Durables,Micro,-0.5,-4.8,-12.7,5.0,SELL,SELL,Y,,DN,
+REFEX,Utilities,Micro,-5.8,-3.0,-24.6,34.7,SELL,SELL,Y,,UP,
+RELAXO,Consumer Durables,Micro,-0.6,-17.8,-27.4,10.0,SELL,SELL,,,,
+RELIGARE,Financial Services,Micro,-6.9,-4.4,-11.7,3.6,SELL,SELL,Y,Y,,DN
+RBA,Consumer Services,Micro,-2.5,-6.9,17.7,49.5,SELL,BUY,,,,
+ROUTE,Telecommunication,Micro,-2.7,-9.7,-15.9,-0.5,SELL,SELL,,,,
+RUBICON,Healthcare,Micro,-4.0,-11.8,16.9,107.3,SELL,,,,,
+SKFINDUS,Capital Goods,Micro,-1.0,-7.4,-0.9,22.6,SELL,,Y,,DN,
+SKFINDIA,Automobile and Auto Components,Micro,-0.2,-3.2,-8.2,0.5,SELL,SELL,Y,,UP,
+SKYGOLD,Consumer Durables,Micro,0.9,0.4,42.4,138.2,BUY,BUY,Y,,UP,
+SMLMAH,Capital Goods,Micro,-1.4,29.7,66.3,64.1,BUY,BUY,,,,
+SHRIPISTON,Automobile and Auto Components,Micro,3.5,1.3,8.5,59.6,BUY,BUY,,,,
+LOTUSDEV,Realty,Micro,-2.6,14.1,39.0,83.3,BUY,BUY,,,,
+SAATVIKGL,Capital Goods,Micro,-8.4,-2.0,-9.8,1.4,SELL,,Y,,DN,
+SAFARI,Consumer Durables,Micro,-5.0,-5.8,-13.1,-4.8,SELL,SELL,,,,
+SAMHI,Consumer Services,Micro,-6.9,-5.0,-15.5,8.6,SELL,SELL,Y,,,
+SANDUMA,Metals & Mining,Micro,-1.0,-10.4,-12.2,-0.6,SELL,SELL,,,,
+SANOFICONR,Healthcare,Micro,-3.6,-7.0,-16.6,-14.6,SELL,SELL,,,,
+SANSERA,Automobile and Auto Components,Micro,-6.5,6.9,33.4,101.0,BUY,BUY,,,,
+SENCO,Consumer Durables,Micro,-2.7,-5.9,-0.8,13.9,SELL,SELL,,,,
+STYL,Financial Services,Micro,2.4,-4.1,14.4,62.2,SELL,,Y,,UP,
+SHAILY,Consumer Durables,Micro,-3.6,-6.6,4.0,46.7,SELL,SELL,Y,Y,,DN
+SHAKTIPUMP,Capital Goods,Micro,-1.8,-5.3,-19.6,-6.9,SELL,SELL,,,,
+SHARDACROP,Chemicals,Micro,-1.7,-4.2,-16.6,-16.2,SELL,SELL,,,,
+SHAREINDIA,Financial Services,Micro,-7.3,20.2,49.8,61.0,BUY,BUY,,,,
+SFL,Consumer Durables,Micro,-3.2,-2.2,-17.6,26.0,SELL,SELL,,,,
+SHILPAMED,Healthcare,Micro,1.4,10.4,74.5,169.6,BUY,BUY,,,,
+RENUKA,Fast Moving Consumer Goods,Micro,-0.7,-9.0,-2.2,-19.5,SELL,SELL,,,,
+SKIPPER,Capital Goods,Micro,-3.6,0.1,-4.3,54.1,SELL,SELL,Y,Y,DN,DN
+SMARTWORKS,Services,Micro,-6.3,-5.2,5.9,35.9,SELL,SELL,Y,Y,DN,DN
+SOUTHBANK,Financial Services,Micro,6.7,5.7,7.0,32.7,BUY,BUY,Y,,,
+STARCEMENT,Construction Materials,Micro,-5.4,-3.0,-14.0,-13.3,SELL,SELL,Y,,,
+SWSOLAR,Construction,Micro,-4.1,-9.7,-30.7,3.4,SELL,SELL,,,,
+STLTECH,Telecommunication,Micro,-0.6,14.6,48.4,369.5,BUY,BUY,,,,
+STAR,Healthcare,Micro,-4.3,13.7,4.0,20.6,BUY,BUY,,,,
+STYRENIX,Chemicals,Micro,-3.0,0.6,-13.0,11.3,SELL,SELL,Y,,,
+SUBROS,Capital Goods,Micro,-2.3,-1.5,-16.7,3.7,SELL,SELL,Y,,DN,
+SUDARSCHEM,Chemicals,Micro,-2.7,-5.5,34.1,57.8,SELL,BUY,Y,,DN,
+SUDEEPPHRM,Chemicals,Micro,-2.0,-3.1,37.0,91.0,BUY,,Y,,UP,
+SPARC,Healthcare,Micro,4.0,3.2,-14.0,65.9,BUY,BUY,Y,Y,,UP
+SUNTECK,Realty,Micro,-4.9,-9.1,-16.7,-9.5,SELL,SELL,,,,
+SUPRIYA,Healthcare,Micro,5.9,24.8,0.1,62.7,BUY,BUY,,,,
+SURYAROSNI,Capital Goods,Micro,4.8,1.1,-12.8,3.4,BUY,SELL,Y,Y,UP,UP
+TARC,Realty,Micro,-1.9,8.2,1.0,7.4,BUY,SELL,,Y,,DN
+TDPOWERSYS,Capital Goods,Micro,-2.5,-5.1,24.0,71.0,BUY,BUY,Y,,UP,
+TSFINV,Financial Services,Micro,-7.9,5.9,-5.1,21.4,SELL,SELL,Y,Y,DN,DN
+TVSSCS,Services,Micro,-3.2,0.8,-6.6,28.6,SELL,SELL,Y,Y,DN,DN
+TMB,Financial Services,Micro,-2.7,-7.8,15.2,40.1,SELL,SELL,Y,Y,DN,DN
+TANLA,Information Technology,Micro,1.7,-6.9,-7.4,18.1,SELL,SELL,,,,
+TEXRAIL,Capital Goods,Micro,3.2,13.6,10.1,38.1,BUY,BUY,,,,
+THANGAMAYL,Consumer Durables,Micro,-1.7,-7.0,-20.1,42.4,SELL,SELL,Y,,DN,
+ANUP,Capital Goods,Micro,-2.0,-9.1,-27.7,-6.2,SELL,SELL,,,,
+THOMASCOOK,Consumer Services,Micro,-1.5,-4.3,-2.6,8.4,SELL,SELL,,,,
+THYROCARE,Healthcare,Micro,-4.9,-9.2,-1.4,52.0,SELL,SELL,Y,Y,DN,UP
+TI,Fast Moving Consumer Goods,Micro,-3.0,-0.4,23.0,31.5,BUY,BUY,,,,
+TIMETECHNO,Capital Goods,Micro,2.2,-0.6,1.3,10.2,BUY,SELL,Y,,UP,
+TIPSMUSIC,Media Entertainment & Publication,Micro,-0.6,2.2,-2.8,24.5,SELL,SELL,Y,Y,DN,UP
+TRANSRAILL,Capital Goods,Micro,-5.6,3.3,-12.9,-6.8,BUY,SELL,Y,Y,,UP
+TRIVENI,Fast Moving Consumer Goods,Micro,0.4,-18.7,-48.4,-37.7,SELL,SELL,,,,
+UJJIVANSFB,Financial Services,Micro,-0.5,-6.8,4.9,16.2,SELL,SELL,,,,
+VGUARD,Consumer Durables,Micro,-4.4,-11.5,-1.1,-4.6,SELL,SELL,,Y,,DN
+VMART,Consumer Services,Micro,-5.4,-11.2,-4.6,38.3,SELL,SELL,,Y,,DN
+VIPIND,Consumer Durables,Micro,-1.4,-4.4,-6.7,-7.4,SELL,SELL,,,,
+V2RETAIL,Consumer Services,Micro,-1.2,-5.4,-8.4,9.9,SELL,SELL,,,,
+DBREALTY,Realty,Micro,0.2,-6.6,-16.1,7.0,SELL,SELL,,,,
+WABAG,Utilities,Micro,-1.6,3.1,-6.6,65.0,SELL,BUY,Y,Y,,UP
+VAIBHAVGBL,Consumer Durables,Micro,-2.6,-7.5,-13.7,9.0,SELL,SELL,,,,
+VARROC,Automobile and Auto Components,Micro,-2.6,-2.3,28.5,72.2,BUY,BUY,,,,
+MANYAVAR,Consumer Services,Micro,-0.3,-0.7,32.8,46.8,SELL,BUY,,,,
+VIKRAMSOLR,Capital Goods,Micro,-1.2,-4.9,-16.5,-13.6,SELL,,,,,
+VIYASH,Healthcare,Micro,-3.9,-8.3,-17.4,26.0,SELL,SELL,,,,
+VOLTAMP,Capital Goods,Micro,-1.4,-2.8,8.7,16.8,SELL,SELL,Y,Y,,DN
+WAAREERTL,Capital Goods,Micro,0.9,-5.5,-19.9,-3.5,SELL,SELL,,,,
+WAKEFIT,Consumer Durables,Micro,-3.8,-3.7,11.4,-4.1,SELL,,Y,,DN,
+WEWORK,Services,Micro,-2.3,-4.2,-11.6,45.5,SELL,,,,,
+WEBELSOLAR,Capital Goods,Micro,-1.4,-7.1,-32.9,-6.9,SELL,SELL,,,,
+WELENT,Construction,Micro,-4.4,9.4,23.0,71.7,BUY,BUY,,,,
+WESTLIFE,Consumer Services,Micro,0.7,1.2,14.0,25.7,BUY,BUY,,,,
+YATHARTH,Healthcare,Micro,-2.3,10.2,28.0,64.4,BUY,BUY,,,,
+ZAGGLE,Information Technology,Micro,-2.8,-5.1,-17.4,-25.5,SELL,SELL,,,,
