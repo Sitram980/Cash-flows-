@@ -32,16 +32,23 @@ for i in range(0, len(syms), 100):
 close = pd.concat(frames, axis=1).dropna(how='all')
 
 # ---- Multi Kernel Regression [ChartPrime] signal (Gaussian kernel, non-repaint) ----
-def mkr(series, bw, fresh_bars, cross_bars, lookback=500):
+def mkr(series, bw, lookback=500):
+    """Returns (regime, days since the line last turned, days since price last crossed the line + direction)."""
     y = series.dropna().values.astype(float)
-    if len(y) < 60: return '', '', ''
-    L = min(lookback, len(y)); w = np.exp(-np.arange(L) / bw)          # Laplace kernel (matches your TradingView setting)
+    if len(y) < 60: return '', '', '', ''
+    L = min(lookback, len(y)); w = np.exp(-np.arange(L) / bw)  # Laplace kernel
     line = np.convolve(y, w)[:len(y)] / np.cumsum(w)[np.minimum(np.arange(len(y)), L - 1)]
     up = np.diff(line) > 0
-    fresh = (up[1:] != up[:-1])[-fresh_bars:].any()
+    turns = np.where(up[1:] != up[:-1])[0]
+    turn_ago = (len(up) - 1 - turns[-1]) if len(turns) else ''
     above = y > line
-    x_up = (above[1:] & ~above[:-1])[-cross_bars:].any(); x_dn = (~above[1:] & above[:-1])[-cross_bars:].any()
-    return ('BUY' if up[-1] else 'SELL'), ('Y' if fresh else ''), ('UP' if x_up else ('DN' if x_dn else ''))
+    crosses = np.where(above[1:] != above[:-1])[0]
+    if len(crosses):
+        cross_ago = len(above) - 1 - crosses[-1]
+        cross_dir = 'UP' if above[-1] else 'DN'
+    else:
+        cross_ago, cross_dir = '', ''
+    return ('BUY' if up[-1] else 'SELL'), turn_ago, cross_ago, cross_dir
 
 weekly = close.resample('W-FRI').last()
 sig = {}
