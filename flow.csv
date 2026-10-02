@@ -136,7 +136,7 @@ COROMANDEL,Chemicals,Mid,-9.2,-7.9,-14.1,-12.2,SELL,SELL,4,2,4,DN,2,DN
 DABUR,Fast Moving Consumer Goods,Mid,-3.0,-1.3,-15.7,-8.5,SELL,SELL,9,12,9,DN,12,DN
 DALBHARAT,Construction Materials,Mid,-2.3,-5.1,-5.1,-8.1,SELL,SELL,23,5,23,DN,5,DN
 DIXON,Consumer Durables,Mid,-4.5,-12.9,-4.5,25.6,SELL,SELL,20,4,20,DN,4,DN
-EMBASSY,Realty,Mid,,,,,SELL,SELL,4,2,4,DN,2,DN
+EMBASSY,Realty,Mid,-2.5,-1.5,-3.0,2.7,SELL,SELL,5,2,5,DN,2,DN
 ENDURANCE,Automobile and Auto Components,Mid,-2.3,-5.6,-1.4,17.8,SELL,SELL,24,5,24,DN,5,DN
 ESCORTS,Capital Goods,Mid,-5.5,-11.7,-10.6,-7.3,SELL,SELL,26,6,26,DN,6,DN
 EXIDEIND,Automobile and Auto Components,Mid,-4.0,-3.8,-1.5,38.4,SELL,SELL,8,2,8,DN,2,DN
@@ -291,7 +291,7 @@ BSOFT,Information Technology,Small,-2.9,-8.4,-2.5,-25.6,SELL,SELL,30,7,30,DN,7,D
 BBOX,Information Technology,Small,0.1,9.7,-19.6,69.0,BUY,BUY,10,4,10,UP,4,UP
 FIRSTCRY,Consumer Services,Small,-2.7,2.3,-19.2,-28.1,SELL,SELL,2,23,2,DN,23,DN
 BRIGADE,Realty,Small,-6.0,-11.0,6.4,10.2,SELL,SELL,13,2,13,DN,2,DN
-BIRET,Realty,Small,,,,,SELL,SELL,10,1,10,DN,1,DN
+BIRET,Realty,Small,-2.0,-3.3,-1.1,4.6,SELL,SELL,11,1,11,DN,1,DN
 CCL,Fast Moving Consumer Goods,Small,1.6,-2.7,-11.7,-7.6,SELL,SELL,17,9,17,DN,9,DN
 CESC,Power,Small,-5.9,-10.1,-19.3,-11.0,SELL,SELL,32,7,32,DN,7,DN
 CIEINDIA,Automobile and Auto Components,Small,-3.2,-2.2,-19.8,-16.8,SELL,SELL,8,11,8,DN,11,DN
@@ -329,7 +329,7 @@ DEEPAKNTR,Chemicals,Small,-6.8,-13.9,-6.4,7.9,SELL,SELL,21,4,21,DN,4,DN
 DELHIVERY,Services,Small,-6.2,-12.0,-23.0,-9.5,SELL,SELL,20,5,20,DN,5,DN
 DEVYANI,Consumer Services,Small,-7.6,-8.0,11.3,27.8,SELL,SELL,6,1,6,DN,1,DN
 LALPATHLAB,Healthcare,Small,2.2,4.6,19.2,47.8,BUY,BUY,19,22,19,UP,22,UP
-DUMMYHEG,Metals & Mining,Small,,,,,,,,,,,,
+DUMMYHEG,Capital Goods,Small,,,,,,,,,,,,
 EIDPARRY,Fast Moving Consumer Goods,Small,-2.2,-15.7,-12.1,-17.9,SELL,SELL,21,4,21,DN,4,DN
 EIHOTEL,Consumer Services,Small,0.3,4.2,-10.5,0.6,SELL,SELL,1,2,1,DN,2,DN
 ELECON,Capital Goods,Small,-4.2,5.6,-17.1,11.7,SELL,SELL,1,1,1,DN,1,DN
