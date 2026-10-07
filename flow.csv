@@ -708,7 +708,7 @@ SOUTHBANK,Financial Services,Micro,-1.6,1.4,4.6,25.0,BUY,BUY,11,7,11,UP,7,UP,47.
 SWSOLAR,Construction,Micro,-1.8,-8.7,-28.9,-5.8,SELL,SELL,60,13,60,DN,13,DN,168.11,Below,Below,Below,Below
 STAR,Healthcare,Micro,-1.7,-7.3,2.1,10.4,SELL,SELL,5,2,5,DN,2,DN,1100.6,Below,Below,Above,Above
 STYLAMIND,Consumer Durables,Micro,1.3,0.1,2.0,50.4,BUY,BUY,1,1,1,UP,1,UP,3351.6,Above,Above,Above,Above
-SUBROS,Capital Goods,Micro,,,,,,,,,,,,,,,,,
+SUBROS,Capital Goods,Micro,-3.4,-2.8,-17.4,-9.3,SELL,SELL,9,9,9,DN,9,DN,675.5,Below,Below,Below,Below
 SUDARSCHEM,Chemicals,Micro,1.9,0.4,23.3,53.4,BUY,BUY,4,15,4,UP,15,UP,1226.6,Above,Above,Above,Above
 SUDEEPPHRM,Chemicals,Micro,-2.9,-12.9,42.2,88.7,BUY,,1,,1,UP,,,1170.4,Below,Above,Above,Above
 SPARC,Healthcare,Micro,-0.2,-3.2,-25.6,38.2,SELL,SELL,6,2,6,DN,2,DN,196.79,Below,Below,Below,Above
