@@ -1,0 +1,36 @@
+name: Daily Stock Screener & Flow Update
+
+on:
+  schedule:
+    # સોમવારથી શુક્રવાર સાંજે IST 4:30 વાગ્યે (UTC 11:00 AM) રન થશે
+    - cron: '0 11 * * 1-5'
+  workflow_dispatch: # ફોનથી ગમે ત્યારે મેન્યુઅલ ટેસ્ટ કરવા માટે
+
+jobs:
+  scan-and-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install yfinance pandas numpy requests beautifulsoup4 lxml
+
+      - name: Run Market & NSDL Scanner Engine
+        run: |
+          python update_all.py
+
+      - name: Commit and Push Updated Files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-updated flow.csv & nsdl.json [skip ci]"
+          file_pattern: "flow.csv nsdl.json"
