@@ -45,14 +45,15 @@ summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px}
 <section id="rot" class="pn" style="display:none;overflow-x:auto"></section>
 <section id="trend" class="pn" style="display:none"></section>
 <section id="sahil" class="pn" style="display:none"></section>
-<div class="grid"><section class="out"><div class="hd">🔴 MONEY FLOWING OUT<small>investors selling</small></div><div id="out"></div></section>
+<section id="wlView" class="pn" style="display:none"></section>
+<div class="grid" id="mainGrid"><section class="out"><div class="hd">🔴 MONEY FLOWING OUT<small>investors selling</small></div><div id="out"></div></section>
 <section class="in"><div class="hd">🟢 MONEY FLOWING IN<small>investors buying</small></div><div id="in"></div></section></div>
 </div>
 </main>
 <script>
 const PERIODS=[["1W","1 Week"],["1M","1 Month"],["3M","3 Months"],["6M","6 Months"]];
 let sig="All",cap="All",mode="price",view="top",period="1M",rows=[],bench={};
-// ---- sample data (illustrative only) ----
+
 const SAMPLE={"Automobile and Auto Components":"MARUTI,M&M,BAJAJ-AUTO|TVSMOTOR,ASHOKLEY,BALKRISIND|SANSERA,GABRIEL,SUBROS|JAMNAAUTO,SUPRAJIT",
 "Capital Goods":"SIEMENS,ABB,HAL|CUMMINSIND,BHEL,POLYCAB|KIRLOSENG,GRSE,TEGA|WENDT,ELECON",
 "Chemicals":"PIDILITIND,SRF,UPL|DEEPAKNTR,TATACHEM,AARTIIND|NEOGEN,FINEORG,CLEAN|BODALCHEM,ANDHRAPET",
@@ -76,12 +77,31 @@ const SAMPLE={"Automobile and Auto Components":"MARUTI,M&M,BAJAJ-AUTO|TVSMOTOR,A
 "Textiles":"PAGEIND,KPRMILL,TRIDENT|WELSPUNLIV,VTL,ARVIND|SUTLEJTEX,GOKEX,SHIVTEX|FILATEX,BANSWARA",
 "Utilities":"ADANIGREEN,NHPC,SJVN|ADANIENSOL,SUZLON,INOXWIND|WAAREEENER,ORIENTGEN|RPOWER,KPIGREEN"};
 const CAPS=["Large","Mid","Small","Micro"];
-// Real NSDL fortnightly data, 1-15 Oct 2026 (Rs crore): [net equity flow, AUC at period end]
-let NSDL_HISTORY={"Information Technology":[-38,2599],"Services":[1397,262],"Media, Entertainment & Publication":[31,252],"Diversified":[115,43],"Chemicals":[-133,41],
-"Utilities":[-33,-34],"Forest Materials":[6,-50],"Textiles":[636,-59],"Construction Materials":[-847,-564],"Realty":[19,-578],
-"Consumer Durables":[-1508,-586],"Construction":[381,-1224],"Power":[-570,-1732],"Consumer Services":[1911,-1931],
-"Oil, Gas & Consumable Fuels":[-4469,-3680],"Metals & Mining":[-2322,-3693],"Capital Goods":[-1353,-3886],"Telecommunication":[-2423,-3928],
-"Healthcare":[3,-5497],"Automobile and Auto Components":[-3542,-6533],"Fast Moving Consumer Goods":[-972,-8172],"Financial Services":[-6943,-8634]};
+
+let NSDL_HISTORY={
+  "Healthcare":[-2445,-418,601,-4501,1435,4101,3654,2910,3021,2114],
+  "Construction":[2199,-991,-220,-603,3484,403,-1602,-404,442,930],
+  "Services":[-362,7019,185,302,2592,2405,-1,590,1193,905],
+  "Consumer Services":[-2434,-365,-1630,-1852,3081,7361,2840,3398,5019,422],
+  "Chemicals":[-121,-700,90,-773,-514,-114,532,315,543,228],
+  "Power":[4956,-1157,476,-2577,-3743,-1267,-1596,-1164,-389,-1653],
+  "Telecommunication":[-1908,-2542,2127,373,-720,-2454,-3271,-3322,-1661,-991],
+  "Fast Moving Consumer Goods":[-229,-1625,-1936,-5063,-474,-1106,478,-189,-1727,-2029],
+  "Automobile and Auto Components":[-1775,-357,-2175,-9044,-1324,-6936,2372,4405,-1299,-2670],
+  "Oil, Gas & Consumable Fuels":[-3351,-6885,-2093,-10488,-2789,258,-513,490,-2251,-2385],
+  "Information Technology":[-2887,-1643,-268,-6733,-733,60,3298,2530,1573,-960],
+  "Financial Services":[-11704,-17960,-5181,-11263,14634,1975,-2869,6535,3959,-6204],
+  "Metals & Mining":[2416,1698,4999,-4722,-4371,5993,-1056,720,1087,-681],
+  "Consumer Durables":[441,-1162,-287,-634,2564,2384,4958,1472,2431,-397],
+  "Capital Goods":[4667,2645,154,-2586,-1442,-2657,-3618,-1556,2162,-108],
+  "Realty":[-206,-430,30,-1093,1893,2072,-279,-1014,420,-762],
+  "Construction Materials":[-670,-1207,-434,-2426,-650,1574,871,384,-250,-358],
+  "Diversified":[3,33,-14,-13,7,29,-1,-18,-4,-23],
+  "Utilities":[-12,-28,-19,7,216,119,-163,7,-38,194],
+  "Textiles":[-48,-112,39,-146,241,248,206,1,-294,10],
+  "Forest Materials":[73,-41,1,-12,-12,-11,40,-9,-7,7],
+  "Media, Entertainment & Publication":[-149,-12,-110,-232,-127,-289,24,-6,72,-93]
+};
 let NSDL_DATE="1–15 Oct 2026";
 let NSDL={"Information Technology":[2599,398397],"Services":[262,186896],"Media, Entertainment & Publication":[252,11084],"Diversified":[43,3626],"Chemicals":[41,119343],
 "Utilities":[-34,2725],"Forest Materials":[-50,1176],"Textiles":[-59,21265],"Construction Materials":[-564,94263],"Realty":[-578,111753],
@@ -89,22 +109,64 @@ let NSDL={"Information Technology":[2599,398397],"Services":[262,186896],"Media,
 "Oil, Gas & Consumable Fuels":[-3680,429974],"Metals & Mining":[-3693,263323],"Capital Goods":[-3886,476822],"Telecommunication":[-3928,343057],
 "Healthcare":[-5497,504679],"Automobile and Auto Components":[-6533,477593],"Fast Moving Consumer Goods":[-8172,268394],"Financial Services":[-8634,2035663]};
 let FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));
+
 function seeded(s){return()=>(s=Math.imul(s^s>>>15,1|s),s=s+Math.imul(s^s>>>7,61|s)^s,((s^s>>>14)>>>0)/4294967296)}
-function sample(){const r=seeded(7),out=[];
- for(const [ind,txt] of Object.entries(SAMPLE)){const base=(r()-.5)*16;
-  txt.split("|").forEach((grp,ci)=>grp.split(",").forEach(sym=>{const o={Symbol:sym,Industry:ind,Cap:CAPS[ci],Daily:"",Weekly:"",DFresh:"",WFresh:"",DCross:"",WCross:""},vol=1+ci*.5;
-   for(const [p,m] of [["1W",.4],["1M",1],["3M",2.2],["6M",3.5]])o[p]=+(base*m+(r()-.5)*10*m*vol).toFixed(1);out.push(o)}))}
- return out}
+
+function sample(){
+  const r=seeded(7),out=[];
+  for(const [ind,txt] of Object.entries(SAMPLE)){
+    const base=(r()-.5)*16;
+    txt.split("|").forEach((grp,ci)=>grp.split(",").forEach(sym=>{
+      const isUp = r() > 0.42;
+      const px = +(120 + r()*2400).toFixed(1);
+      const o={
+        Symbol:sym,Industry:ind,Cap:CAPS[ci],Price:px,
+        Daily:isUp?"BUY":"SELL",Weekly:isUp?"BUY":"SELL",
+        DFresh:r()>0.7?"★":"",WFresh:r()>0.7?"★":"",
+        DCross:isUp?"UP":"DN",DCrossAgo:Math.floor(r()*5),
+        WCross:isUp?"UP":"DN",WCrossAgo:Math.floor(r()*5),
+        DTurnAgo:Math.floor(r()*5),WTurnAgo:Math.floor(r()*5),
+        EMA20:isUp?"Above":"Below",EMA50:isUp?"Above":"Below",
+        EMA100:isUp?"Above":"Below",EMA200:isUp?"Above":"Below",
+        RSState:isUp?"Rising":"Falling",RSPos:isUp?"Y":"N",
+        RSCross:isUp?"UP":"DN",RSCrossAgo:Math.floor(r()*10),
+        DelivPct:Math.floor(32+r()*45),DelivHigh:r()>0.65?"Y":"N",
+        RSI_D:Math.floor(36+r()*32),RSI_W:Math.floor(40+r()*28),RSI_M:50,
+        RSI40Cross:isUp?"UP":"",RSI40CrossAgo:2,
+        RSI50Cross:isUp?"UP":"",RSI50CrossAgo:3,
+        RSI60Cross:isUp?"UP":"",RSI60CrossAgo:4,
+        DConfirmed:"Y",WConfirmed:"Y",
+        DLine:+(px*0.98).toFixed(1),DUpper:+(px*1.08).toFixed(1),DLower:+(px*0.94).toFixed(1),
+        WLine:+(px*0.96).toFixed(1),WUpper:+(px*1.12).toFixed(1),WLower:+(px*0.90).toFixed(1),
+        SahilD:isUp?"BUY":"SELL",SahilDAgo:Math.floor(r()*4),
+        SahilW:isUp?"BUY":"SELL",SahilWAgo:Math.floor(r()*4)
+      },vol=1+ci*.5;
+      for(const [p,m] of [["1W",.4],["1M",1],["3M",2.2],["6M",3.5]])o[p]=+(base*m+(r()-.5)*10*m*vol).toFixed(1);
+      out.push(o);
+    }))
+  }
+  return out;
+}
+
 const capOf=v=>/micro/i.test(v||"")?"Micro":/mid/i.test(v||"")?"Mid":/small/i.test(v||"")?"Small":/large/i.test(v||"")?"Large":"";
-// ---- CSV: Symbol,Industry,Cap,1W,1M,3M,6M,Daily,Weekly,DTurnAgo,WTurnAgo,DCrossAgo,DCross,WCrossAgo,WCross,Price,EMA20,EMA50,EMA100,EMA200,RSState,RSCrossAgo,RSCross,RSPos,DelivPct,DelivHigh,RSI_D,RSI_W,RSI_M,RSI40CrossAgo,RSI40Cross,RSI50CrossAgo,RSI50Cross,RSI60CrossAgo,RSI60Cross,DConfirmed,WConfirmed,DLine,DUpper,DLower,WLine,WUpper,WLower,SahilD,SahilDAgo,SahilW,SahilWAgo  (optional row Symbol=NIFTY500 for benchmark) ----
 function splitCSV(l){const o=[];let c="",q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===","&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o}
 function parseCSV(t){const L=t.replace(/^\uFEFF/,"").trim().split(/\r?\n/),h=splitCSV(L.shift()).map(x=>x.trim());
  return L.filter(l=>l.trim()).map(l=>{const c=splitCSV(l),o={};h.forEach((k,i)=>o[k]=c[i]?.trim());return o})}
 const canon=x=>{const n=(x||"").replace(/,/g,"").trim();return Object.keys(NSDL).find(k=>k.replace(/,/g,"")===n)||(x||"").trim()};
-function load(recs){bench={};rows=[];for(const r of recs){const o={Symbol:r.Symbol||r.index||r["Unnamed: 0"]||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DTurnAgo:r.DTurnAgo!==""&&r.DTurnAgo!==undefined?+r.DTurnAgo:"",WTurnAgo:r.WTurnAgo!==""&&r.WTurnAgo!==undefined?+r.WTurnAgo:"",DCrossAgo:r.DCrossAgo!==""&&r.DCrossAgo!==undefined?+r.DCrossAgo:"",DCross:(r.DCross||"").toUpperCase(),WCrossAgo:r.WCrossAgo!==""&&r.WCrossAgo!==undefined?+r.WCrossAgo:"",WCross:(r.WCross||"").toUpperCase(),Price:parseFloat(r.Price)||"",EMA20:r.EMA20||"",EMA50:r.EMA50||"",EMA100:r.EMA100||"",EMA200:r.EMA200||"",RSState:r.RSState||"",RSCrossAgo:r.RSCrossAgo!==""&&r.RSCrossAgo!==undefined?+r.RSCrossAgo:"",RSCross:(r.RSCross||"").toUpperCase(),RSPos:(r.RSPos||"").toUpperCase(),DelivPct:parseFloat(r.DelivPct)||"",DelivHigh:(r.DelivHigh||"").toUpperCase(),RSI_D:parseFloat(r.RSI_D),RSI_W:parseFloat(r.RSI_W),RSI_M:parseFloat(r.RSI_M),RSI40CrossAgo:r.RSI40CrossAgo!==""&&r.RSI40CrossAgo!==undefined?+r.RSI40CrossAgo:"",RSI40Cross:(r.RSI40Cross||"").toUpperCase(),RSI50CrossAgo:r.RSI50CrossAgo!==""&&r.RSI50CrossAgo!==undefined?+r.RSI50CrossAgo:"",RSI50Cross:(r.RSI50Cross||"").toUpperCase(),RSI60CrossAgo:r.RSI60CrossAgo!==""&&r.RSI60CrossAgo!==undefined?+r.RSI60CrossAgo:"",RSI60Cross:(r.RSI60Cross||"").toUpperCase(),DConfirmed:(r.DConfirmed||"").toUpperCase(),WConfirmed:(r.WConfirmed||"").toUpperCase(),DLine:parseFloat(r.DLine),DUpper:parseFloat(r.DUpper),DLower:parseFloat(r.DLower),WLine:parseFloat(r.WLine),WUpper:parseFloat(r.WUpper),WLower:parseFloat(r.WLower),SahilD:(r.SahilD||"").toUpperCase(),SahilDAgo:r.SahilDAgo!==""&&r.SahilDAgo!==undefined?+r.SahilDAgo:"",SahilW:(r.SahilW||"").toUpperCase(),SahilWAgo:r.SahilWAgo!==""&&r.SahilWAgo!==undefined?+r.SahilWAgo:""};
-  PERIODS.forEach(([p])=>o[p]=parseFloat(r[p]));
-  if(/^NIFTY ?500$/i.test(o.Symbol))PERIODS.forEach(([p])=>bench[p]=o[p]);else if(o.Industry&&!isNaN(o[period]))rows.push(o)}
- PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.reduce((a,b)=>a+b,0)/v.length}});renderTop5();render()}
+
+function load(recs){
+  bench={};rows=[];
+  for(const r of recs){
+    const o={Symbol:r.Symbol||r.index||r["Unnamed: 0"]||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DTurnAgo:r.DTurnAgo!==""&&r.DTurnAgo!==undefined?+r.DTurnAgo:"",WTurnAgo:r.WTurnAgo!==""&&r.WTurnAgo!==undefined?+r.WTurnAgo:"",DCrossAgo:r.DCrossAgo!==""&&r.DCrossAgo!==undefined?+r.DCrossAgo:"",DCross:(r.DCross||"").toUpperCase(),WCrossAgo:r.WCrossAgo!==""&&r.WCrossAgo!==undefined?+r.WCrossAgo:"",WCross:(r.WCross||"").toUpperCase(),Price:parseFloat(r.Price)||"",EMA20:r.EMA20||"",EMA50:r.EMA50||"",EMA100:r.EMA100||"",EMA200:r.EMA200||"",RSState:r.RSState||"",RSCrossAgo:r.RSCrossAgo!==""&&r.RSCrossAgo!==undefined?+r.RSCrossAgo:"",RSCross:(r.RSCross||"").toUpperCase(),RSPos:(r.RSPos||"").toUpperCase(),DelivPct:parseFloat(r.DelivPct)||"",DelivHigh:(r.DelivHigh||"").toUpperCase(),RSI_D:parseFloat(r.RSI_D),RSI_W:parseFloat(r.RSI_W),RSI_M:parseFloat(r.RSI_M),RSI40CrossAgo:r.RSI40CrossAgo!==""&&r.RSI40CrossAgo!==undefined?+r.RSI40CrossAgo:"",RSI40Cross:(r.RSI40Cross||"").toUpperCase(),RSI50CrossAgo:r.RSI50CrossAgo!==""&&r.RSI50CrossAgo!==undefined?+r.RSI50CrossAgo:"",RSI50Cross:(r.RSI50Cross||"").toUpperCase(),RSI60CrossAgo:r.RSI60CrossAgo!==""&&r.RSI60CrossAgo!==undefined?+r.RSI60CrossAgo:"",RSI60Cross:(r.RSI60Cross||"").toUpperCase(),DConfirmed:(r.DConfirmed||"").toUpperCase(),WConfirmed:(r.WConfirmed||"").toUpperCase(),DLine:parseFloat(r.DLine),DUpper:parseFloat(r.DUpper),DLower:parseFloat(r.DLower),WLine:parseFloat(r.WLine),WUpper:parseFloat(r.WUpper),WLower:parseFloat(r.WLower),SahilD:(r.SahilD||"").toUpperCase(),SahilDAgo:r.SahilDAgo!==""&&r.SahilDAgo!==undefined?+r.SahilDAgo:"",SahilW:(r.SahilW||"").toUpperCase(),SahilWAgo:r.SahilWAgo!==""&&r.SahilWAgo!==undefined?+r.SahilWAgo:""};
+    PERIODS.forEach(([p])=>o[p]=parseFloat(r[p]));
+    if(/^NIFTY ?500$/i.test(o.Symbol))PERIODS.forEach(([p])=>bench[p]=o[p]);
+    else if(o.Industry&&!isNaN(o[period]))rows.push(o);
+  }
+  PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.length?v.reduce((a,b)=>a+b,0)/v.length:0}});
+  renderTop5();
+  render();
+}
+
 function buyScore(r,sm){
  let s=0;const R=[];
  if(r.Daily==="BUY"&&r.DConfirmed==="Y"){s+=2;R.push("Daily confirmed BUY")}
@@ -118,18 +180,21 @@ function buyScore(r,sm){
  if(!isNaN(r["1M"])&&r["1M"]>sm){s+=1;R.push("beats its sector")}
  return{score:s,reasons:R}
 }
+
 function slTarget(r){
  if(isNaN(r.DLine))return null;
  const ext=!isNaN(r.DUpper)&&r.Price>r.DUpper;
  return{sl:r.DLower,target:r.DUpper,line:r.DLine,extended:ext}
 }
+
 function wlGet(){try{return JSON.parse(localStorage.getItem("cfm_watchlist_v1")||"{}")}catch(e){return{}}}
-function wlSet(sym,status,price){try{const w=wlGet();w[sym]={status,price:price||"",added:new Date().toISOString().slice(0,10)};localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist()}
-function wlRemove(sym){try{const w=wlGet();delete w[sym];localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist()}
+function wlSet(sym,status,price){try{const w=wlGet();w[sym]={status,price:price||"",added:new Date().toISOString().slice(0,10)};localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist();if(mode==="watchlist")renderWatchlistTab()}
+function wlRemove(sym){try{const w=wlGet();delete w[sym];localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist();if(mode==="watchlist")renderWatchlistTab()}
 function watchBtns(sym,price){
  let st="";try{st=(wlGet()[sym]||{}).status||""}catch(e){}
  return `<button data-wl="watch" data-sym="${esc(sym)}" data-px="${price||""}" style="padding:3px 8px;font-size:10px;border-radius:10px;border:1px solid var(--mut);background:${st==="watch"?"var(--fg)":"var(--card)"};color:${st==="watch"?"var(--bg)":"var(--fg)"}">${st==="watch"?"★ Watching":"☆ Watch"}</button> <button data-wl="bought" data-sym="${esc(sym)}" data-px="${price||""}" style="padding:3px 8px;font-size:10px;border-radius:10px;border:1px solid var(--mut);background:${st==="bought"?"var(--gc)":"var(--card)"};color:${st==="bought"?"#fff":"var(--fg)"}">${st==="bought"?"✓ Bought":"Mark Bought"}</button>`
 }
+
 function renderWatchlist(){
  const el=document.getElementById("wl");let w={};try{w=wlGet()}catch(e){}
  const syms=Object.keys(w);
@@ -139,16 +204,72 @@ function renderWatchlist(){
   const rec=w[sym],r=rows.find(x=>x.Symbol===sym);
   const now=r?r.Price:"",chg=(now&&rec.price)?((now-rec.price)/rec.price*100):null;
   const sig=r?(r.Daily==="BUY"&&r.DConfirmed==="Y"?"Daily BUY ✓":r.Daily==="SELL"&&r.DConfirmed==="Y"?"Daily SELL ✓":"mixed/unconfirmed"):"not in current data";
-  return `<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:16px;padding:0 4px">✕</button><b>${esc(sym)}</b> <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i><small>${rec.price?"at ₹"+rec.price+" on "+rec.added:"added "+rec.added}${now?" · now ₹"+now:""}${chg!==null?" · <span style=\"color:var(--"+(chg>=0?"gc":"rc")+")\">"+(chg>=0?"+":"")+chg.toFixed(1)+"%</span>":""}</small><small>${sig}</small></div>`}).join("");
+  return `<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:16px;padding:0 4px;cursor:pointer">✕</button><b>${esc(sym)}</b> <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i><small>${rec.price?"at ₹"+rec.price+" on "+rec.added:"added "+rec.added}${now?" · now ₹"+now:""}${chg!==null?" · <span style=\"color:var(--"+(chg>=0?"gc":"rc")+")\">"+(chg>=0?"+":"")+chg.toFixed(1)+"%</span>":""}</small><small>${sig}</small></div>`}).join("");
  el.innerHTML=`<h3>⭐ My Watchlist</h3><small style="color:var(--mut)">Saved only on this device/browser.</small><div class="sl" style="margin-top:8px">${lines}</div>`
 }
+
+function renderWatchlistTab(){
+ hideAll("wlView");
+ const el=document.getElementById("wlView");
+ let w={};try{w=wlGet()}catch(e){}
+ const syms=Object.keys(w);
+ 
+ const cards=syms.map(sym=>{
+   const rec=w[sym], r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase());
+   const now=r?r.Price:"", chg=(now&&rec.price)?((now-rec.price)/rec.price*100):null;
+   const dSig=r?r.Daily:"—", wSig=r?r.Weekly:"—";
+   const isDailyBuy = dSig==="BUY", isWeeklyBuy = wSig==="BUY";
+   const e20=r?r.EMA20:"—", e50=r?r.EMA50:"—";
+   const rsi=r?r.RSI_D:"—";
+   const st=r?slTarget(r):null;
+
+   return `<div class="sr" style="padding:10px 0;border-top:1px solid var(--mut)">
+     <button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:18px;cursor:pointer;padding:0 8px">✕</button>
+     <div style="font-size:16px;font-weight:700">${esc(sym)} <small style="font-weight:400;color:var(--mut)">${r?esc(r.Industry):""}</small></div>
+     <div style="margin:4px 0">
+       <b>₹${now||"—"}</b> 
+       ${chg!==null?`<span style="color:var(--${chg>=0?"gc":"rc"});font-weight:700">(${chg>=0?"+":""}${chg.toFixed(1)}%)</span>`:""}
+       <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i>
+     </div>
+     <div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">
+       <span class="sg ${isDailyBuy?"b":"s"}">Daily ${dSig}</span>
+       <span class="sg ${isWeeklyBuy?"b":"s"}">Weekly ${wSig}</span>
+       <span class="cp">EMA20: ${e20}</span>
+       <span class="cp">EMA50: ${e50}</span>
+       <span class="cp">RSI: ${rsi}</span>
+     </div>
+     ${st?`<small style="color:var(--mut);display:block">Stop-loss ~₹${st.sl} · Target ~₹${st.target}</small>`:""}
+   </div>`;
+ }).join("");
+
+ el.innerHTML=`<h3>⭐ My Watchlist — Live Buy/Sell Signals</h3>
+ <small style="color:var(--mut);display:block;margin-bottom:10px">Add any stock symbol to monitor daily/weekly trends and targets.</small>
+ <div style="display:flex;gap:8px;margin-bottom:16px;max-width:400px">
+   <input id="wlAddInput" type="text" placeholder="Symbol (e.g. TATAPOWER)..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:13px;text-transform:uppercase">
+   <button id="wlAddBtn" style="border:1px solid var(--mut);background:var(--fg);color:var(--bg);border-radius:20px;padding:8px 16px;cursor:pointer;font-weight:700">+ Add</button>
+ </div>
+ <div class="sl">${cards||"<div style='color:var(--mut);padding:10px 0'>Watchlist is empty. Type a symbol above and tap + Add, or search stocks and click ☆ Watch.</div>"}</div>`;
+
+ document.getElementById("wlAddBtn").onclick=()=>{
+   const inp = document.getElementById("wlAddInput");
+   const val = (inp.value||"").trim().toUpperCase();
+   if(!val) return;
+   const f = rows.find(x=>x.Symbol.toUpperCase()===val);
+   wlSet(val, "watch", f?f.Price:"");
+   inp.value="";
+ };
+ document.getElementById("tabs").innerHTML=bar(false);
+}
+
 document.addEventListener("click",e=>{
  const d=e.target.dataset;
  if(d.wl){wlSet(d.sym,d.wl,parseFloat(d.px)||"")}
  else if(d.wlrm){wlRemove(d.wlrm)}
 });
+
 let simpleMode=false;
-document.getElementById("simpleBtn").onclick=()=>{simpleMode=!simpleMode;document.getElementById("advWrap").style.display=simpleMode?"none":"block";document.getElementById("simpleBtn").textContent=simpleMode?"\ud83d\udd0d Advanced Mode":"\ud83c\udfaf Simple Mode"};
+document.getElementById("simpleBtn").onclick=()=>{simpleMode=!simpleMode;document.getElementById("advWrap").style.display=simpleMode?"none":"block";document.getElementById("simpleBtn").textContent=simpleMode?"🔍 Advanced Mode":"🎯 Simple Mode"};
+
 function renderTop5(){
  const el=document.getElementById("top5");
  const has=rows.some(x=>x.Daily);
@@ -159,56 +280,75 @@ function renderTop5(){
  const picks=rows.filter(r=>r.Daily==="BUY"&&r.DConfirmed==="Y"&&r.Weekly==="BUY"&&r.WConfirmed==="Y").map(r=>{
   const sm=secAvg[r.Industry]||0,{score,reasons}=buyScore(r,sm),st=slTarget(r);
   return{r,score,reasons,st}}).sort((a,b)=>b.score-a.score||b.r["1M"]-a.r["1M"]).slice(0,5);
- el.innerHTML=`<h3>\u{1F3AF} Today's Top 5 Picks \u2014 confirmed Daily+Weekly BUY</h3>
+ el.innerHTML=`<h3>🎯 Today's Top 5 Picks — confirmed Daily+Weekly BUY</h3>
  <small style="color:var(--mut)">Buy Score out of 10. Screening aid, not advice — always check the chart before acting.</small>
- <div class="sl" style="margin-top:8px">${picks.length?picks.map((o,i)=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.score}/10</span><b>${i+1}. ${esc(o.r.Symbol)}</b>${o.r.Cap?` <i class="cp">${o.r.Cap}</i>`:""}<small>${esc(o.r.Industry)} \u00b7 1M ${o.r["1M"]>=0?"+":""}${o.r["1M"].toFixed(1)}% \u00b7 3M ${o.r["3M"]>=0?"+":""}${o.r["3M"].toFixed(1)}%</small><small>${o.reasons.join(" \u00b7 ")}</small>${o.st?`<small>Stop-loss ~\u20b9${o.st.sl} \u00b7 Target ~\u20b9${o.st.target}${o.st.extended?" \u26a0 already above target band":""}</small>`:""}<div style="margin-top:4px">${watchBtns(o.r.Symbol,o.r.Price)}</div></div>`).join(""):"<small>No confirmed Daily+Weekly BUY stocks right now.</small>"}</div>`
+ <div class="sl" style="margin-top:8px">${picks.length?picks.map((o,i)=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.score}/10</span><b>${i+1}. ${esc(o.r.Symbol)}</b>${o.r.Cap?` <i class="cp">${o.r.Cap}</i>`:""}<small>${esc(o.r.Industry)} · 1M ${o.r["1M"]>=0?"+":""}${o.r["1M"].toFixed(1)}% · 3M ${o.r["3M"]>=0?"+":""}${o.r["3M"].toFixed(1)}%</small><small>${o.reasons.join(" · ")}</small>${o.st?`<small>Stop-loss ~₹${o.st.sl} · Target ~₹${o.st.target}${o.st.extended?" ⚠ already above target band":""}</small>`:""}<div style="margin-top:4px">${watchBtns(o.r.Symbol,o.r.Price)}</div></div>`).join(""):"<small>No confirmed Daily+Weekly BUY stocks right now.</small>"}</div>`
  renderWatchlist();
 }
+
 const sigOK=x=>sig==="All"||(sig==="D"&&x.Daily==="BUY"&&x.DConfirmed==="Y")||(sig==="W"&&x.Weekly==="BUY"&&x.WConfirmed==="Y")||(sig==="DW"&&x.Daily==="BUY"&&x.DConfirmed==="Y"&&x.Weekly==="BUY"&&x.WConfirmed==="Y")||(sig==="DS"&&x.Daily==="SELL"&&x.DConfirmed==="Y")||(sig==="WS"&&x.Weekly==="SELL"&&x.WConfirmed==="Y")||(sig==="DWS"&&x.Daily==="SELL"&&x.DConfirmed==="Y"&&x.Weekly==="SELL"&&x.WConfirmed==="Y");
 const chip=(t,v,f)=>v?`<i class="sg ${v==="BUY"?"b":"s"}">${t} ${v}${f?" ★":""}</i>`:"";
-const avg=a=>a.reduce((x,y)=>x+y,0)/a.length,esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function card(i,name,stocks,inflow){const m=avg(stocks.map(s=>s[period])),b=bench[period],rel=m-b,beat=stocks.filter(s=>s[period]>b).length;
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0,esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]);
+
+function card(i,name,stocks,inflow){
+ const m=avg(stocks.map(s=>s[period])),b=bench[period]||0,rel=m-b,beat=stocks.filter(s=>s[period]>b).length;
  const top=stocks.filter(sigOK).sort((a,c)=>inflow?c[period]-a[period]:a[period]-c[period]);
  return `<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>${stocks.length} stocks · ${beat} beat Nifty 500</span>${stocks.some(x=>x.Daily)?`<span>Confirmed MKR BUY: ${stocks.filter(x=>x.Daily==="BUY"&&x.DConfirmed==="Y").length} daily · ${stocks.filter(x=>x.Weekly==="BUY"&&x.WConfirmed==="Y").length} weekly</span>`:""}${FPI[name]?`<span>FPI holdings ₹${FPI[name].toLocaleString("en-IN")} Cr</span>`:""}</span>
  <span class="rt"><b>${m>=0?"+":""}${m.toFixed(1)}%</b><span>${rel>=0?"▲ OUT":"▼ UNDER"} Nifty 500 by ${Math.abs(rel).toFixed(1)}%</span></span></summary>
- <div class="st"><h4>${sig==="All"?"ALL "+top.length:top.length+" OF "+stocks.length} STOCKS · ${inflow?"BEST":"WORST"} FIRST</h4><div class="sc">${top.map(s=>`<div><span>${esc(s.Symbol)}${s.Cap?` <i class="cp">${s.Cap}</i>`:""}<br>${chip("D",s.Daily,s.DFresh)}${chip("W",s.Weekly,s.WFresh)}</span><b>${s[period]>=0?"+":""}${s[period].toFixed(1)}%</b></div>`).join("")}</div></details>`}
+ <div class="st"><h4>${sig==="All"?"ALL "+top.length:top.length+" OF "+stocks.length} STOCKS · ${inflow?"BEST":"WORST"} FIRST</h4><div class="sc">${top.map(s=>`<div><span>${esc(s.Symbol)}${s.Cap?` <i class="cp">${s.Cap}</i>`:""}<br>${chip("D",s.Daily,s.DFresh)}${chip("W",s.Weekly,s.WFresh)}</span><b>${s[period]>=0?"+":""}${s[period].toFixed(1)}%</b></div>`).join("")}</div></details>`
+}
 
 const fmt=n=>Math.abs(n).toLocaleString("en-IN");
-function cardF(i,name,flow,auc,inflow){return `<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>FPI holdings ₹${fmt(auc)} Cr</span></span>
+function cardF(i,name,flow,auc,inflow){
+ return `<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>FPI holdings ₹${fmt(auc)} Cr</span></span>
  <span class="rt"><b>${flow>=0?"+":"−"}₹${fmt(flow)} Cr</b><span>${(flow/auc*100).toFixed(2)}% of holdings</span></span></summary>
- <div class="st"><h4>NSDL NET FPI EQUITY FLOW · ${NSDL_DATE}</h4><div><span>${inflow?"Net bought":"Net sold"}</span><b>₹${fmt(flow)} Cr</b></div><div><span>Holdings at period end</span><b>₹${fmt(auc)} Cr</b></div></div></details>`}
-function renderF(){document.getElementById("sigp").style.display="none";document.getElementById("short").style.display="none";document.getElementById("rot").style.display="none";document.getElementById("trend").style.display="none";document.getElementById("sahil").style.display="none";const secs=Object.entries(NSDL).sort((a,b)=>a[1][0]-b[1][0]),neg=secs.filter(x=>x[1][0]<0),pos=secs.filter(x=>x[1][0]>=0).reverse(),all=view==="all";
+ <div class="st"><h4>NSDL NET FPI EQUITY FLOW · ${NSDL_DATE}</h4><div><span>${inflow?"Net bought":"Net sold"}</span><b>₹${fmt(flow)} Cr</b></div><div><span>Holdings at period end</span><b>₹${fmt(auc)} Cr</b></div></div></details>`
+}
+
+function renderF(){
+ hideAll("grid");
+ const secs=Object.entries(NSDL).sort((a,b)=>a[1][0]-b[1][0]),neg=secs.filter(x=>x[1][0]<0),pos=secs.filter(x=>x[1][0]>=0).reverse(),all=view==="all";
  const O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
  document.getElementById("out").innerHTML=O.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],false)).join("");
  document.getElementById("in").innerHTML=I.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],true)).join("");
- const t=secs.reduce((a,x)=>a+x[1][0],0);document.getElementById("sub").textContent=`FPI net equity flow · ${NSDL_DATE} · all sectors ${t>=0?"+":"−"}₹${fmt(t)} Cr · source: NSDL`;
- document.getElementById("tabs").innerHTML=bar(false)}
-function bar(showP){return `<button class="${mode==="price"?"on":""}" data-m="price">Price return</button><button class="${mode==="fpi"?"on":""}" data-m="fpi">FPI net flow (NSDL)</button><button class="${mode==="rotation"?"on":""}" data-m="rotation">Sector Rotation</button><button class="${mode==="trend"?"on":""}" data-m="trend">Trend Scanner</button><button class="${mode==="sahil"?"on":""}" data-m="sahil">Breakout Scanner</button>`+(showP?PERIODS.map(([p,l])=>`<button class="${p===period?"on":""}" data-p="${p}">${l}</button>`).join(""):"")+(showP?["All",...CAPS].map(c=>`<button class="${c===cap?"on":""}" data-c="${c}">${c==="All"?"All caps":c+" cap"}</button>`).join(""):"")+(showP?[["All","All signals"],["D","Daily BUY"],["W","Weekly BUY"],["DW","Daily+Weekly BUY"],["DS","Daily SELL"],["WS","Weekly SELL"],["DWS","Daily+Weekly SELL"]].map(([k,l])=>`<button class="${k===sig?"on":""}" data-s="${k}">${l}</button>`).join(""):"")+`<button class="${view==="top"?"on":""}" data-v="top">Top 5 sectors</button><button class="${view==="all"?"on":""}" data-v="all">All sectors</button>`}
+ const t=secs.reduce((a,x)=>a+x[1][0],0);
+ document.getElementById("sub").textContent=`FPI net equity flow · ${NSDL_DATE} · all sectors ${t>=0?"+":"−"}₹${fmt(t)} Cr · source: NSDL`;
+ document.getElementById("tabs").innerHTML=bar(false);
+}
+
+function bar(showP){
+ return `<button class="${mode==="price"?"on":""}" data-m="price">Price return</button><button class="${mode==="fpi"?"on":""}" data-m="fpi">FPI net flow (NSDL)</button><button class="${mode==="rotation"?"on":""}" data-m="rotation">Sector Rotation</button><button class="${mode==="trend"?"on":""}" data-m="trend">Trend Scanner</button><button class="${mode==="sahil"?"on":""}" data-m="sahil">Breakout Scanner</button><button class="${mode==="watchlist"?"on":""}" data-m="watchlist">⭐ Watchlist</button>`+(showP?PERIODS.map(([p,l])=>`<button class="${p===period?"on":""}" data-p="${p}">${l}</button>`).join(""):"")+(showP?["All",...CAPS].map(c=>`<button class="${c===cap?"on":""}" data-c="${c}">${c==="All"?"All caps":c+" cap"}</button>`).join(""):"")+(showP?[["All","All signals"],["D","Daily BUY"],["W","Weekly BUY"],["DW","Daily+Weekly BUY"],["DS","Daily SELL"],["WS","Weekly SELL"],["DWS","Daily+Weekly SELL"]].map(([k,l])=>`<button class="${k===sig?"on":""}" data-s="${k}">${l}</button>`).join(""):"")+`<button class="${view==="top"?"on":""}" data-v="top">Top 5 sectors</button><button class="${view==="all"?"on":""}" data-v="all">All sectors</button>`
+}
 
 let sm="BUY",so=false;
 const ago=n=>n===""||n===undefined||n===null?"":n===0?"today":n===1?"1 bar ago":n+" bars ago";
-function why(x){const b=sm==="BUY",R=[];
+function why(x){
+ const b=sm==="BUY",R=[];
  if(x.DTurnAgo!==""&&x.Daily===(b?"BUY":"SELL"))R.push("Daily: line turned "+(b?"up":"down")+" ("+ago(x.DTurnAgo)+")");
  if(x.DCross===(b?"UP":"DN")&&x.DCrossAgo!=="")R.push("Daily: price crossed "+(b?"above":"below")+" line ("+ago(x.DCrossAgo)+")");
  if(x.WTurnAgo!==""&&x.Weekly===(b?"BUY":"SELL"))R.push("Weekly: line turned "+(b?"up":"down")+" ("+ago(x.WTurnAgo)+")");
  if(x.WCross===(b?"UP":"DN")&&x.WCrossAgo!=="")R.push("Weekly: price crossed "+(b?"above":"below")+" line ("+ago(x.WCrossAgo)+")");
- return R}
-function renderSig(all,inSet){const el=document.getElementById("sigp"),b=sm==="BUY";el.style.display="block";
+ return R;
+}
+
+function renderSig(all,inSet){
+ const el=document.getElementById("sigp"),b=sm==="BUY";el.style.display="block";
  const has=all.some(x=>x.Daily||x.Weekly);
  const it=all.map(x=>({x,R:why(x),ins:inSet.has(x.Industry)})).filter(o=>o.R.length&&(!so||o.ins)).sort((a,c)=>c.R.length-a.R.length||c.x[period]-a.x[period]);
  el.innerHTML=`<h3>${b?"▲ Stocks crossing ABOVE":"▼ Stocks crossing BELOW"} Multi Kernel Regression [ChartPrime] — ${it.length} stocks</h3>
  <div class="bar"><button class="${b?"on":""}" data-sm="BUY">BUY ▲</button><button class="${!b?"on":""}" data-sm="SELL">SELL ▼</button><button class="${!so?"on":""}" data-so="0">All sectors</button><button class="${so?"on":""}" data-so="1">Money-inflow sectors only</button></div>
- <div class="sl">${has?(it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}<small>${esc(o.x.Industry)}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No stocks match right now.</small>"):"<small>No real signals yet. This is sample data, so signals are hidden. Load the real flow.csv (Colab cell 10 or the daily GitHub run) to see true BUY/SELL stocks.</small>"}</div>`}
-document.getElementById("rot").onclick=e=>{};
-document.getElementById("trend").onclick=e=>{const d=e.target.dataset;if(d.tc){tcap=d.tc;renderTrend()}else if(d.trs){trs=d.trs;renderTrend()}else if(d.tdv){tdv=d.tdv;renderTrend()}else if(d.trsi){trsi=d.trsi;renderTrend()}};
+ <div class="sl">${has?(it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}<small>${esc(o.x.Industry)}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No stocks match right now.</small>"):"<small>No real signals yet. This is sample data, so signals are hidden. Load the real flow.csv (Colab cell 10 or the daily GitHub run) to see true BUY/SELL stocks.</small>"}</div>`
+}
+
 document.getElementById("sigp").onclick=e=>{const d=e.target.dataset;if(d.sm){sm=d.sm;render()}else if(d.so!==undefined){so=d.so==="1";render()}};
 
-function renderShort(all){const el=document.getElementById("short");el.style.display="block";
+function renderShort(all){
+ const el=document.getElementById("short");el.style.display="block";
  const has=all.some(x=>x.Daily||x.Weekly),G={};all.forEach(r=>(G[r.Industry]??=[]).push(r));
  const mean=(v,k)=>avg(v.map(x=>x[k]).filter(x=>!isNaN(x)));
  const secs=Object.entries(G).filter(([,v])=>v.length>=3).map(([n,v])=>{const m1=mean(v,"1M"),m3=mean(v,"3M"),
   d=v.filter(x=>x.Daily==="BUY"&&x.DConfirmed==="Y").length/v.length,w=v.filter(x=>x.Weekly==="BUY"&&x.WConfirmed==="Y").length/v.length,fl=NSDL[n]?NSDL[n][0]:null;
-  const c=[["1M > Nifty 500",m1>bench["1M"]],["3M > Nifty 500",m3>bench["3M"]],["FPI buying",fl!==null&&fl>0],["50%+ confirmed Daily BUY",has&&d>=.5],["50%+ confirmed Weekly BUY",has&&w>=.5]];
+  const c=[["1M > Nifty 500",m1>(bench["1M"]||0)],["3M > Nifty 500",m3>(bench["3M"]||0)],["FPI buying",fl!==null&&fl>0],["50%+ confirmed Daily BUY",has&&d>=.5],["50%+ confirmed Weekly BUY",has&&w>=.5]];
   return{n,v,m1,c,score:c.filter(x=>x[1]).length}}).sort((a,b)=>b.score-a.score||b.m1-a.m1);
  const top=secs.slice(0,5);
  const st=[];top.forEach(sc=>sc.v.filter(x=>x.Daily==="BUY"&&x.Weekly==="BUY"&&x.DConfirmed==="Y"&&x.WConfirmed==="Y").forEach(x=>{
@@ -223,7 +363,8 @@ function renderShort(all){const el=document.getElementById("short");el.style.dis
  <h4 style="margin:12px 0 4px;font-size:12px;letter-spacing:.06em;color:var(--mut)">TOP SECTORS (score out of 5)</h4>
  ${top.map((o,i)=>`<div class="sr"><span class="r">${o.score}/5</span><b>${i+1}. ${esc(o.n)}</b><small>1M avg ${f1(o.m1)} · ${o.v.length} stocks</small><small>${o.c.map(([l,ok])=>`<span style="color:var(--${ok?"gc":"rc"})">${ok?"✓":"✗"} ${l}</span>`).join(" · ")}</small></div>`).join("")||"<small>Not enough data.</small>"}
  <h4 style="margin:12px 0 4px;font-size:12px;letter-spacing:.06em;color:var(--mut)">STOCKS IN THESE SECTORS WITH DAILY + WEEKLY BUY (top 15)</h4>
- <div class="sl">${has?(st.slice(0,15).map(o=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.pts}/5</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}<small>${esc(o.sc.n)} · 1M ${f1(o.x["1M"])} · 3M ${f1(o.x["3M"])}</small><small>${["Daily BUY","Weekly BUY",o.fresh?"fresh — turned/crossed "+(o.dAge<=1?ago(o.dAge)+" (daily)":ago(o.wAge)+" (weekly)"):"",o.lead?"beats its sector":"",o.ext?"⚠ up 25%+ in 1M, may be extended":""].filter(Boolean).join(" · ")}</small></div>`).join("")||"<small>No stock has both Daily and Weekly BUY in these sectors right now.</small>"):"<small>Sample data has no signals. Load your real data to see stocks.</small>"}</div>`}
+ <div class="sl">${has?(st.slice(0,15).map(o=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.pts}/5</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}<small>${esc(o.sc.n)} · 1M ${f1(o.x["1M"])} · 3M ${f1(o.x["3M"])}</small><small>${["Daily BUY","Weekly BUY",o.fresh?"fresh — turned/crossed "+(o.dAge<=1?ago(o.dAge)+" (daily)":ago(o.wAge)+" (weekly)"):"",o.lead?"beats its sector":"",o.ext?"⚠ up 25%+ in 1M, may be extended":""].filter(Boolean).join(" · ")}</small></div>`).join("")||"<small>No stock has both Daily and Weekly BUY in these sectors right now.</small>"):"<small>Sample data has no signals. Load your real data to see stocks.</small>"}</div>`
+}
 
 function doSearch(){
  const q=document.getElementById("sq").value.trim().toLowerCase(),el=document.getElementById("sres");
@@ -246,7 +387,6 @@ function doSearch(){
    const rv=r[period]||0,inflow=rv>=0,cap=r.Cap?(" <i class=\"cp\">"+r.Cap+"</i>"):"";
    const dch=r.Daily?("<i class=\"sg "+(r.Daily==="BUY"?"b":"s")+"\">D "+r.Daily+"</i>"):"";
    const wch=r.Weekly?("<i class=\"sg "+(r.Weekly==="BUY"?"b":"s")+"\">W "+r.Weekly+"</i>"):"";
-   const ago=n=>n===""||n===undefined||n===null?"":n===0?"today":n===1?"1 bar ago":n+" bars ago";
    const dReason=r.Daily?("Daily: "+r.Daily+(r.DConfirmed==="Y"?" \u2713 confirmed (price agrees with the line)":" \u26a0 not yet confirmed (price hasn't followed the line)")+(r.DTurnAgo!==""?" (line turned "+ago(r.DTurnAgo)+")":"")+(r.DCross?", price crossed "+(r.DCross==="UP"?"above":"below")+" the line "+ago(r.DCrossAgo):"")):"No daily signal yet";
    const wReason=r.Weekly?("Weekly: "+r.Weekly+(r.WConfirmed==="Y"?" \u2713 confirmed (price agrees with the line)":" \u26a0 not yet confirmed (price hasn't followed the line)")+(r.WTurnAgo!==""?" (line turned "+ago(r.WTurnAgo)+")":"")+(r.WCross?", price crossed "+(r.WCross==="UP"?"above":"below")+" the line "+ago(r.WCrossAgo):"")):"No weekly signal yet";
    const ret=p=>isNaN(r[p])?"—":((r[p]>=0?"+":"")+r[p].toFixed(1)+"%");
@@ -275,19 +415,39 @@ function doSearch(){
 }
 document.getElementById("sq").oninput=doSearch;
 
+function hideAll(except){
+ ["short","sigp","rot","trend","sahil","wlView","mainGrid"].forEach(id=>{
+  const e=document.getElementById(id);
+  if(e){
+    if(id==="mainGrid"){e.style.display=(except==="grid")?"grid":"none"}
+    else{e.style.display=(id===except)?"block":"none"}
+  }
+ });
+}
 
-function hideAll(except){["short","sigp","rot","trend","sahil"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=id===except?"block":"none"})}
-const streakOf=hist=>{if(!hist||!hist.length)return"";let n=1;const sign=hist[hist.length-1]>=0;for(let i=hist.length-2;i>=0;i--){if((hist[i]>=0)===sign)n++;else break}return n+"x "+(sign?"BUY":"SELL")};
+const streakOf=hist=>{
+ if(!hist||!hist.length)return"";
+ const sign=hist[hist.length-1]>=0;
+ let n=0;
+ for(let i=hist.length-1;i>=0;i--){
+   if((hist[i]>=0)===sign)n++;
+   else break;
+ }
+ return n>=2 ? `${n}x ${sign?"BUY":"SELL"}` : "";
+};
+
 function renderRotation(){
- hideAll("rot");document.getElementById("out").innerHTML="";document.getElementById("in").innerHTML="";
- const el=document.getElementById("rot"),G={};rows.forEach(r=>{if(!isNaN(r["1M"]))(G[r.Industry]??=[]).push(r)});
- const rowsHtml=Object.entries(G).filter(([,v])=>v.length>=3).map(([n,v])=>{
+ hideAll("rot");
+ const el=document.getElementById("rot"),G={};
+ rows.forEach(r=>{if(!isNaN(r["1M"]))(G[r.Industry]??=[]).push(r)});
+ const rowsHtml=Object.entries(G).filter(([,v])=>v.length>=2).map(([n,v])=>{
   const m1=avg(v.map(x=>x["1M"]).filter(x=>!isNaN(x))),m3=avg(v.map(x=>x["3M"]).filter(x=>!isNaN(x)));
-  const vs3=m3-bench["3M"],lead1=m1>bench["1M"],lead3=m3>bench["3M"];
+  const vs3=m3-(bench["3M"]||0),lead1=m1>(bench["1M"]||0),lead3=m3>(bench["3M"]||0);
   const sig=lead1&&lead3?["Leading","gc"]:lead1&&!lead3?["Improving","gc"]:!lead1&&lead3?["Weakening","rc"]:["Lagging","rc"];
   const up=v.filter(x=>x.Daily==="BUY"&&x.DConfirmed==="Y").length,upPct=v.some(x=>x.Daily)?(up/v.length*100):null;
   const hist=NSDL_HISTORY[n],streak=streakOf(hist),fl=NSDL[n];
   return{n,v:v.length,vs3,sig,upPct,streak,flow:fl?fl[0]:null}}).sort((a,b)=>b.vs3-a.vs3);
+
  el.innerHTML=`<h3>Sector Rotation — relative strength vs Nifty 500</h3><small style="color:var(--mut)">3M return vs Nifty 500 · trend label from 1M &amp; 3M · % stocks with a Daily BUY · FPI fortnight streak</small>
  <div style="overflow-x:auto;margin-top:10px"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap">
  <tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px 10px 6px 0">Sector</th><th style="padding:6px 10px">vs Nifty (3M)</th><th style="padding:6px 10px">Trend</th><th style="padding:6px 10px">% stocks confirmed Daily BUY</th><th style="padding:6px 10px">FPI streak</th></tr>
@@ -295,12 +455,15 @@ function renderRotation(){
  <td style="padding:6px 10px;color:var(--${r.vs3>=0?"gc":"rc"})">${r.vs3>=0?"+":""}${r.vs3.toFixed(1)}%</td>
  <td style="padding:6px 10px"><i class="sg ${r.sig[1]==="gc"?"b":"s"}">${r.sig[0]}</i></td>
  <td style="padding:6px 10px">${r.upPct===null?"—":r.upPct.toFixed(0)+"%"}</td>
- <td style="padding:6px 10px;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td></tr>`).join("")}
- </table></div>`}
+ <td style="padding:6px 10px;font-weight:700;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td></tr>`).join("")}
+ </table></div>`;
+ document.getElementById("tabs").innerHTML=bar(false);
+}
+
 let tcap="All",trs="All",tdv="All",trsi="All";
 function renderTrend(){
  const rsiCell=v=>isNaN(v)?"—":`<span style="color:var(--${v>70?"rc":v<30?"gc":"fg"})">${v}</span>`;
- hideAll("trend");document.getElementById("out").innerHTML="";document.getElementById("in").innerHTML="";
+ hideAll("trend");
  const el=document.getElementById("trend"),q=(document.getElementById("sq").value||"").trim().toLowerCase();
  let list=rows.filter(r=>r.Price);
  if(tcap!=="All")list=list.filter(r=>r.Cap===tcap);
@@ -327,40 +490,94 @@ function renderTrend(){
  <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap">
  <tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px 10px 6px 0">Stock</th><th style="padding:6px 10px">Sector</th><th style="padding:6px 10px">Price</th><th style="padding:6px 10px">Trend</th><th style="padding:6px 10px">20d</th><th style="padding:6px 10px">50d</th><th style="padding:6px 10px">100d</th><th style="padding:6px 10px">200d</th><th style="padding:6px 10px">RS vs Nifty</th><th style="padding:6px 10px">Delivery %</th><th style="padding:6px 10px">RSI D/W/M</th><th style="padding:6px 10px">RSI&gt;40</th><th style="padding:6px 10px">RSI&gt;50</th><th style="padding:6px 10px">RSI&gt;60</th></tr>
  ${list.slice(0,80).map(r=>`<tr style="border-bottom:1px solid var(--card)"><td style="padding:6px 10px 6px 0"><b>${esc(r.Symbol)}</b>${r.Cap?` <i class="cp">${r.Cap}</i>`:""}</td><td style="padding:6px 10px;color:var(--mut)">${esc(r.Industry||"")}</td><td style="padding:6px 10px">${r.Price||"—"}</td><td style="padding:6px 10px">${r.Daily?`<i class="sg ${r.Daily==="BUY"?"b":"s"}">${r.Daily==="BUY"?"UPTREND":"DOWNTREND"}${r.DConfirmed==="Y"?" ✓":" ⚠"}</i>`:"—"}</td><td style="padding:6px 10px">${cell(r.EMA20)}</td><td style="padding:6px 10px">${cell(r.EMA50)}</td><td style="padding:6px 10px">${cell(r.EMA100)}</td><td style="padding:6px 10px">${cell(r.EMA200)}</td><td style="padding:6px 10px">${r.RSState?`<i class="sg ${r.RSState==="Rising"?"b":"s"}">${r.RSState}${r.RSPos==="Y"?" RS+":""}${r.RSCross==="UP"&&r.RSCrossAgo!==""&&r.RSCrossAgo<=10?" ↑0":""}</i>`:"—"}</td><td style="padding:6px 10px">${r.DelivPct?`<span style="color:var(--${r.DelivHigh==="Y"?"gc":"fg"})">${r.DelivPct}%${r.DelivHigh==="Y"?" ★":""}</span>`:"—"}</td><td style="padding:6px 10px">${rsiCell(r.RSI_D)} / ${rsiCell(r.RSI_W)} / ${rsiCell(r.RSI_M)}</td><td style="padding:6px 10px">${cell(isNaN(r.RSI_D)?"":(r.RSI_D>40?"Above":"Below"))}${r.RSI40Cross==="UP"&&r.RSI40CrossAgo!==""?" ↑":""}</td><td style="padding:6px 10px">${cell(isNaN(r.RSI_D)?"":(r.RSI_D>50?"Above":"Below"))}${r.RSI50Cross==="UP"&&r.RSI50CrossAgo!==""?" ↑":""}</td><td style="padding:6px 10px">${cell(isNaN(r.RSI_D)?"":(r.RSI_D>60?"Above":"Below"))}${r.RSI60Cross==="UP"&&r.RSI60CrossAgo!==""?" ↑":""}</td></tr>`).join("")||"<tr><td colspan=14 style=\"padding:10px 0;color:var(--mut)\">No matching stocks.</td></tr>"}
- </table></div>`}
+ </table></div>`;
+ document.getElementById("tabs").innerHTML=bar(false);
+}
+
+document.getElementById("trend").onclick=e=>{const d=e.target.dataset;if(d.tc){tcap=d.tc;renderTrend()}else if(d.trs){trs=d.trs;renderTrend()}else if(d.tdv){tdv=d.tdv;renderTrend()}else if(d.trsi){trsi=d.trsi;renderTrend()}};
 document.getElementById("sq").addEventListener("input",()=>{if(mode==="trend")renderTrend();if(mode==="sahil")renderSahil()});
+
 let sahilTf="W";
 function renderSahil(){
- hideAll("sahil");document.getElementById("out").innerHTML="";document.getElementById("in").innerHTML="";
+ hideAll("sahil");
  const el=document.getElementById("sahil"),fld=sahilTf==="W"?"SahilW":"SahilD",agoFld=sahilTf==="W"?"SahilWAgo":"SahilDAgo";
  const has=rows.some(x=>x[fld]);
  const buys=rows.filter(r=>r[fld]==="BUY").sort((a,b)=>(a[agoFld]===""?99:a[agoFld])-(b[agoFld]===""?99:b[agoFld]));
  const sells=rows.filter(r=>r[fld]==="SELL").sort((a,b)=>(a[agoFld]===""?99:a[agoFld])-(b[agoFld]===""?99:b[agoFld]));
- const row=r=>`<div class="sr"><span class="r" style="color:var(--${r[fld]==="BUY"?"gc":"rc"})">${r[agoFld]===0?"today":r[agoFld]===1?"1 bar ago":r[agoFld]+" bars ago"}</span><b>${esc(r.Symbol)}</b>${r.Cap?` <i class="cp">${r.Cap}</i>`:""}<small>${esc(r.Industry||"")} \u00b7 Price \u20b9${r.Price||"—"}</small></div>`;
+ const row=r=>`<div class="sr"><span class="r" style="color:var(--${r[fld]==="BUY"?"gc":"rc"})">${r[agoFld]===0?"today":r[agoFld]===1?"1 bar ago":r[agoFld]+" bars ago"}</span><b>${esc(r.Symbol)}</b>${r.Cap?` <i class="cp">${r.Cap}</i>`:""}<small>${esc(r.Industry||"")} · Price ₹${r.Price||"—"}</small></div>`;
  el.innerHTML=`<h3>SAHIL Breakout + Volume Scanner (${sahilTf==="W"?"Weekly":"Daily"})</h3>
- <small style="color:var(--mut)">Close breaks the prior 20-bar high/low with volume \u2265 1.5\u00d7 its 20-bar average. Fresh breakouts only (last 10 bars).</small>
+ <small style="color:var(--mut)">Close breaks the prior 20-bar high/low with volume ≥ 1.5× its 20-bar average. Fresh breakouts only (last 10 bars).</small>
  <div class="bar" style="margin:8px 0"><button class="${sahilTf==="D"?"on":""}" data-stf="D">Daily</button><button class="${sahilTf==="W"?"on":""}" data-stf="W">Weekly</button></div>
- ${has?`<div class="grid" style="margin-top:10px"><div><h4 style="color:var(--rc);font-size:12px;letter-spacing:.06em">BREAKDOWN (SELL) \u2014 ${sells.length}</h4><div class="sl">${sells.map(row).join("")||"<small>None right now.</small>"}</div></div><div><h4 style="color:var(--gc);font-size:12px;letter-spacing:.06em">BREAKOUT (BUY) \u2014 ${buys.length}</h4><div class="sl">${buys.map(row).join("")||"<small>None right now.</small>"}</div></div></div>`:`<small>No breakout data in this dataset \u2014 re-export flow.csv with the updated script.</small>`}`
+ ${has?`<div class="grid" style="margin-top:10px"><div><h4 style="color:var(--rc);font-size:12px;letter-spacing:.06em">BREAKDOWN (SELL) — ${sells.length}</h4><div class="sl">${sells.map(row).join("")||"<small>None right now.</small>"}</div></div><div><h4 style="color:var(--gc);font-size:12px;letter-spacing:.06em">BREAKOUT (BUY) — ${buys.length}</h4><div class="sl">${buys.map(row).join("")||"<small>None right now.</small>"}</div></div></div>`:`<small>No breakout data in this dataset — re-export flow.csv with the updated script.</small>`}`
+ document.getElementById("tabs").innerHTML=bar(false);
 }
+
 document.getElementById("sahil").onclick=e=>{const d=e.target.dataset;if(d.stf){sahilTf=d.stf;renderSahil()}};
-function render(){if(mode==="rotation")return renderRotation();if(mode==="trend")return renderTrend();if(mode==="sahil")return renderSahil();document.getElementById("rot").style.display="none";document.getElementById("trend").style.display="none";document.getElementById("sahil").style.display="none";if(mode==="fpi")return renderF();const g={};rows.forEach(r=>{if((cap==="All"||r.Cap===cap)&&!isNaN(r[period]))(g[r.Industry]??=[]).push(r)});
+
+function render(){
+ if(mode==="rotation")return renderRotation();
+ if(mode==="trend")return renderTrend();
+ if(mode==="sahil")return renderSahil();
+ if(mode==="watchlist")return renderWatchlistTab();
+ if(mode==="fpi")return renderF();
+
+ hideAll("grid");
+ const g={};rows.forEach(r=>{if((cap==="All"||r.Cap===cap)&&!isNaN(r[period]))(g[r.Industry]??=[]).push(r)});
  const secs=Object.entries(g).filter(([,v])=>v.length>=(cap==="All"?3:2)).map(([n,v])=>[n,v,avg(v.map(x=>x[period]))]).sort((a,b)=>a[2]-b[2]);
  const all=view==="all",neg=secs.filter(x=>x[2]<0),pos=secs.filter(x=>x[2]>=0).reverse();
  const O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
  document.getElementById("out").innerHTML=O.map(([n,v],i)=>card(i+1,n,v,false)).join("")||"<div class='note'>None</div>";
  document.getElementById("in").innerHTML=I.map(([n,v],i)=>card(i+1,n,v,true)).join("")||"<div class='note'>None</div>";
- renderShort(Object.values(g).flat());renderSig(Object.values(g).flat(),new Set(I.map(x=>x[0])));
- const b=bench[period];document.getElementById("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT of sectors (left) and INTO sectors (right)`;
- document.getElementById("tabs").innerHTML=bar(true)}
+ renderShort(Object.values(g).flat());
+ renderSig(Object.values(g).flat(),new Set(I.map(x=>x[0])));
+ const b=bench[period]||0;
+ document.getElementById("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT of sectors (left) and INTO sectors (right)`;
+ document.getElementById("tabs").innerHTML=bar(true);
+}
+
 let cur=sample();
-document.getElementById("tabs").onclick=e=>{const d=e.target.dataset;if(d.p){period=d.p;load(cur)}else if(d.v){view=d.v;render()}else if(d.m){mode=d.m;render()}else if(d.tc){tcap=d.tc;renderTrend()}else if(d.trs){trs=d.trs;renderTrend()}else if(d.tdv){tdv=d.tdv;renderTrend()}else if(d.trsi){trsi=d.trsi;renderTrend()}else if(d.c){cap=d.c;render()}else if(d.s){sig=d.s;render()}};
+document.getElementById("tabs").onclick=e=>{
+ const d=e.target.dataset;
+ if(d.p){period=d.p;load(cur)}
+ else if(d.v){view=d.v;render()}
+ else if(d.m){mode=d.m;render()}
+ else if(d.tc){tcap=d.tc;renderTrend()}
+ else if(d.trs){trs=d.trs;renderTrend()}
+ else if(d.tdv){tdv=d.tdv;renderTrend()}
+ else if(d.trsi){trsi=d.trsi;renderTrend()}
+ else if(d.c){cap=d.c;render()}
+ else if(d.s){sig=d.s;render()}
+};
+
 const note=t=>document.getElementById("note").textContent=t;
-function useCSV(text,name){try{const recs=parseCSV(text);if(!recs.length||!("Industry" in recs[0])||!("1M" in recs[0]))throw 0;cur=recs;load(cur);note("Showing your data: "+name+" · "+recs.length+" stocks")}catch(e){note("Could not read this CSV. Use the flow.csv made by the Colab file (columns: Symbol, Industry, Cap, 1W, 1M, 3M, 6M ...).")}}
+function useCSV(text,name){
+ try{
+   const recs=parseCSV(text);
+   if(!recs.length||!("Industry" in recs[0])||!("1M" in recs[0]))throw 0;
+   cur=recs;
+   load(cur);
+   note("Showing your data: "+name+" · "+recs.length+" stocks");
+ }catch(e){
+   note("Could not read this CSV. Use the flow.csv made by the Colab file (columns: Symbol, Industry, Cap, 1W, 1M, 3M, 6M ...).");
+ }
+}
+
 document.getElementById("f").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>useCSV(t,f.name)).catch(()=>note("Could not open the file. Try “Paste CSV instead”."))};
 document.getElementById("pb").onclick=()=>{const w=document.getElementById("pw");w.style.display=w.style.display==="none"?"block":"none"};
 document.getElementById("pgo").onclick=()=>useCSV(document.getElementById("ta").value,"pasted data");
-load(cur);
-fetch("nsdl.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{NSDL=j.data;NSDL_DATE=j.date;NSDL_HISTORY=j.history||{};FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));render()}).catch(()=>{});
-fetch("flow.csv",{cache:"no-store"}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{useCSV(t,"flow.csv");note("Live data · updated automatically after market close")}).catch(()=>{});
 
+load(cur);
+
+fetch("nsdl.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{
+ NSDL=j.data||NSDL;
+ NSDL_DATE=j.date||NSDL_DATE;
+ if(j.history)NSDL_HISTORY=j.history;
+ FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));
+ render();
+}).catch(()=>{});
+
+fetch("flow.csv",{cache:"no-store"}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{
+ useCSV(t,"flow.csv");
+ note("Live data · updated automatically after market close");
+}).catch(()=>{});
 </script></body></html>
