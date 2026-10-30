@@ -1,0 +1,5 @@
+# Extra stocks to track (one NSE symbol per line). Lines starting with # are ignored.
+# After editing this file, run the workflow once (Actions -> Run workflow).
+BSE
+SDBL
+MUKKA
