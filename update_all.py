@@ -174,7 +174,13 @@ def main():
     })
 
     all_tickers = []
-        # extra_symbols.txt mathi nava stocks ઉમેરો
+    meta = {}
+    for sec, stocks in SECTOR_MAP.items():
+        for sym, cap in stocks:
+            all_tickers.append(sym)
+            meta[sym.replace(".NS", "")] = (sec, cap)
+            
+    # extra_symbols.txt mathi nava stocks ઉમેરો
     if os.path.exists("extra_symbols.txt"):
         with open("extra_symbols.txt", "r", encoding="utf-8") as ef:
             for line in ef:
@@ -184,13 +190,7 @@ def main():
                     if t_ns not in all_tickers:
                         all_tickers.append(t_ns)
                         meta[sym] = ("Others", "Small")
-
-    meta = {}
-    for sec, stocks in SECTOR_MAP.items():
-        for sym, cap in stocks:
-            all_tickers.append(sym)
-            meta[sym.replace(".NS", "")] = (sec, cap)
-
+                        
     data = yf.download(all_tickers, period="1y", interval="1d", group_by='ticker', progress=False)
 
     for ticker in all_tickers:
