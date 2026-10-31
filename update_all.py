@@ -174,6 +174,17 @@ def main():
     })
 
     all_tickers = []
+        # extra_symbols.txt mathi nava stocks ઉમેરો
+    if os.path.exists("extra_symbols.txt"):
+        with open("extra_symbols.txt", "r", encoding="utf-8") as ef:
+            for line in ef:
+                sym = line.strip().upper()
+                if sym and not sym.startswith("#"):
+                    t_ns = f"{sym}.NS"
+                    if t_ns not in all_tickers:
+                        all_tickers.append(t_ns)
+                        meta[sym] = ("Others", "Small")
+
     meta = {}
     for sec, stocks in SECTOR_MAP.items():
         for sym, cap in stocks:
