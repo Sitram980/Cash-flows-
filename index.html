@@ -104,7 +104,7 @@ let NSDL_HISTORY={
   "Forest Materials":[73,-41,1,-12,-12,-11,40,-9,-7,7],
   "Media, Entertainment & Publication":[-149,-12,-110,-232,-127,-289,24,-6,72,-93]
 };
-let NSDL_DATE="1–15 Oct 2026";
+let NSDL_DATE="16–31 Oct 2026";
 let NSDL={"Information Technology":[2599,398397],"Services":[262,186896],"Media, Entertainment & Publication":[252,11084],"Diversified":[43,3626],"Chemicals":[41,119343],
 "Utilities":[-34,2725],"Forest Materials":[-50,1176],"Textiles":[-59,21265],"Construction Materials":[-564,94263],"Realty":[-578,111753],
 "Consumer Durables":[-586,179333],"Construction":[-1224,112879],"Power":[-1732,235832],"Consumer Services":[-1931,287273],
@@ -182,6 +182,24 @@ function load(recs){
     else if(o.Industry&&!isNaN(o[period]))rows.push(o);
   }
   PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.length?v.reduce((a,b)=>a+b,0)/v.length:0}});
+
+  // જો બધા સ્ટોક્સમાં RS Rank 50 દેખાતો હોય, તો બ્રાઉઝર જાતે સાચો 1-99 પર્સન્ટાઈલ રેન્ક ગણી લેશે
+  const uniqueRanks = new Set(rows.map(x => x.RS_Rank).filter(x => !isNaN(x)));
+  if (uniqueRanks.size <= 1) {
+    const valid = rows.filter(x => !isNaN(x["1M"]) && !isNaN(x["3M"]));
+    valid.forEach(x => {
+      const r1 = isNaN(x["1M"]) ? 0 : x["1M"];
+      const r3 = isNaN(x["3M"]) ? 0 : x["3M"];
+      const r6 = isNaN(x["6M"]) ? r3 : x["6M"];
+      x._calcScore = (0.4 * r3) + (0.3 * r6) + (0.3 * r1);
+    });
+    valid.sort((a, b) => a._calcScore - b._calcScore);
+    const n = valid.length;
+    valid.forEach((x, idx) => {
+      x.RS_Rank = Math.max(1, Math.min(99, Math.round(((idx + 1) / n) * 100)));
+    });
+  }
+
   renderTop5();
   render();
 }
@@ -242,7 +260,6 @@ function renderWatchlistTab(){
     const isDailyBuy = dSig==="BUY", isWeeklyBuy = wSig==="BUY";
     const e20=r?r.EMA20:"—", e50=r?r.EMA50:"—";
     const rsi=r?r.RSI_D:"—";
-    const rsRank=r?r.RS_Rank:"—";
     const st=r?slTarget(r):null;
 
     return `<div class="sr" style="padding:10px 0;border-top:1px solid var(--mut)">
@@ -407,7 +424,7 @@ function doSearch(){
   if(bySym.length){
     html+="<h4 style=\"margin:10px 0 4px;font-size:12px;color:var(--mut)\">STOCKS</h4><div class=\"sl\">";
     bySym.slice(0,25).forEach(r=>{
-      const bs=buyScore(r,0),st=slTarget(r);
+      const st=slTarget(r);
       html+="<div class=\"sr\"><b>"+esc(r.Symbol)+"</b> <span class=\"cp\" style=\"font-weight:700\">RS: "+r.RS_Rank+"</span> <small>₹"+(r.Price||"—")+" · "+esc(r.Industry)+"</small><br><small>Daily: "+r.Daily+" · Weekly: "+r.Weekly+"</small>"+(st?"<br><small>SL: ₹"+st.sl+" · Target: ₹"+st.target+"</small>":"")+"<div style=\"margin-top:4px\">"+watchBtns(r.Symbol,r.Price)+"</div></div>";
     });
     html+="</div>";
@@ -463,7 +480,7 @@ function renderRotation(){
   document.getElementById("tabs").innerHTML=bar(false);
 }
 
-let tcap="All",trs="All",tdv="All",trsi="All";
+let tcap="All",trs="All";
 function renderTrend(){
   hideAll("trend");
   const el=document.getElementById("trend"),q=(document.getElementById("sq").value||"").trim().toLowerCase();
@@ -473,11 +490,8 @@ function renderTrend(){
   if(trs==="Falling")list=list.filter(r=>r.RSState==="Falling");
   if(trs==="Breakout")list=list.filter(r=>r.RSPos==="Y");
   if(trs==="RS80")list=list.filter(r=>r.RS_Rank>=80);
-  if(tdv==="HighDeliv")list=list.filter(r=>r.DelivHigh==="Y");
-  if(trsi==="OB_D")list=list.filter(r=>r.RSI_D>70);
-  if(trsi==="OS_D")list=list.filter(r=>r.RSI_D<30);
   if(q)list=list.filter(r=>r.Symbol.toLowerCase().includes(q)||(r.Industry||"").toLowerCase().includes(q));
-  list=list.slice().sort((a,b)=>b.RS_Rank-a.RS_Rank||(b.Daily==="BUY")-(a.Daily==="BUY"));
+  list=list.slice().sort((a,b)=>(b.RS_Rank||50)-(a.RS_Rank||50)||(b.Daily==="BUY")-(a.Daily==="BUY"));
   const cell=v=>v?`<span style="color:var(--${v==="Above"?"gc":"rc"})">${v}</span>`:"—";
   el.innerHTML=`<h3>Trend Scanner (${list.length} stocks)</h3>
   <div class="bar" style="margin:8px 0">${["All",...CAPS].map(c=>`<button class="${c===tcap?"on":""}" data-tc="${c}">${c==="All"?"All caps":c+" cap"}</button>`).join("")}</div>
