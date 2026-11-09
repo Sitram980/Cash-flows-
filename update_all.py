@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import datetime
 import requests
@@ -164,10 +165,10 @@ def calculate_mkr(series, period=14):
     return line, upper, lower
 
 # ==========================================
-# 3. NSDL FPI AUTO-UPDATE ENGINE
+# 3. FPIDATA.IN FPI AUTO-UPDATE ENGINE
 # ==========================================
 def update_nsdl_json():
-    print("NSDL FPI ડેટા ચેક કરી રહ્યા છીએ...")
+    print("fpidata.in પરથી લેટેસ્ટ FPI ફ્લો ડેટા તપાસી રહ્યા છીએ...")
     nsdl_file = "nsdl.json"
     curr_data = {}
     if os.path.exists(nsdl_file):
@@ -178,39 +179,56 @@ def update_nsdl_json():
             curr_data = {}
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     }
-    url = "https://www.fpi.nsdl.co.in/web/Reports/FortnightSectorwise.aspx"
 
     try:
-        r = requests.get(url, headers=headers, timeout=15)
+        url_fpi = "https://fpidata.in/"
+        r = requests.get(url_fpi, headers=headers, timeout=15)
         if r.status_code == 200:
             soup = BeautifulSoup(r.text, "html.parser")
-            table = soup.find("table", {"id": "gvSectorwise"}) or soup.find("table")
-            if table:
-                rows = table.find_all("tr")
-                parsed_sectors = {}
-                for tr in rows[1:]:
-                    cols = [td.get_text(strip=True).replace(",", "") for td in tr.find_all("td")]
-                    if len(cols) >= 3:
-                        sec_name = cols[0]
-                        try:
-                            net_flow = float(cols[1])
-                            auc = float(cols[2])
-                            parsed_sectors[sec_name] = [net_flow, auc]
-                        except ValueError:
-                            continue
+            text_all = soup.get_text()
+            
+            # તારીખ શોધવી (જેમ કે 31 Oct 2026)
+            date_match = re.search(r'(\d{1,2}\s+[A-Za-z]{3}\s+20\d\d)', text_all)
+            fpi_date = date_match.group(1) if date_match else datetime.datetime.now().strftime("%d %b %Y")
 
-                if parsed_sectors:
-                    curr_data["data"] = parsed_sectors
-                    curr_data["date"] = datetime.datetime.now().strftime("%d %b %Y")
-                    with open(nsdl_file, "w", encoding="utf-8") as f:
-                        json.dump(curr_data, f, indent=2)
-                    print("NSDL ડેટા સફળતાપૂર્વક અપડેટ થયો.")
-                    return
-        print("NSDL ડેટા પહેલેથી જ અપ-ટુ-ડેટ છે અથવા નવો રિપોર્ટ હજુ આવ્યો નથી.")
+            parsed_sectors = {}
+            tables = soup.find_all("table")
+            for tbl in tables:
+                rows = tbl.find_all("tr")
+                for tr in rows:
+                    cols = [td.get_text(strip=True).replace(",", "") for td in tr.find_all(["td", "th"])]
+                    if len(cols) >= 2:
+                        name = cols[0].strip()
+                        matched_sec = None
+                        for s_key in SECTOR_MAP.keys():
+                            if s_key.lower() in name.lower() or name.lower() in s_key.lower():
+                                matched_sec = s_key
+                                break
+                        if matched_sec:
+                            nums = []
+                            for c_val in cols[1:]:
+                                c_clean = c_val.replace("₹", "").replace("Cr", "").replace("+", "").replace("−", "-").strip()
+                                try:
+                                    nums.append(float(c_clean))
+                                except ValueError:
+                                    continue
+                            if nums:
+                                net_flow = nums[0]
+                                auc = nums[1] if len(nums) > 1 else (curr_data.get("data", {}).get(matched_sec, [0, 50000])[1])
+                                parsed_sectors[matched_sec] = [net_flow, auc]
+
+            if len(parsed_sectors) >= 10:
+                curr_data["date"] = fpi_date
+                curr_data["data"] = parsed_sectors
+                with open(nsdl_file, "w", encoding="utf-8") as f:
+                    json.dump(curr_data, f, indent=2)
+                print(f"fpidata.in પરથી {len(parsed_sectors)} સેક્ટર્સનો FPI ડેટા સફળતાપૂર્વક અપડેટ થયો ({fpi_date}).")
+                return
     except Exception as e:
-        print(f"NSDL અપડેટ સ્કીપ થયું: {e}")
+        print(f"fpidata.in સ્ક્રેપિંગમાં ચેતવણી: {e}. વર્તમાન ડેટા સુરક્ષિત રાખવામાં આવ્યો છે.")
 
 # ==========================================
 # 4. MAIN SCREENER & DATA GENERATOR
@@ -226,6 +244,7 @@ def main():
             all_tickers.append(sym)
             meta[sym.replace(".NS", "")] = (sec, cap)
 
+    # extra_symbols.txt માંથી સુરક્ષિત રીતે સ્ટોક્સ લોડ કરવા
     if os.path.exists("extra_symbols.txt"):
         with open("extra_symbols.txt", "r", encoding="utf-8") as ef:
             for line in ef:
@@ -292,7 +311,7 @@ def main():
             r6m = round(float((cur_price - c.iloc[-130]) / c.iloc[-130] * 100), 2) if len(c) >= 130 else 0.0
             r1y = round(float((cur_price - c.iloc[0]) / c.iloc[0] * 100), 2) if len(c) >= 200 else r6m
 
-            # Weighted RS Score: 40% (3M), 30% (6M), 30% (1Y)
+            # Weighted RS Score (3M: 40%, 6M: 30%, 1Y: 30%)
             rs_score = round((0.4 * r3m) + (0.3 * r6m) + (0.3 * r1y), 2)
 
             ema20 = calculate_ema(c, 20).iloc[-1]
@@ -316,7 +335,7 @@ def main():
             daily_sig = "BUY" if cur_price >= d_line_val else "SELL"
             d_conf = "Y" if (daily_sig == "BUY" and cur_price >= ema20) or (daily_sig == "SELL" and cur_price < ema20) else "N"
 
-            # --- SAHIL BREAKOUT: DAILY CALCULATION ---
+            # --- SAHIL BREAKOUT: DAILY ---
             high_20_d = c.iloc[-21:-1].max()
             low_20_d = c.iloc[-21:-1].min()
             vol_avg_20_d = v.iloc[-21:-1].mean()
@@ -327,7 +346,7 @@ def main():
             sahil_d = "BUY" if is_sahil_d_buy else ("SELL" if is_sahil_d_sell else "")
             sahil_d_ago = 0 if sahil_d else ""
 
-            # --- SAHIL BREAKOUT: REAL WEEKLY CALCULATION (W-FRI) ---
+            # --- SAHIL BREAKOUT: WEEKLY (W-FRI) ---
             df_w = df.resample('W-FRI').agg({
                 'Open': 'first',
                 'High': 'max',
@@ -427,15 +446,15 @@ def main():
 
     df_out = pd.DataFrame(out_rows)
 
-    # 0 to 100 Percentile Relative Strength Rank
+    # 1 to 99 Percentile RS Rank (NaN-Safe)
     mask = df_out["Symbol"] != "NIFTY 500"
     if mask.sum() > 0:
-        df_out.loc[mask, "RS_Rank"] = (
-            df_out.loc[mask, "RS_Score"].rank(pct=True) * 100
-        ).round(0).astype(int)
+        scores = pd.to_numeric(df_out.loc[mask, "RS_Score"], errors="coerce").fillna(0)
+        ranks = (scores.rank(pct=True) * 100).round(0).clip(1, 99).astype(int)
+        df_out.loc[mask, "RS_Rank"] = ranks
 
     df_out.to_csv("flow.csv", index=False)
-    print(f"flow.csv તૈયાર થઈ ગયું છે! (કુલ {len(df_out)} રેકોર્ડ્સ, RS Rank 0-100 ગણાઈ ગયું)")
+    print(f"flow.csv તૈયાર થઈ ગયું છે! (કુલ {len(df_out)} સ્ટોક્સ, RS Rank 1-99 સફળતાપૂર્વક કેલ્ક્યુલેટ થયું)")
 
     update_nsdl_json()
 
