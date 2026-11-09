@@ -157,7 +157,6 @@ def calculate_rsi(series, period=14):
     return 100 - (100 / (1 + rs))
 
 def calculate_mkr(series, period=14):
-    """Multi-Kernel Regression (ChartPrime proxy estimation)"""
     line = series.ewm(span=period, adjust=False).mean()
     std = series.rolling(window=period).std().fillna(0)
     upper = line + (1.5 * std)
@@ -209,7 +208,7 @@ def update_nsdl_json():
                         json.dump(curr_data, f, indent=2)
                     print("NSDL ડેટા સફળતાપૂર્વક અપડેટ થયો.")
                     return
-        print("NSDL ડેટા પહેલેથી જ અપ-ટુ-ડેટ છે અથવા નવો પખવાડિયાનો રિપોર્ટ હજુ આવ્યો નથી.")
+        print("NSDL ડેટા પહેલેથી જ અપ-ટુ-ડેટ છે અથવા નવો રિપોર્ટ હજુ આવ્યો નથી.")
     except Exception as e:
         print(f"NSDL અપડેટ સ્કીપ થયું: {e}")
 
@@ -219,17 +218,14 @@ def update_nsdl_json():
 def main():
     print("સ્ટોક્સનું માર્કેટ સ્કેનિંગ શરૂ થાય છે...")
     
-    # 1. Pehla empty list ane meta dictionary initialize karo
     all_tickers = []
     meta = {}
 
-    # 2. 22 Sectors mathi tickers add karo
     for sec, stocks in SECTOR_MAP.items():
         for sym, cap in stocks:
             all_tickers.append(sym)
             meta[sym.replace(".NS", "")] = (sec, cap)
 
-    # 3. extra_symbols.txt mathi nava stocks add karo (Safe Execution)
     if os.path.exists("extra_symbols.txt"):
         with open("extra_symbols.txt", "r", encoding="utf-8") as ef:
             for line in ef:
@@ -240,7 +236,6 @@ def main():
                         all_tickers.append(t_ns)
                     meta[sym] = ("Others", "Small")
 
-    # Benchmark: Nifty 500
     bench_sym = "^CRSLDX"
     tickers_to_download = list(set(all_tickers + [bench_sym]))
 
@@ -249,7 +244,6 @@ def main():
 
     out_rows = []
 
-    # Benchmark Returns calculate karo
     bench_rets = {"1W": 0.0, "1M": 0.0, "3M": 0.0, "6M": 0.0}
     try:
         if bench_sym in data and len(data[bench_sym]["Close"].dropna()) > 30:
@@ -262,7 +256,6 @@ def main():
     except Exception as e:
         print(f"Benchmark error: {e}")
 
-    # Add NIFTY 500 Row
     out_rows.append({
         "Symbol": "NIFTY 500", "Industry": "", "Cap": "", "Price": "",
         "1W": bench_rets["1W"], "1M": bench_rets["1M"], "3M": bench_rets["3M"], "6M": bench_rets["6M"],
@@ -270,6 +263,7 @@ def main():
         "DCross": "", "DCrossAgo": "", "WCross": "", "WCrossAgo": "",
         "DTurnAgo": "", "WTurnAgo": "", "EMA20": "", "EMA50": "", "EMA100": "", "EMA200": "",
         "RSState": "", "RSPos": "", "RSCross": "", "RSCrossAgo": "",
+        "RS_Score": 0.0, "RS_Rank": 50,
         "DelivPct": "", "DelivHigh": "", "RSI_D": "", "RSI_W": "", "RSI_M": "",
         "RSI40Cross": "", "RSI40CrossAgo": "", "RSI50Cross": "", "RSI50CrossAgo": "",
         "RSI60Cross": "", "RSI60CrossAgo": "", "DConfirmed": "", "WConfirmed": "",
@@ -277,7 +271,6 @@ def main():
         "SahilD": "", "SahilDAgo": "", "SahilW": "", "SahilWAgo": ""
     })
 
-    # Darek Stock nu Analysis
     for t in all_tickers:
         raw_sym = t.replace(".NS", "")
         sec, cap = meta.get(raw_sym, ("Others", "Small"))
@@ -293,13 +286,15 @@ def main():
             v = df["Volume"]
             cur_price = round(float(c.iloc[-1]), 2)
 
-            # Returns
             r1w = round(float((cur_price - c.iloc[-6]) / c.iloc[-6] * 100), 2) if len(c) >= 6 else 0.0
             r1m = round(float((cur_price - c.iloc[-22]) / c.iloc[-22] * 100), 2) if len(c) >= 22 else 0.0
             r3m = round(float((cur_price - c.iloc[-66]) / c.iloc[-66] * 100), 2) if len(c) >= 66 else 0.0
             r6m = round(float((cur_price - c.iloc[-130]) / c.iloc[-130] * 100), 2) if len(c) >= 130 else 0.0
+            r1y = round(float((cur_price - c.iloc[0]) / c.iloc[0] * 100), 2) if len(c) >= 200 else r6m
 
-            # Moving Averages (EMA)
+            # Weighted RS Score: 40% (3M), 30% (6M), 30% (1Y)
+            rs_score = round((0.4 * r3m) + (0.3 * r6m) + (0.3 * r1y), 2)
+
             ema20 = calculate_ema(c, 20).iloc[-1]
             ema50 = calculate_ema(c, 50).iloc[-1]
             ema100 = calculate_ema(c, 100).iloc[-1] if len(c) >= 100 else ema50
@@ -310,11 +305,9 @@ def main():
             s_ema100 = "Above" if cur_price >= ema100 else "Below"
             s_ema200 = "Above" if cur_price >= ema200 else "Below"
 
-            # RSI
             rsi_series = calculate_rsi(c, 14)
             rsi_d = round(float(rsi_series.iloc[-1]), 1) if not np.isnan(rsi_series.iloc[-1]) else 50.0
 
-            # MKR Signals (Daily & Weekly)
             d_line, d_upper, d_lower = calculate_mkr(c, 14)
             d_line_val = round(float(d_line.iloc[-1]), 2)
             d_upper_val = round(float(d_upper.iloc[-1]), 2)
@@ -334,7 +327,7 @@ def main():
             sahil_d = "BUY" if is_sahil_d_buy else ("SELL" if is_sahil_d_sell else "")
             sahil_d_ago = 0 if sahil_d else ""
 
-            # --- SAHIL BREAKOUT: REAL WEEKLY CALCULATION (W-FRI Resampling) ---
+            # --- SAHIL BREAKOUT: REAL WEEKLY CALCULATION (W-FRI) ---
             df_w = df.resample('W-FRI').agg({
                 'Open': 'first',
                 'High': 'max',
@@ -372,7 +365,6 @@ def main():
                 weekly_sig = "BUY" if w_cur >= w_line_val else "SELL"
                 w_conf = "Y"
 
-            # Relative Strength (RS vs Nifty 500)
             rs_pos = "Y" if r1m > bench_rets["1M"] else "N"
             rs_state = "Rising" if r1m >= r3m else "Falling"
 
@@ -387,7 +379,7 @@ def main():
                 "6M": r6m,
                 "Daily": daily_sig,
                 "Weekly": weekly_sig,
-                "DFresh": "★" if (c.iloc[-2] < d_line.iloc[-2] and cur_price >= d_line_val) else "",
+                "DFresh": "★" if (len(c) >= 2 and c.iloc[-2] < d_line.iloc[-2] and cur_price >= d_line_val) else "",
                 "WFresh": "",
                 "DCross": "UP" if cur_price >= d_line_val else "DN",
                 "DCrossAgo": 0,
@@ -403,6 +395,8 @@ def main():
                 "RSPos": rs_pos,
                 "RSCross": "UP" if rs_pos == "Y" else "DN",
                 "RSCrossAgo": 1,
+                "RS_Score": rs_score,
+                "RS_Rank": 50,
                 "DelivPct": 45,
                 "DelivHigh": "N",
                 "RSI_D": rsi_d,
@@ -431,14 +425,19 @@ def main():
             print(f"Error processing {t}: {err}")
             continue
 
-    # 5. CSV Save karo
     df_out = pd.DataFrame(out_rows)
-    df_out.to_csv("flow.csv", index=False)
-    print(f"flow.csv સફળતાપૂર્વક બની ગઈ છે! (કુલ {len(df_out)} રેકોર્ડ્સ)")
 
-    # 6. NSDL Check
+    # 0 to 100 Percentile Relative Strength Rank
+    mask = df_out["Symbol"] != "NIFTY 500"
+    if mask.sum() > 0:
+        df_out.loc[mask, "RS_Rank"] = (
+            df_out.loc[mask, "RS_Score"].rank(pct=True) * 100
+        ).round(0).astype(int)
+
+    df_out.to_csv("flow.csv", index=False)
+    print(f"flow.csv તૈયાર થઈ ગયું છે! (કુલ {len(df_out)} રેકોર્ડ્સ, RS Rank 0-100 ગણાઈ ગયું)")
+
     update_nsdl_json()
 
 if __name__ == "__main__":
     main()
-    
