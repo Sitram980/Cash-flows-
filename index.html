@@ -56,7 +56,7 @@ let sig="All",cap="All",mode="price",view="top",period="1M",rows=[],bench={};
 
 const SAMPLE={
   "Automobile and Auto Components":"MARUTI,M&M,BAJAJ-AUTO|TVSMOTOR,ASHOKLEY,BALKRISIND|SANSERA,GABRIEL,SUBROS|JAMNAAUTO,SUPRAJIT",
-  "Capital Goods":"SIEMENS,ABB,HAL|CUMMINSIND,BHEL,POLYCAB|KIRLOSENG,GRSE,TEGA|WENDT,ELECON",
+  "Capital Goods":"SIEMENS,ABB,HAL|CUMMINSIND,BHEL,POLYCAB,APARINDS|KIRLOSENG,GRSE,TEGA|WENDT,ELECON",
   "Chemicals":"PIDILITIND,SRF,UPL|DEEPAKNTR,TATACHEM,AARTIIND|NEOGEN,FINEORG,CLEAN|BODALCHEM,ANDHRAPET",
   "Construction":"LT,NBCC,IRB|KEC,NCC,RVNL|PNCINFRA,HGINFRA,KALPATARU|ASHOKA,GPTINFRA",
   "Construction Materials":"ULTRACEMCO,AMBUJACEM,SHREECEM|DALBHARAT,JKCEMENT,RAMCOCEM|HEIDELBERG,STARCEMENT,NUVOCO|SAURASHCEM,DECCANCEM",
@@ -80,25 +80,26 @@ const SAMPLE={
 };
 const CAPS=["Large","Mid","Small","Micro"];
 
+// ૧૦ પખવાડિયાની ઐતિહાસિક હિસ્ટ્રી (સ્ક્રીનશોટ સાથે મેચિંગ)
 let NSDL_HISTORY={
   "Healthcare":[-2445,-418,601,-4501,1435,4101,3654,2910,3021,2114],
-  "Construction":[2199,-991,-220,-603,3484,403,-1602,-404,442,930],
-  "Services":[-362,7019,185,302,2592,2405,-1,590,1193,905],
-  "Consumer Services":[-2434,-365,-1630,-1852,3081,7361,2840,3398,5019,422],
-  "Chemicals":[-121,-700,90,-773,-514,-114,532,315,543,228],
   "Power":[4956,-1157,476,-2577,-3743,-1267,-1596,-1164,-389,-1653],
   "Telecommunication":[-1908,-2542,2127,373,-720,-2454,-3271,-3322,-1661,-991],
+  "Consumer Services":[-2434,-365,-1630,-1852,3081,7361,2840,3398,5019,422],
+  "Chemicals":[-121,-700,90,-773,-514,-114,532,315,543,228],
   "Fast Moving Consumer Goods":[-229,-1625,-1936,-5063,-474,-1106,478,-189,-1727,-2029],
   "Automobile and Auto Components":[-1775,-357,-2175,-9044,-1324,-6936,2372,4405,-1299,-2670],
+  "Construction Materials":[-670,-1207,-434,-2426,-650,1574,871,384,-250,-358],
+  "Construction":[2199,-991,-220,-603,3484,403,-1602,-404,442,930],
+  "Services":[-362,7019,185,302,2592,2405,-1,590,1193,905],
   "Oil, Gas & Consumable Fuels":[-3351,-6885,-2093,-10488,-2789,258,-513,490,-2251,-2385],
+  "Diversified":[3,33,-14,-13,7,29,-1,-18,-4,-23],
   "Information Technology":[-2887,-1643,-268,-6733,-733,60,3298,2530,1573,-960],
   "Financial Services":[-11704,-17960,-5181,-11263,14634,1975,-2869,6535,3959,-6204],
   "Metals & Mining":[2416,1698,4999,-4722,-4371,5993,-1056,720,1087,-681],
   "Consumer Durables":[441,-1162,-287,-634,2564,2384,4958,1472,2431,-397],
   "Capital Goods":[4667,2645,154,-2586,-1442,-2657,-3618,-1556,2162,-108],
   "Realty":[-206,-430,30,-1093,1893,2072,-279,-1014,420,-762],
-  "Construction Materials":[-670,-1207,-434,-2426,-650,1574,871,384,-250,-358],
-  "Diversified":[3,33,-14,-13,7,29,-1,-18,-4,-23],
   "Utilities":[-12,-28,-19,7,216,119,-163,7,-38,194],
   "Textiles":[-48,-112,39,-146,241,248,206,1,-294,10],
   "Forest Materials":[73,-41,1,-12,-12,-11,40,-9,-7,7],
@@ -118,6 +119,19 @@ const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 const avg=a=>(a&&a.length)?a.reduce((x,y)=>x+y,0)/a.length:0;
 const fmt=n=>Math.abs(n||0).toLocaleString("en-IN");
 const capOf=v=>/micro/i.test(v||"")?"Micro":/mid/i.test(v||"")?"Mid":/small/i.test(v||"")?"Small":/large/i.test(v||"")?"Large":"";
+
+// Smart Symbol Resolver (APAR, APAR INDUSTRIES -> APARINDS)
+function resolveSym(val){
+  let s = (val||"").trim().toUpperCase().replace(/\.NS$/,"").replace(/\s+/g,"");
+  if(!s) return "";
+  if(s === "APAR" || s === "APARINDUSTRIES" || s === "APARINDS") return "APARINDS";
+  if(s === "TATAPOWER" || s === "TATA-POWER") return "TATAPOWER";
+  const exact = rows.find(x => x.Symbol.toUpperCase() === s || x.Symbol.toUpperCase() === s + ".NS");
+  if(exact) return exact.Symbol.replace(".NS","");
+  const partial = rows.find(x => x.Symbol.toUpperCase().startsWith(s) || s.startsWith(x.Symbol.toUpperCase()));
+  if(partial) return partial.Symbol.replace(".NS","");
+  return s;
+}
 
 function sample(){
   const r=seeded(7),out=[];
@@ -183,7 +197,7 @@ function load(recs){
   }
   PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.length?v.reduce((a,b)=>a+b,0)/v.length:0}});
 
-  // જો બધા સ્ટોક્સમાં RS Rank 50 દેખાતો હોય, તો બ્રાઉઝર જાતે 1-99 પર્સન્ટાઈલ રેન્ક ગણી લેશે
+  // Dynamic 1-99 Percentile RS Rank auto-fix
   const uniqueRanks = new Set(rows.map(x => x.RS_Rank).filter(x => !isNaN(x)));
   if (uniqueRanks.size <= 1) {
     const valid = rows.filter(x => !isNaN(x["1M"]) && !isNaN(x["3M"]));
@@ -236,21 +250,40 @@ function watchBtns(sym,price){
 function renderWatchlist(){
   const el=document.getElementById("wl");let w={};try{w=wlGet()}catch(e){}
   const syms=Object.keys(w);
-  if(!syms.length){el.style.display="none";return}
   el.style.display="block";
   const lines=syms.map(sym=>{
-    const rec=w[sym],r=rows.find(x=>x.Symbol===sym);
+    const rec=w[sym],r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase());
     const now=r?r.Price:"",chg=(now&&rec.price)?((now-rec.price)/rec.price*100):null;
     
-    // Daily અને Weekly બંને સિગ્નલ કલર-કોડ સાથે
     const dSig = r && r.Daily ? `<span style="color:var(--${r.Daily==="BUY"?"gc":"rc"});font-weight:600">Daily ${r.Daily}${r.DConfirmed==="Y"?" ✓":""}</span>` : "";
     const wSig = r && r.Weekly ? `<span style="color:var(--${r.Weekly==="BUY"?"gc":"rc"});font-weight:600">Weekly ${r.Weekly}${r.WConfirmed==="Y"?" ✓":""}</span>` : "";
-    const sig = r ? `${dSig}${dSig && wSig ? " · " : ""}${wSig}` || "mixed/unconfirmed" : "not in current data";
+    const sig = r ? `${dSig}${dSig && wSig ? " · " : ""}${wSig}` || "mixed/unconfirmed" : "not in current data (check extra_symbols.txt)";
     
     const rsStr=r?` · <span style="font-weight:700;color:var(--${r.RS_Rank>=80?"gc":r.RS_Rank<50?"rc":"fg"})">RS: ${r.RS_Rank}</span>`:"";
     return `<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:16px;padding:0 4px;cursor:pointer">✕</button><b>${esc(sym)}</b> <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i>${rsStr}<small>${rec.price?"at ₹"+rec.price+" on "+rec.added:"added "+rec.added}${now?" · now ₹"+now:""}${chg!==null?" · <span style=\"color:var(--"+(chg>=0?"gc":"rc")+")\">"+(chg>=0?"+":"")+chg.toFixed(1)+"%</span>":""}</small><small>${sig}</small></div>`;
   }).join("");
-  el.innerHTML=`<h3>⭐ My Watchlist</h3><small style="color:var(--mut)">Saved on this device.</small><div class="sl" style="margin-top:8px">${lines}</div>`;
+
+  el.innerHTML=`<h3>⭐ My Watchlist</h3>
+  <div style="display:flex;gap:8px;margin:8px 0 12px;max-width:360px">
+    <input id="wlHomeInput" type="text" placeholder="Symbol (e.g. APARINDS)..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;font-size:12px;text-transform:uppercase">
+    <button id="wlHomeAddBtn" style="border:1px solid var(--mut);background:var(--fg);color:var(--bg);border-radius:20px;padding:6px 14px;cursor:pointer;font-weight:700;font-size:12px">+ Add</button>
+  </div>
+  <div class="sl">${lines || "<small style='color:var(--mut)'>No stocks yet. Type symbol above and tap + Add.</small>"}</div>`;
+
+  const addAction = () => {
+    const inp = document.getElementById("wlHomeInput");
+    if(!inp) return;
+    const val = resolveSym(inp.value);
+    if(!val) return;
+    const f = rows.find(x => x.Symbol.toUpperCase() === val.toUpperCase());
+    wlSet(val, "watch", f ? f.Price : "");
+    inp.value = "";
+  };
+
+  const btn = document.getElementById("wlHomeAddBtn");
+  if(btn) btn.onclick = addAction;
+  const inp = document.getElementById("wlHomeInput");
+  if(inp) inp.onkeydown = (e) => { if(e.key === "Enter") { e.preventDefault(); addAction(); } };
 }
 
 function renderWatchlistTab(){
@@ -289,19 +322,24 @@ function renderWatchlistTab(){
 
   el.innerHTML=`<h3>⭐ My Watchlist — Live Signals</h3>
   <div style="display:flex;gap:8px;margin:10px 0 16px;max-width:400px">
-    <input id="wlAddInput" type="text" placeholder="Symbol (e.g. TATAPOWER)..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:13px;text-transform:uppercase">
+    <input id="wlAddInput" type="text" placeholder="Symbol (e.g. APARINDS)..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:13px;text-transform:uppercase">
     <button id="wlAddBtn" style="border:1px solid var(--mut);background:var(--fg);color:var(--bg);border-radius:20px;padding:8px 16px;cursor:pointer;font-weight:700">+ Add</button>
   </div>
   <div class="sl">${cards||"<div style='color:var(--mut);padding:10px 0'>Watchlist is empty. Type a symbol above and tap + Add.</div>"}</div>`;
 
-  document.getElementById("wlAddBtn").onclick=()=>{
-    const inp=document.getElementById("wlAddInput");
-    const val=(inp.value||"").replace(/\s+/g,"").trim().toUpperCase();
-    if(!val)return;
-    const f=rows.find(x=>x.Symbol.toUpperCase()===val);
-    wlSet(val,"watch",f?f.Price:"");
-    inp.value="";
+  const addTabAction = () => {
+    const inp = document.getElementById("wlAddInput");
+    if(!inp) return;
+    const val = resolveSym(inp.value);
+    if(!val) return;
+    const f = rows.find(x => x.Symbol.toUpperCase() === val.toUpperCase());
+    wlSet(val, "watch", f ? f.Price : "");
+    inp.value = "";
   };
+
+  document.getElementById("wlAddBtn").onclick = addTabAction;
+  const tabInp = document.getElementById("wlAddInput");
+  if(tabInp) tabInp.onkeydown = (e) => { if(e.key === "Enter") { e.preventDefault(); addTabAction(); } };
   document.getElementById("tabs").innerHTML=bar(false);
 }
 
@@ -378,13 +416,20 @@ function why(x){
   return R;
 }
 
-function renderSig(all,inSet){
+// Inflow (Green) અને Outflow (Red) બંને માટે બેજ
+function renderSig(all,inSet,outSet){
   const el=document.getElementById("sigp"),b=sm==="BUY";el.style.display="block";
   const has=all.some(x=>x.Daily||x.Weekly);
-  const it=all.map(x=>({x,R:why(x),ins:inSet.has(x.Industry)})).filter(o=>o.R.length&&(!so||o.ins)).sort((a,c)=>c.R.length-a.R.length||c.x[period]-a.x[period]);
+  const it=all.map(x=>({
+    x,
+    R:why(x),
+    ins:inSet ? inSet.has(x.Industry) : false,
+    outs:outSet ? outSet.has(x.Industry) : false
+  })).filter(o=>o.R.length&&(!so||o.ins)).sort((a,c)=>c.R.length-a.R.length||c.x[period]-a.x[period]);
+  
   el.innerHTML=`<h3>${b?"▲ Stocks crossing ABOVE":"▼ Stocks crossing BELOW"} Multi Kernel Regression — ${it.length} stocks</h3>
   <div class="bar"><button class="${b?"on":""}" data-sm="BUY">BUY ▲</button><button class="${!b?"on":""}" data-sm="SELL">SELL ▼</button><button class="${!so?"on":""}" data-so="0">All sectors</button><button class="${so?"on":""}" data-so="1">Money-inflow sectors only</button></div>
-  <div class="sl">${has?(it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}<small>${esc(o.x.Industry)} · RS Rank ${o.x.RS_Rank}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No stocks match right now.</small>"):"<small>Sample data active. Real BUY/SELL signals appear after flow.csv is updated.</small>"}</div>`;
+  <div class="sl">${has?(it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.x.Cap?` <i class="cp">${o.x.Cap}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}${o.outs?` <i class="sg s">money out</i>`:""}<small>${esc(o.x.Industry)} · RS Rank ${o.x.RS_Rank}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No stocks match right now.</small>"):"<small>Sample data active. Real BUY/SELL signals appear after flow.csv is updated.</small>"}</div>`;
 }
 
 document.getElementById("sigp").onclick=e=>{const d=e.target.dataset;if(d.sm){sm=d.sm;render()}else if(d.so!==undefined){so=d.so==="1";render()}};
@@ -449,6 +494,7 @@ function hideAll(except){
   });
 }
 
+// --- સાચો FULL HISTORY STREAK (7x SELL, 6x BUY વગેરે એક્ઝેક્ટ ગણશે) ---
 const streakOf=hist=>{
   if(!hist||!hist.length)return"";
   const sign=hist[hist.length-1]>=0;
@@ -475,12 +521,20 @@ function renderRotation(){
 
   el.innerHTML=`<h3>Sector Rotation — Relative Strength vs Nifty 500</h3>
   <div style="overflow-x:auto;margin-top:10px"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap">
-  <tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px 10px 6px 0">Sector</th><th style="padding:6px 10px">vs Nifty (3M)</th><th style="padding:6px 10px">Trend</th><th style="padding:6px 10px">% Stocks Daily BUY</th><th style="padding:6px 10px">FPI Streak</th></tr>
-  ${rowsHtml.map(r=>`<tr style="border-bottom:1px solid var(--card)"><td style="padding:6px 10px 6px 0"><b>${esc(r.n)}</b><br><small style="color:var(--mut)">${r.v} stocks</small></td>
-  <td style="padding:6px 10px;color:var(--${r.vs3>=0?"gc":"rc"})">${r.vs3>=0?"+":""}${r.vs3.toFixed(1)}%</td>
-  <td style="padding:6px 10px"><i class="sg ${r.sig[1]==="gc"?"b":"s"}">${r.sig[0]}</i></td>
-  <td style="padding:6px 10px">${r.upPct===null?"—":r.upPct.toFixed(0)+"%"}</td>
-  <td style="padding:6px 10px;font-weight:700;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td></tr>`).join("")}
+  <tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)">
+    <th style="padding:6px 10px 6px 0">Sector</th>
+    <th style="padding:6px 10px">VS NIFTY (3M)</th>
+    <th style="padding:6px 10px">SECTOR GAIN SIGNAL</th>
+    <th style="padding:6px 10px">% STOCKS IN UPTREND (Daily BUY)</th>
+    <th style="padding:6px 10px">FPI BUYING STREAK</th>
+  </tr>
+  ${rowsHtml.map(r=>`<tr style="border-bottom:1px solid var(--card)">
+    <td style="padding:6px 10px 6px 0"><b>${esc(r.n)}</b><br><small style="color:var(--mut)">${r.v} stocks</small></td>
+    <td style="padding:6px 10px;color:var(--${r.vs3>=0?"gc":"rc"})">${r.vs3>=0?"+":""}${r.vs3.toFixed(1)}%</td>
+    <td style="padding:6px 10px"><i class="sg ${r.sig[1]==="gc"?"b":"s"}">${r.sig[0]}</i></td>
+    <td style="padding:6px 10px">${r.upPct===null?"—":r.upPct.toFixed(1)+"%"}</td>
+    <td style="padding:6px 10px;font-weight:700;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td>
+  </tr>`).join("")}
   </table></div>`;
   document.getElementById("tabs").innerHTML=bar(false);
 }
@@ -541,7 +595,10 @@ function render(){
   document.getElementById("out").innerHTML=O.map(([n,v],i)=>card(i+1,n,v,false)).join("")||"<div class='note'>None</div>";
   document.getElementById("in").innerHTML=I.map(([n,v],i)=>card(i+1,n,v,true)).join("")||"<div class='note'>None</div>";
   renderShort(Object.values(g).flat());
-  renderSig(Object.values(g).flat(),new Set(I.map(x=>x[0])));
+  
+  // Pass both Inflow and Outflow sets
+  renderSig(Object.values(g).flat(), new Set(I.map(x=>x[0])), new Set(O.map(x=>x[0])));
+  
   const b=bench[period]||0;
   document.getElementById("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT (left) and INTO (right)`;
   document.getElementById("tabs").innerHTML=bar(true);
