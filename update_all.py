@@ -141,7 +141,34 @@ SECTOR_MAP = {
         ("ADANIENSOL.NS", "Large"), ("SUZLON.NS", "Mid"), ("INOXWIND.NS", "Small"),
         ("WAAREEENER.NS", "Large"), ("ORIENTGEN.NS", "Micro"),
         ("RPOWER.NS", "Micro"), ("KPIGREEN.NS", "Small")
-    ]
+    ],
+        "ETFs": [
+        # --- Broad Market & Cap-Based ---
+        ("NIFTYBEES.NS", "Large"), ("JUNIORBEES.NS", "Large"), ("SETFNIF50.NS", "Large"),
+        ("UTINIFTETF.NS", "Large"), ("NEXT50IETF.NS", "Large"), ("ICICIB22.NS", "Large"),
+        ("MID150BEES.NS", "Mid"), ("HDFCMID150.NS", "Mid"), ("HDFCSML250.NS", "Small"),
+
+        # --- Sectoral ETFs ---
+        ("BANKBEES.NS", "Large"), ("PSUBNKBEES.NS", "Mid"), ("PVTBNKADD.NS", "Large"),
+        ("FINIETF.NS", "Large"), ("ITBEES.NS", "Large"), ("PHARMABEES.NS", "Large"),
+        ("HEALTHY.NS", "Mid"), ("AUTOBEES.NS", "Large"), ("FMCGIETF.NS", "Large"),
+        ("CONSUMBEES.NS", "Large"), ("INFRABEES.NS", "Large"), ("OILIETF.NS", "Large"),
+        ("METALIETF.NS", "Mid"),
+
+        # --- Thematic & Smart Beta (Factor) ETFs ---
+        ("CPSEETF.NS", "Large"), ("MODEFENCE.NS", "Mid"), ("EVINDIA.NS", "Mid"),
+        ("MAKEINDIA.NS", "Mid"), ("MOM100.NS", "Mid"), ("MOM30IETF.NS", "Large"),
+        ("ALPHA.NS", "Mid"), ("ALPL30IETF.NS", "Large"), ("LOWVOLIETF.NS", "Large"),
+        ("QUAL30IETF.NS", "Large"), ("NV20IETF.NS", "Large"), ("DIVOPPBEES.NS", "Large"),
+
+        # --- Gold & Silver Commodities ---
+        ("GOLDBEES.NS", "Large"), ("GOLDCASE.NS", "Large"), ("SETFGOLD.NS", "Large"),
+        ("SILVERBEES.NS", "Large"), ("SILVERIETF.NS", "Large"),
+
+        # --- International / Global ETFs ---
+        ("MON100.NS", "Large"), ("MAFANG.NS", "Large"),
+        ("MASPTOP50.NS", "Large"), ("HNGSNGBEES.NS", "Large")
+        ]
 }
 
 # ==========================================
