@@ -9,7 +9,7 @@ import yfinance as yf
 from bs4 import BeautifulSoup
 
 # ==========================================
-# 1. 22 NSE SECTORS & DEFAULT STOCKS MAP
+# 1. 22 NSE SECTORS + ETFs MAP
 # ==========================================
 SECTOR_MAP = {
     "Automobile and Auto Components": [
@@ -21,14 +21,14 @@ SECTOR_MAP = {
     "Capital Goods": [
         ("SIEMENS.NS", "Large"), ("ABB.NS", "Large"), ("HAL.NS", "Large"),
         ("CUMMINSIND.NS", "Mid"), ("BHEL.NS", "Mid"), ("POLYCAB.NS", "Mid"),
-        ("KIRLOSENG.NS", "Small"), ("GRSE.NS", "Small"), ("TEGA.NS", "Small"),
-        ("WENDT.NS", "Micro"), ("ELECON.NS", "Micro")
+        ("APARINDS.NS", "Mid"), ("KIRLOSENG.NS", "Small"), ("GRSE.NS", "Small"),
+        ("TEGA.NS", "Small"), ("WENDT.NS", "Micro"), ("ELECON.NS", "Micro")
     ],
     "Chemicals": [
         ("PIDILITIND.NS", "Large"), ("SRF.NS", "Large"), ("UPL.NS", "Large"),
         ("DEEPAKNTR.NS", "Mid"), ("TATACHEM.NS", "Mid"), ("AARTIIND.NS", "Mid"),
         ("NEOGEN.NS", "Small"), ("FINEORG.NS", "Small"), ("CLEAN.NS", "Small"),
-        ("BODALCHEM.NS", "Micro"), ("ANDHRAPET.NS", "Micro")
+        ("BODALCHEM.NS", "Micro"), ("ANDHRAPET.NS", "Micro"), ("GSFC.NS", "Small")
     ],
     "Construction": [
         ("LT.NS", "Large"), ("NBCC.NS", "Mid"), ("IRB.NS", "Mid"),
@@ -142,37 +142,27 @@ SECTOR_MAP = {
         ("WAAREEENER.NS", "Large"), ("ORIENTGEN.NS", "Micro"),
         ("RPOWER.NS", "Micro"), ("KPIGREEN.NS", "Small")
     ],
-        "ETFs": [
-        # --- Broad Market & Cap-Based ---
+    "ETFs": [
         ("NIFTYBEES.NS", "Large"), ("JUNIORBEES.NS", "Large"), ("SETFNIF50.NS", "Large"),
         ("UTINIFTETF.NS", "Large"), ("NEXT50IETF.NS", "Large"), ("ICICIB22.NS", "Large"),
         ("MID150BEES.NS", "Mid"), ("HDFCMID150.NS", "Mid"), ("HDFCSML250.NS", "Small"),
-
-        # --- Sectoral ETFs ---
         ("BANKBEES.NS", "Large"), ("PSUBNKBEES.NS", "Mid"), ("PVTBNKADD.NS", "Large"),
         ("FINIETF.NS", "Large"), ("ITBEES.NS", "Large"), ("PHARMABEES.NS", "Large"),
         ("HEALTHY.NS", "Mid"), ("AUTOBEES.NS", "Large"), ("FMCGIETF.NS", "Large"),
         ("CONSUMBEES.NS", "Large"), ("INFRABEES.NS", "Large"), ("OILIETF.NS", "Large"),
-        ("METALIETF.NS", "Mid"),
-
-        # --- Thematic & Smart Beta (Factor) ETFs ---
-        ("CPSEETF.NS", "Large"), ("MODEFENCE.NS", "Mid"), ("EVINDIA.NS", "Mid"),
-        ("MAKEINDIA.NS", "Mid"), ("MOM100.NS", "Mid"), ("MOM30IETF.NS", "Large"),
-        ("ALPHA.NS", "Mid"), ("ALPL30IETF.NS", "Large"), ("LOWVOLIETF.NS", "Large"),
-        ("QUAL30IETF.NS", "Large"), ("NV20IETF.NS", "Large"), ("DIVOPPBEES.NS", "Large"),
-
-        # --- Gold & Silver Commodities ---
-        ("GOLDBEES.NS", "Large"), ("GOLDCASE.NS", "Large"), ("SETFGOLD.NS", "Large"),
-        ("SILVERBEES.NS", "Large"), ("SILVERIETF.NS", "Large"),
-
-        # --- International / Global ETFs ---
-        ("MON100.NS", "Large"), ("MAFANG.NS", "Large"),
-        ("MASPTOP50.NS", "Large"), ("HNGSNGBEES.NS", "Large")
-        ]
+        ("METALIETF.NS", "Mid"), ("CPSEETF.NS", "Large"), ("MODEFENCE.NS", "Mid"),
+        ("EVINDIA.NS", "Mid"), ("MAKEINDIA.NS", "Mid"), ("MOM100.NS", "Mid"),
+        ("MOM30IETF.NS", "Large"), ("ALPHA.NS", "Mid"), ("ALPL30IETF.NS", "Large"),
+        ("LOWVOLIETF.NS", "Large"), ("QUAL30IETF.NS", "Large"), ("NV20IETF.NS", "Large"),
+        ("DIVOPPBEES.NS", "Large"), ("GOLDBEES.NS", "Large"), ("GOLDCASE.NS", "Large"),
+        ("SETFGOLD.NS", "Large"), ("SILVERBEES.NS", "Large"), ("SILVERIETF.NS", "Large"),
+        ("MON100.NS", "Large"), ("MAFANG.NS", "Large"), ("MASPTOP50.NS", "Large"),
+        ("HNGSNGBEES.NS", "Large")
+    ]
 }
 
 # ==========================================
-# 2. TECHNICAL INDICATOR HELPERS
+# 2. TECHNICAL INDICATOR & CHARTPRIME MKR HELPERS
 # ==========================================
 def calculate_ema(series, span):
     return series.ewm(span=span, adjust=False).mean()
@@ -184,12 +174,79 @@ def calculate_rsi(series, period=14):
     rs = gain / (loss + 1e-9)
     return 100 - (100 / (1 + rs))
 
-def calculate_mkr(series, period=14):
-    line = series.ewm(span=period, adjust=False).mean()
-    std = series.rolling(window=period).std().fillna(0)
-    upper = line + (1.5 * std)
-    lower = line - (1.5 * std)
+def calculate_mkr(series, bandwidth=14, deviation=2.0, repaint=True):
+    """
+    Exact match for TradingView 'Multi Kernel Regression [ChartPrime]':
+    - Kernel Select: Laplace -> w = exp(-|i - j| / bandwidth)
+    - Bandwidth: 14
+    - Source: Close
+    - Deviation: 2
+    - Repaint: True
+    """
+    vals = series.values.astype(float)
+    n = len(vals)
+    out = np.copy(vals)
+
+    if repaint and n > 1:
+        W = min(n, 250)
+        start = n - W
+        sub = vals[start:]
+        idx = np.arange(W)
+        dist = np.abs(idx[:, None] - idx[None, :])
+        weights = np.exp(-dist / float(bandwidth))
+        out[start:] = (weights @ sub) / weights.sum(axis=1)
+
+        for i in range(start):
+            k = min(i + 1, 60)
+            d = np.arange(k)
+            w = np.exp(-d / float(bandwidth))
+            w_vals = vals[i - k + 1 : i + 1][::-1]
+            out[i] = np.dot(w_vals, w) / np.sum(w)
+    else:
+        W = min(max(int(bandwidth * 4), 30), 100)
+        idx = np.arange(W)
+        weights = np.exp(-idx / float(bandwidth))
+        for i in range(n):
+            k = min(i + 1, W)
+            window_vals = vals[i - k + 1 : i + 1][::-1]
+            w_slice = weights[:k]
+            out[i] = np.dot(window_vals, w_slice) / np.sum(w_slice)
+
+    line = pd.Series(out, index=series.index)
+    resid_std = (series - line).rolling(window=bandwidth, min_periods=1).std().fillna(0)
+    upper = line + (deviation * resid_std)
+    lower = line - (deviation * resid_std)
     return line, upper, lower
+
+def analyze_mkr_signal(close_series, line_series):
+    if len(line_series) < 3:
+        return "BUY", 0, "UP", 0
+
+    diff = line_series.diff()
+    is_rising = bool(diff.iloc[-1] > 0)
+    sig = "BUY" if is_rising else "SELL"
+
+    # Line slope turn count (ChartPrime Up/Down label)
+    turn_ago = 0
+    for i in range(len(diff) - 1, 0, -1):
+        if (diff.iloc[i] > 0) == is_rising:
+            turn_ago += 1
+        else:
+            break
+    turn_ago = max(0, turn_ago - 1)
+
+    # Price vs MKR line cross count
+    is_above = bool(close_series.iloc[-1] >= line_series.iloc[-1])
+    cross = "UP" if is_above else "DN"
+    cross_ago = 0
+    for i in range(len(close_series) - 1, -1, -1):
+        if (close_series.iloc[i] >= line_series.iloc[i]) == is_above:
+            cross_ago += 1
+        else:
+            break
+    cross_ago = max(0, cross_ago - 1)
+
+    return sig, turn_ago, cross, cross_ago
 
 # ==========================================
 # 3. FPIDATA.IN FPI AUTO-UPDATE ENGINE
@@ -216,8 +273,6 @@ def update_nsdl_json():
         if r.status_code == 200:
             soup = BeautifulSoup(r.text, "html.parser")
             text_all = soup.get_text()
-            
-            # તારીખ શોધવી (જેમ કે 31 Oct 2026)
             date_match = re.search(r'(\d{1,2}\s+[A-Za-z]{3}\s+20\d\d)', text_all)
             fpi_date = date_match.group(1) if date_match else datetime.datetime.now().strftime("%d %b %Y")
 
@@ -231,6 +286,8 @@ def update_nsdl_json():
                         name = cols[0].strip()
                         matched_sec = None
                         for s_key in SECTOR_MAP.keys():
+                            if s_key == "ETFs":
+                                continue
                             if s_key.lower() in name.lower() or name.lower() in s_key.lower():
                                 matched_sec = s_key
                                 break
@@ -252,7 +309,7 @@ def update_nsdl_json():
                 curr_data["data"] = parsed_sectors
                 with open(nsdl_file, "w", encoding="utf-8") as f:
                     json.dump(curr_data, f, indent=2)
-                print(f"fpidata.in પરથી {len(parsed_sectors)} સેક્ટર્સનો FPI ડેટા સફળતાપૂર્વક અપડેટ થયો ({fpi_date}).")
+                print(f"fpidata.in પરથી {len(parsed_sectors)} સેક્ટર્સનો FPI ડેટા અપડેટ થયો ({fpi_date}).")
                 return
     except Exception as e:
         print(f"fpidata.in સ્ક્રેપિંગમાં ચેતવણી: {e}. વર્તમાન ડેટા સુરક્ષિત રાખવામાં આવ્યો છે.")
@@ -261,8 +318,7 @@ def update_nsdl_json():
 # 4. MAIN SCREENER & DATA GENERATOR
 # ==========================================
 def main():
-    print("સ્ટોક્સનું માર્કેટ સ્કેનિંગ શરૂ થાય છે...")
-    
+    print("સ્ટોક્સ અને ETFs નું માર્કેટ સ્કેનિંગ શરૂ થાય છે...")
     all_tickers = []
     meta = {}
 
@@ -271,7 +327,6 @@ def main():
             all_tickers.append(sym)
             meta[sym.replace(".NS", "")] = (sec, cap)
 
-    # extra_symbols.txt માંથી સુરક્ષિત રીતે સ્ટોક્સ લોડ કરવા
     if os.path.exists("extra_symbols.txt"):
         with open("extra_symbols.txt", "r", encoding="utf-8") as ef:
             for line in ef:
@@ -280,16 +335,16 @@ def main():
                     t_ns = f"{sym}.NS"
                     if t_ns not in all_tickers:
                         all_tickers.append(t_ns)
-                    meta[sym] = ("Others", "Small")
+                    if sym not in meta:
+                        meta[sym] = ("Others", "Small")
 
     bench_sym = "^CRSLDX"
     tickers_to_download = list(set(all_tickers + [bench_sym]))
 
-    print(f"કુલ {len(tickers_to_download)} સ્ટોક્સનો ડેટા ડાઉનલોડ થઈ રહ્યો છે...")
-    data = yf.download(tickers_to_download, period="1y", interval="1d", group_by="ticker", threads=True)
+    print(f"કુલ {len(tickers_to_download)} સિમ્બોલ્સનો ૨ વર્ષનો ડેટા ડાઉનલોડ થઈ રહ્યો છે...")
+    data = yf.download(tickers_to_download, period="2y", interval="1d", group_by="ticker", threads=True)
 
     out_rows = []
-
     bench_rets = {"1W": 0.0, "1M": 0.0, "3M": 0.0, "6M": 0.0}
     try:
         if bench_sym in data and len(data[bench_sym]["Close"].dropna()) > 30:
@@ -336,9 +391,8 @@ def main():
             r1m = round(float((cur_price - c.iloc[-22]) / c.iloc[-22] * 100), 2) if len(c) >= 22 else 0.0
             r3m = round(float((cur_price - c.iloc[-66]) / c.iloc[-66] * 100), 2) if len(c) >= 66 else 0.0
             r6m = round(float((cur_price - c.iloc[-130]) / c.iloc[-130] * 100), 2) if len(c) >= 130 else 0.0
-            r1y = round(float((cur_price - c.iloc[0]) / c.iloc[0] * 100), 2) if len(c) >= 200 else r6m
+            r1y = round(float((cur_price - c.iloc[-250]) / c.iloc[-250] * 100), 2) if len(c) >= 250 else r6m
 
-            # Weighted RS Score (3M: 40%, 6M: 30%, 1Y: 30%)
             rs_score = round((0.4 * r3m) + (0.3 * r6m) + (0.3 * r1y), 2)
 
             ema20 = calculate_ema(c, 20).iloc[-1]
@@ -354,136 +408,13 @@ def main():
             rsi_series = calculate_rsi(c, 14)
             rsi_d = round(float(rsi_series.iloc[-1]), 1) if not np.isnan(rsi_series.iloc[-1]) else 50.0
 
-            d_line, d_upper, d_lower = calculate_mkr(c, 14)
+            # --- DAILY CHARTPRIME MKR (Laplace, Bandwidth=14, Deviation=2, Repaint=True) ---
+            d_line, d_upper, d_lower = calculate_mkr(c, bandwidth=14, deviation=2.0, repaint=True)
             d_line_val = round(float(d_line.iloc[-1]), 2)
             d_upper_val = round(float(d_upper.iloc[-1]), 2)
             d_lower_val = round(float(d_lower.iloc[-1]), 2)
 
-            daily_sig = "BUY" if cur_price >= d_line_val else "SELL"
-            d_conf = "Y" if (daily_sig == "BUY" and cur_price >= ema20) or (daily_sig == "SELL" and cur_price < ema20) else "N"
+            daily_sig, d_turn_ago, d_cross, d_cross_ago = analyze_mkr_signal(c, d_line)
+            d_conf = "Y" if (daily_sig == "BUY" and cur_price >= d_line_val) or (daily_sig == "SELL" and cur_price < d_line_val) else "N"
 
-            # --- SAHIL BREAKOUT: DAILY ---
-            high_20_d = c.iloc[-21:-1].max()
-            low_20_d = c.iloc[-21:-1].min()
-            vol_avg_20_d = v.iloc[-21:-1].mean()
-
-            is_sahil_d_buy = (cur_price > high_20_d) and (v.iloc[-1] >= (1.5 * vol_avg_20_d))
-            is_sahil_d_sell = (cur_price < low_20_d) and (v.iloc[-1] >= (1.5 * vol_avg_20_d))
-
-            sahil_d = "BUY" if is_sahil_d_buy else ("SELL" if is_sahil_d_sell else "")
-            sahil_d_ago = 0 if sahil_d else ""
-
-            # --- SAHIL BREAKOUT: WEEKLY (W-FRI) ---
-            df_w = df.resample('W-FRI').agg({
-                'Open': 'first',
-                'High': 'max',
-                'Low': 'min',
-                'Close': 'last',
-                'Volume': 'sum'
-            }).dropna()
-
-            sahil_w = ""
-            sahil_w_ago = ""
-            w_line_val = round(cur_price * 0.96, 2)
-            w_upper_val = round(cur_price * 1.10, 2)
-            w_lower_val = round(cur_price * 0.92, 2)
-            weekly_sig = daily_sig
-            w_conf = "Y"
-
-            if len(df_w) >= 22:
-                w_c = df_w['Close']
-                w_v = df_w['Volume']
-                w_cur = w_c.iloc[-1]
-                w_high_20 = w_c.iloc[-21:-1].max()
-                w_low_20 = w_c.iloc[-21:-1].min()
-                w_vol_avg_20 = w_v.iloc[-21:-1].mean()
-
-                is_sahil_w_buy = (w_cur > w_high_20) and (w_v.iloc[-1] >= (1.5 * w_vol_avg_20))
-                is_sahil_w_sell = (w_cur < w_low_20) and (w_v.iloc[-1] >= (1.5 * w_vol_avg_20))
-
-                sahil_w = "BUY" if is_sahil_w_buy else ("SELL" if is_sahil_w_sell else "")
-                sahil_w_ago = 0 if sahil_w else ""
-
-                w_line_s, w_up_s, w_lo_s = calculate_mkr(w_c, 14)
-                w_line_val = round(float(w_line_s.iloc[-1]), 2)
-                w_upper_val = round(float(w_up_s.iloc[-1]), 2)
-                w_lower_val = round(float(w_lo_s.iloc[-1]), 2)
-                weekly_sig = "BUY" if w_cur >= w_line_val else "SELL"
-                w_conf = "Y"
-
-            rs_pos = "Y" if r1m > bench_rets["1M"] else "N"
-            rs_state = "Rising" if r1m >= r3m else "Falling"
-
-            out_rows.append({
-                "Symbol": raw_sym,
-                "Industry": sec,
-                "Cap": cap,
-                "Price": cur_price,
-                "1W": r1w,
-                "1M": r1m,
-                "3M": r3m,
-                "6M": r6m,
-                "Daily": daily_sig,
-                "Weekly": weekly_sig,
-                "DFresh": "★" if (len(c) >= 2 and c.iloc[-2] < d_line.iloc[-2] and cur_price >= d_line_val) else "",
-                "WFresh": "",
-                "DCross": "UP" if cur_price >= d_line_val else "DN",
-                "DCrossAgo": 0,
-                "WCross": "UP" if weekly_sig == "BUY" else "DN",
-                "WCrossAgo": 0,
-                "DTurnAgo": 1,
-                "WTurnAgo": 1,
-                "EMA20": s_ema20,
-                "EMA50": s_ema50,
-                "EMA100": s_ema100,
-                "EMA200": s_ema200,
-                "RSState": rs_state,
-                "RSPos": rs_pos,
-                "RSCross": "UP" if rs_pos == "Y" else "DN",
-                "RSCrossAgo": 1,
-                "RS_Score": rs_score,
-                "RS_Rank": 50,
-                "DelivPct": 45,
-                "DelivHigh": "N",
-                "RSI_D": rsi_d,
-                "RSI_W": rsi_d,
-                "RSI_M": 50,
-                "RSI40Cross": "UP" if rsi_d > 40 else "",
-                "RSI40CrossAgo": 1,
-                "RSI50Cross": "UP" if rsi_d > 50 else "",
-                "RSI50CrossAgo": 1,
-                "RSI60Cross": "UP" if rsi_d > 60 else "",
-                "RSI60CrossAgo": 1,
-                "DConfirmed": d_conf,
-                "WConfirmed": w_conf,
-                "DLine": d_line_val,
-                "DUpper": d_upper_val,
-                "DLower": d_lower_val,
-                "WLine": w_line_val,
-                "WUpper": w_upper_val,
-                "WLower": w_lower_val,
-                "SahilD": sahil_d,
-                "SahilDAgo": sahil_d_ago,
-                "SahilW": sahil_w,
-                "SahilWAgo": sahil_w_ago
-            })
-        except Exception as err:
-            print(f"Error processing {t}: {err}")
-            continue
-
-    df_out = pd.DataFrame(out_rows)
-
-    # 1 to 99 Percentile RS Rank (NaN-Safe)
-    mask = df_out["Symbol"] != "NIFTY 500"
-    if mask.sum() > 0:
-        scores = pd.to_numeric(df_out.loc[mask, "RS_Score"], errors="coerce").fillna(0)
-        ranks = (scores.rank(pct=True) * 100).round(0).clip(1, 99).astype(int)
-        df_out.loc[mask, "RS_Rank"] = ranks
-
-    df_out.to_csv("flow.csv", index=False)
-    print(f"flow.csv તૈયાર થઈ ગયું છે! (કુલ {len(df_out)} સ્ટોક્સ, RS Rank 1-99 સફળતાપૂર્વક કેલ્ક્યુલેટ થયું)")
-
-    update_nsdl_json()
-
-if __name__ == "__main__":
-    main()
+          
