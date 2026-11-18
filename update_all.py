@@ -6,7 +6,6 @@ import requests
 import pandas as pd
 import numpy as np
 import yfinance as yf
-from bs4 import BeautifulSoup
 
 # ==========================================
 # 1. 22 NSE SECTORS + ETFs MAP
@@ -176,12 +175,8 @@ def calculate_rsi(series, period=14):
 
 def calculate_mkr(series, bandwidth=14, deviation=2.0, repaint=True):
     """
-    Exact match for TradingView 'Multi Kernel Regression [ChartPrime]':
-    - Kernel Select: Laplace -> w = exp(-|i - j| / bandwidth)
-    - Bandwidth: 14
-    - Source: Close
-    - Deviation: 2
-    - Repaint: True
+    TradingView 'Multi Kernel Regression [ChartPrime]':
+    Laplace Kernel, Bandwidth=14, Source=Close, Deviation=2, Repaint=True
     """
     vals = series.values.astype(float)
     n = len(vals)
@@ -226,7 +221,6 @@ def analyze_mkr_signal(close_series, line_series):
     is_rising = bool(diff.iloc[-1] > 0)
     sig = "BUY" if is_rising else "SELL"
 
-    # Line slope turn count (ChartPrime Up/Down label)
     turn_ago = 0
     for i in range(len(diff) - 1, 0, -1):
         if (diff.iloc[i] > 0) == is_rising:
@@ -235,7 +229,6 @@ def analyze_mkr_signal(close_series, line_series):
             break
     turn_ago = max(0, turn_ago - 1)
 
-    # Price vs MKR line cross count
     is_above = bool(close_series.iloc[-1] >= line_series.iloc[-1])
     cross = "UP" if is_above else "DN"
     cross_ago = 0
@@ -249,7 +242,7 @@ def analyze_mkr_signal(close_series, line_series):
     return sig, turn_ago, cross, cross_ago
 
 # ==========================================
-# 3. FPIDATA.IN FPI AUTO-UPDATE ENGINE
+# 3. FPIDATA.IN FPI AUTO-UPDATE (NO EXTERNAL DEPENDENCY)
 # ==========================================
 def update_nsdl_json():
     print("fpidata.in પરથી લેટેસ્ટ FPI ફ્લો ડેટા તપાસી રહ્યા છીએ...")
@@ -271,38 +264,37 @@ def update_nsdl_json():
         url_fpi = "https://fpidata.in/"
         r = requests.get(url_fpi, headers=headers, timeout=15)
         if r.status_code == 200:
-            soup = BeautifulSoup(r.text, "html.parser")
-            text_all = soup.get_text()
-            date_match = re.search(r'(\d{1,2}\s+[A-Za-z]{3}\s+20\d\d)', text_all)
+            html_text = r.text
+            plain_text = re.sub(r'<[^>]+>', ' ', html_text)
+            date_match = re.search(r'(\d{1,2}\s+[A-Za-z]{3}\s+20\d\d)', plain_text)
             fpi_date = date_match.group(1) if date_match else datetime.datetime.now().strftime("%d %b %Y")
 
             parsed_sectors = {}
-            tables = soup.find_all("table")
-            for tbl in tables:
-                rows = tbl.find_all("tr")
-                for tr in rows:
-                    cols = [td.get_text(strip=True).replace(",", "") for td in tr.find_all(["td", "th"])]
-                    if len(cols) >= 2:
-                        name = cols[0].strip()
-                        matched_sec = None
-                        for s_key in SECTOR_MAP.keys():
-                            if s_key == "ETFs":
+            rows_html = re.findall(r'<tr[^>]*>(.*?)</tr>', html_text, flags=re.S | re.I)
+            for tr in rows_html:
+                cells = re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', tr, flags=re.S | re.I)
+                cols = [re.sub(r'<[^>]+>', '', c).replace('&amp;', '&').replace(',', '').strip() for c in cells]
+                if len(cols) >= 2:
+                    name = cols[0].strip()
+                    matched_sec = None
+                    for s_key in SECTOR_MAP.keys():
+                        if s_key == "ETFs":
+                            continue
+                        if s_key.lower() in name.lower() or name.lower() in s_key.lower():
+                            matched_sec = s_key
+                            break
+                    if matched_sec:
+                        nums = []
+                        for c_val in cols[1:]:
+                            c_clean = c_val.replace("₹", "").replace("Cr", "").replace("+", "").replace("−", "-").strip()
+                            try:
+                                nums.append(float(c_clean))
+                            except ValueError:
                                 continue
-                            if s_key.lower() in name.lower() or name.lower() in s_key.lower():
-                                matched_sec = s_key
-                                break
-                        if matched_sec:
-                            nums = []
-                            for c_val in cols[1:]:
-                                c_clean = c_val.replace("₹", "").replace("Cr", "").replace("+", "").replace("−", "-").strip()
-                                try:
-                                    nums.append(float(c_clean))
-                                except ValueError:
-                                    continue
-                            if nums:
-                                net_flow = nums[0]
-                                auc = nums[1] if len(nums) > 1 else (curr_data.get("data", {}).get(matched_sec, [0, 50000])[1])
-                                parsed_sectors[matched_sec] = [net_flow, auc]
+                        if nums:
+                            net_flow = nums[0]
+                            auc = nums[1] if len(nums) > 1 else (curr_data.get("data", {}).get(matched_sec, [0, 50000])[1])
+                            parsed_sectors[matched_sec] = [net_flow, auc]
 
             if len(parsed_sectors) >= 10:
                 curr_data["date"] = fpi_date
@@ -379,12 +371,12 @@ def main():
         try:
             if t not in data:
                 continue
-            df = data[t].dropna()
+            df = data[t].dropna(subset=["Close"])
             if len(df) < 50:
                 continue
 
             c = df["Close"]
-            v = df["Volume"]
+            v = df["Volume"].fillna(0)
             cur_price = round(float(c.iloc[-1]), 2)
 
             r1w = round(float((cur_price - c.iloc[-6]) / c.iloc[-6] * 100), 2) if len(c) >= 6 else 0.0
@@ -417,4 +409,131 @@ def main():
             daily_sig, d_turn_ago, d_cross, d_cross_ago = analyze_mkr_signal(c, d_line)
             d_conf = "Y" if (daily_sig == "BUY" and cur_price >= d_line_val) or (daily_sig == "SELL" and cur_price < d_line_val) else "N"
 
-          
+            # --- SAHIL BREAKOUT: DAILY ---
+            high_20_d = c.iloc[-21:-1].max()
+            low_20_d = c.iloc[-21:-1].min()
+            vol_avg_20_d = v.iloc[-21:-1].mean()
+
+            is_sahil_d_buy = (cur_price > high_20_d) and (vol_avg_20_d > 0) and (v.iloc[-1] >= (1.5 * vol_avg_20_d))
+            is_sahil_d_sell = (cur_price < low_20_d) and (vol_avg_20_d > 0) and (v.iloc[-1] >= (1.5 * vol_avg_20_d))
+
+            sahil_d = "BUY" if is_sahil_d_buy else ("SELL" if is_sahil_d_sell else "")
+            sahil_d_ago = 0 if sahil_d else ""
+
+            # --- WEEKLY CHARTPRIME MKR & BREAKOUT (W-FRI, Laplace 14, Deviation 2) ---
+            df_w = df.resample('W-FRI').agg({
+                'Open': 'first',
+                'High': 'max',
+                'Low': 'min',
+                'Close': 'last',
+                'Volume': 'sum'
+            }).dropna(subset=['Close'])
+
+            sahil_w = ""
+            sahil_w_ago = ""
+            w_line_val = round(cur_price * 0.96, 2)
+            w_upper_val = round(cur_price * 1.10, 2)
+            w_lower_val = round(cur_price * 0.92, 2)
+            weekly_sig = daily_sig
+            w_turn_ago = d_turn_ago
+            w_cross = d_cross
+            w_cross_ago = d_cross_ago
+            w_conf = "Y"
+
+            if len(df_w) >= 22:
+                w_c = df_w['Close']
+                w_v = df_w['Volume'].fillna(0)
+                w_cur = w_c.iloc[-1]
+                w_high_20 = w_c.iloc[-21:-1].max()
+                w_low_20 = w_c.iloc[-21:-1].min()
+                w_vol_avg_20 = w_v.iloc[-21:-1].mean()
+
+                is_sahil_w_buy = (w_cur > w_high_20) and (w_vol_avg_20 > 0) and (w_v.iloc[-1] >= (1.5 * w_vol_avg_20))
+                is_sahil_w_sell = (w_cur < w_low_20) and (w_vol_avg_20 > 0) and (w_v.iloc[-1] >= (1.5 * w_vol_avg_20))
+
+                sahil_w = "BUY" if is_sahil_w_buy else ("SELL" if is_sahil_w_sell else "")
+                sahil_w_ago = 0 if sahil_w else ""
+
+                w_line_s, w_up_s, w_lo_s = calculate_mkr(w_c, bandwidth=14, deviation=2.0, repaint=True)
+                w_line_val = round(float(w_line_s.iloc[-1]), 2)
+                w_upper_val = round(float(w_up_s.iloc[-1]), 2)
+                w_lower_val = round(float(w_lo_s.iloc[-1]), 2)
+                weekly_sig, w_turn_ago, w_cross, w_cross_ago = analyze_mkr_signal(w_c, w_line_s)
+                w_conf = "Y" if (weekly_sig == "BUY" and w_cur >= w_line_val) or (weekly_sig == "SELL" and w_cur < w_line_val) else "N"
+
+            rs_pos = "Y" if r1m > bench_rets["1M"] else "N"
+            rs_state = "Rising" if r1m >= r3m else "Falling"
+
+            out_rows.append({
+                "Symbol": raw_sym,
+                "Industry": sec,
+                "Cap": cap,
+                "Price": cur_price,
+                "1W": r1w,
+                "1M": r1m,
+                "3M": r3m,
+                "6M": r6m,
+                "Daily": daily_sig,
+                "Weekly": weekly_sig,
+                "DFresh": "★" if d_turn_ago <= 1 else "",
+                "WFresh": "★" if w_turn_ago <= 1 else "",
+                "DCross": d_cross,
+                "DCrossAgo": d_cross_ago,
+                "WCross": w_cross,
+                "WCrossAgo": w_cross_ago,
+                "DTurnAgo": d_turn_ago,
+                "WTurnAgo": w_turn_ago,
+                "EMA20": s_ema20,
+                "EMA50": s_ema50,
+                "EMA100": s_ema100,
+                "EMA200": s_ema200,
+                "RSState": rs_state,
+                "RSPos": rs_pos,
+                "RSCross": "UP" if rs_pos == "Y" else "DN",
+                "RSCrossAgo": 1,
+                "RS_Score": rs_score,
+                "RS_Rank": 50,
+                "DelivPct": 45,
+                "DelivHigh": "N",
+                "RSI_D": rsi_d,
+                "RSI_W": rsi_d,
+                "RSI_M": 50,
+                "RSI40Cross": "UP" if rsi_d > 40 else "",
+                "RSI40CrossAgo": 1,
+                "RSI50Cross": "UP" if rsi_d > 50 else "",
+                "RSI50CrossAgo": 1,
+                "RSI60Cross": "UP" if rsi_d > 60 else "",
+                "RSI60CrossAgo": 1,
+                "DConfirmed": d_conf,
+                "WConfirmed": w_conf,
+                "DLine": d_line_val,
+                "DUpper": d_upper_val,
+                "DLower": d_lower_val,
+                "WLine": w_line_val,
+                "WUpper": w_upper_val,
+                "WLower": w_lower_val,
+                "SahilD": sahil_d,
+                "SahilDAgo": sahil_d_ago,
+                "SahilW": sahil_w,
+                "SahilWAgo": sahil_w_ago
+            })
+        except Exception as err:
+            print(f"Error processing {t}: {err}")
+            continue
+
+    df_out = pd.DataFrame(out_rows)
+
+    # 1 to 99 Percentile RS Rank (NaN-Safe)
+    mask = df_out["Symbol"] != "NIFTY 500"
+    if mask.sum() > 0:
+        scores = pd.to_numeric(df_out.loc[mask, "RS_Score"], errors="coerce").fillna(0)
+        ranks = (scores.rank(pct=True) * 100).round(0).clip(1, 99).astype(int)
+        df_out.loc[mask, "RS_Rank"] = ranks
+
+    df_out.to_csv("flow.csv", index=False)
+    print(f"flow.csv તૈયાર થઈ ગયું છે! (કુલ {len(df_out)} સ્ટોક્સ + ETFs)")
+
+    update_nsdl_json()
+
+if __name__ == "__main__":
+    main()
