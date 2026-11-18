@@ -173,6 +173,20 @@ def calculate_rsi(series, period=14):
     rs = gain / (loss + 1e-9)
     return 100 - (100 / (1 + rs))
 
+def analyze_rsi_cross(rsi_series, level):
+    if len(rsi_series.dropna()) < 2:
+        return "", ""
+    valid = rsi_series.dropna()
+    is_above = bool(valid.iloc[-1] >= level)
+    cross = "UP" if is_above else "DN"
+    ago = 0
+    for i in range(len(valid) - 1, -1, -1):
+        if (valid.iloc[i] >= level) == is_above:
+            ago += 1
+        else:
+            break
+    return cross, max(0, ago - 1)
+
 def calculate_mkr(series, bandwidth=14, deviation=2.0, repaint=True):
     """
     TradingView 'Multi Kernel Regression [ChartPrime]':
@@ -241,15 +255,15 @@ def analyze_mkr_signal(close_series, line_series):
 
     return sig, turn_ago, cross, cross_ago
 
-def calculate_sahil_breakout(df, entry_len=20, exit_len=10):
+def calculate_sahil_breakout(df, entry_len=50, exit_len=20):
     """
-    Matches TradingView Sahil Breakout (20-bar Highest High BUY / 10-20 bar Lowest Low EXIT-SELL):
-    - Upper Green Line: Highest High of previous 20 bars
-    - Lower Red Line: Lowest Low of previous 10/20 bars
-    - Triggers BUY as soon as Close breaks above Upper Green Line (no restrictive volume block)
+    Sahil's Video Strategy (50-bar Highest High BUY / 20-bar Lowest Low EXIT):
+    - Upper Green Line: Highest High of previous 50 bars
+    - Lower Red Line: Lowest Low of previous 20 bars (Trailing Stop-Loss)
+    - Returns: (state, bars_ago, breakout_level, trailing_sl)
     """
     if len(df) < entry_len + 1:
-        return "", ""
+        return "", "", "", ""
 
     high = df["High"]
     low = df["Low"]
@@ -257,7 +271,6 @@ def calculate_sahil_breakout(df, entry_len=20, exit_len=10):
 
     upper = high.rolling(entry_len).max().shift(1)
     lower_exit = low.rolling(exit_len).min().shift(1)
-    lower_20 = low.rolling(entry_len).min().shift(1)
 
     state = ""
     bars_ago = ""
@@ -267,7 +280,6 @@ def calculate_sahil_breakout(df, entry_len=20, exit_len=10):
         c_val = close.iloc[i]
         u_val = upper.iloc[i]
         l_exit_val = lower_exit.iloc[i]
-        l_20_val = lower_20.iloc[i]
 
         if pd.isna(u_val) or pd.isna(l_exit_val):
             continue
@@ -276,17 +288,17 @@ def calculate_sahil_breakout(df, entry_len=20, exit_len=10):
             if state != "BUY":
                 state = "BUY"
                 last_sig_idx = i
-        elif c_val < l_20_val:
-            if state != "SELL":
-                state = "SELL"
-                last_sig_idx = i
         elif state == "BUY" and c_val < l_exit_val:
             state = "SELL"
             last_sig_idx = i
 
     if last_sig_idx is not None:
         bars_ago = (len(df) - 1) - last_sig_idx
-    return state, bars_ago
+
+    breakout_level = round(float(high.rolling(entry_len).max().iloc[-1]), 2)
+    trailing_sl = round(float(low.rolling(exit_len).min().iloc[-1]), 2)
+
+    return state, bars_ago, breakout_level, trailing_sl
 
 # ==========================================
 # 3. FPIDATA.IN FPI AUTO-UPDATE (NO EXTERNAL DEPENDENCY)
@@ -357,6 +369,7 @@ def update_nsdl_json():
 # 4. MAIN SCREENER & DATA GENERATOR
 # ==========================================
 def main():
+    update_nsdl_json()
     print("સ્ટોક્સ અને ETFs નું માર્કેટ સ્કેનિંગ શરૂ થાય છે...")
     all_tickers = []
     meta = {}
@@ -385,6 +398,7 @@ def main():
 
     out_rows = []
     bench_rets = {"1W": 0.0, "1M": 0.0, "3M": 0.0, "6M": 0.0}
+    b_c = None
     try:
         if bench_sym in data and len(data[bench_sym]["Close"].dropna()) > 30:
             b_c = data[bench_sym]["Close"].dropna()
@@ -408,7 +422,8 @@ def main():
         "RSI40Cross": "", "RSI40CrossAgo": "", "RSI50Cross": "", "RSI50CrossAgo": "",
         "RSI60Cross": "", "RSI60CrossAgo": "", "DConfirmed": "", "WConfirmed": "",
         "DLine": "", "DUpper": "", "DLower": "", "WLine": "", "WUpper": "", "WLower": "",
-        "SahilD": "", "SahilDAgo": "", "SahilW": "", "SahilWAgo": ""
+        "SahilD": "", "SahilDAgo": "", "SahilD_BO": "", "SahilD_TSL": "",
+        "SahilW": "", "SahilWAgo": "", "SahilW_BO": "", "SahilW_TSL": ""
     })
 
     for t in all_tickers:
@@ -433,66 +448,72 @@ def main():
 
             rs_score = round((0.4 * r3m) + (0.3 * r6m) + (0.3 * r1y), 2)
 
-            ema20 = calculate_ema(c, 20).iloc[-1]
-            ema50 = calculate_ema(c, 50).iloc[-1]
-            ema100 = calculate_ema(c, 100).iloc[-1] if len(c) >= 100 else ema50
-            ema200 = calculate_ema(c, 200).iloc[-1] if len(c) >= 200 else ema100
+            ema20 = round(float(calculate_ema(c, 20).iloc[-1]), 2)
+            ema50 = round(float(calculate_ema(c, 50).iloc[-1]), 2)
+            ema100 = round(float(calculate_ema(c, 100).iloc[-1]), 2)
+            ema200 = round(float(calculate_ema(c, 200).iloc[-1]), 2)
 
-            s_ema20 = "Above" if cur_price >= ema20 else "Below"
-            s_ema50 = "Above" if cur_price >= ema50 else "Below"
-            s_ema100 = "Above" if cur_price >= ema100 else "Below"
-            s_ema200 = "Above" if cur_price >= ema200 else "Below"
+            # Daily MKR
+            d_line_s, d_upper_s, d_lower_s = calculate_mkr(c, bandwidth=14, deviation=2.0, repaint=True)
+            d_sig, d_turn_ago, d_cross, d_cross_ago = analyze_mkr_signal(c, d_line_s)
+            d_fresh = "YES" if d_turn_ago <= 3 else ""
+            d_confirmed = "YES" if (d_sig == "BUY" and d_cross == "UP") else ""
 
-            rsi_series = calculate_rsi(c, 14)
-            rsi_d = round(float(rsi_series.iloc[-1]), 1) if not np.isnan(rsi_series.iloc[-1]) else 50.0
+            # Weekly Resample & Weekly MKR
+            agg_dict = {"High": "max", "Low": "min", "Close": "last"}
+            if "Open" in df.columns:
+                agg_dict["Open"] = "first"
+            if "Volume" in df.columns:
+                agg_dict["Volume"] = "sum"
+            df_w = df.resample("W-FRI").agg(agg_dict).dropna(subset=["Close", "High", "Low"])
+            w_c = df_w["Close"]
 
-            # --- DAILY CHARTPRIME MKR (Laplace, Bandwidth=14, Deviation=2, Repaint=True) ---
-            d_line, d_upper, d_lower = calculate_mkr(c, bandwidth=14, deviation=2.0, repaint=True)
-            d_line_val = round(float(d_line.iloc[-1]), 2)
-            d_upper_val = round(float(d_upper.iloc[-1]), 2)
-            d_lower_val = round(float(d_lower.iloc[-1]), 2)
+            w_line_s, w_upper_s, w_lower_s = calculate_mkr(w_c, bandwidth=14, deviation=2.0, repaint=True)
+            w_sig, w_turn_ago, w_cross, w_cross_ago = analyze_mkr_signal(w_c, w_line_s)
+            w_fresh = "YES" if w_turn_ago <= 2 else ""
+            w_confirmed = "YES" if (w_sig == "BUY" and w_cross == "UP") else ""
 
-            daily_sig, d_turn_ago, d_cross, d_cross_ago = analyze_mkr_signal(c, d_line)
-            d_conf = "Y" if (daily_sig == "BUY" and cur_price >= d_line_val) or (daily_sig == "SELL" and cur_price < d_line_val) else "N"
+            # Mansfield Relative Strength (vs Nifty 500)
+            rs_state, rs_pos, rs_cross, rs_cross_ago = "", "", "", ""
+            if b_c is not None and len(b_c) > 50:
+                aligned_b = b_c.reindex(df.index).ffill()
+                rs_ratio = (c / aligned_b) * 100
+                rs_ma = rs_ratio.rolling(50).mean()
+                mrs = ((rs_ratio / rs_ma) - 1) * 100
+                mrs_valid = mrs.dropna()
+                if len(mrs_valid) > 1:
+                    rs_pos = round(float(mrs_valid.iloc[-1]), 2)
+                    is_rs_pos = rs_pos >= 0
+                    rs_state = "BUY" if is_rs_pos else "SELL"
+                    rs_cross = "UP" if is_rs_pos else "DN"
+                    c_ago = 0
+                    for idx_i in range(len(mrs_valid) - 1, -1, -1):
+                        if (mrs_valid.iloc[idx_i] >= 0) == is_rs_pos:
+                            c_ago += 1
+                        else:
+                            break
+                    rs_cross_ago = max(0, c_ago - 1)
 
-            # --- SAHIL BREAKOUT: DAILY (20-bar High BUY / 10-20 bar Low EXIT-SELL) ---
-            sahil_d, sahil_d_ago = calculate_sahil_breakout(df, entry_len=20, exit_len=10)
+            # RSI (Daily, Weekly, Monthly + 40/50/60 Crosses)
+            rsi_d_s = calculate_rsi(c, 14)
+            rsi_w_s = calculate_rsi(w_c, 14)
+            try:
+                df_m = df.resample("ME").agg({"Close": "last"}).dropna()
+            except Exception:
+                df_m = df.resample("M").agg({"Close": "last"}).dropna()
+            rsi_m_s = calculate_rsi(df_m["Close"], 14)
 
-            # --- WEEKLY CHARTPRIME MKR & SAHIL BREAKOUT (W-FRI) ---
-            df_w = df.resample('W-FRI').agg({
-                'Open': 'first',
-                'High': 'max',
-                'Low': 'min',
-                'Close': 'last',
-                'Volume': 'sum'
-            }).dropna(subset=['Close', 'High', 'Low'])
+            rsi_d_val = round(float(rsi_d_s.iloc[-1]), 1) if not pd.isna(rsi_d_s.iloc[-1]) else ""
+            rsi_w_val = round(float(rsi_w_s.iloc[-1]), 1) if not pd.isna(rsi_w_s.iloc[-1]) else ""
+            rsi_m_val = round(float(rsi_m_s.iloc[-1]), 1) if len(rsi_m_s) > 0 and not pd.isna(rsi_m_s.iloc[-1]) else ""
 
-            sahil_w = ""
-            sahil_w_ago = ""
-            w_line_val = round(cur_price * 0.96, 2)
-            w_upper_val = round(cur_price * 1.10, 2)
-            w_lower_val = round(cur_price * 0.92, 2)
-            weekly_sig = daily_sig
-            w_turn_ago = d_turn_ago
-            w_cross = d_cross
-            w_cross_ago = d_cross_ago
-            w_conf = "Y"
+            r40_c, r40_ago = analyze_rsi_cross(rsi_d_s, 40)
+            r50_c, r50_ago = analyze_rsi_cross(rsi_d_s, 50)
+            r60_c, r60_ago = analyze_rsi_cross(rsi_d_s, 60)
 
-            if len(df_w) >= 22:
-                w_c = df_w['Close']
-                w_cur = w_c.iloc[-1]
-
-                sahil_w, sahil_w_ago = calculate_sahil_breakout(df_w, entry_len=20, exit_len=10)
-
-                w_line_s, w_up_s, w_lo_s = calculate_mkr(w_c, bandwidth=14, deviation=2.0, repaint=True)
-                w_line_val = round(float(w_line_s.iloc[-1]), 2)
-                w_upper_val = round(float(w_up_s.iloc[-1]), 2)
-                w_lower_val = round(float(w_lo_s.iloc[-1]), 2)
-                weekly_sig, w_turn_ago, w_cross, w_cross_ago = analyze_mkr_signal(w_c, w_line_s)
-                w_conf = "Y" if (weekly_sig == "BUY" and w_cur >= w_line_val) or (weekly_sig == "SELL" and w_cur < w_line_val) else "N"
-
-            rs_pos = "Y" if r1m > bench_rets["1M"] else "N"
-            rs_state = "Rising" if r1m >= r3m else "Falling"
+            # Sahil 50-20 Breakout & Trailing Stop-Loss (Daily & Weekly)
+            sahil_d, sahil_d_ago, sahil_d_bo, sahil_d_tsl = calculate_sahil_breakout(df, 50, 20)
+            sahil_w, sahil_w_ago, sahil_w_bo, sahil_w_tsl = calculate_sahil_breakout(df_w, 50, 20)
 
             out_rows.append({
                 "Symbol": raw_sym,
@@ -503,67 +524,71 @@ def main():
                 "1M": r1m,
                 "3M": r3m,
                 "6M": r6m,
-                "Daily": daily_sig,
-                "Weekly": weekly_sig,
-                "DFresh": "★" if d_turn_ago <= 1 else "",
-                "WFresh": "★" if w_turn_ago <= 1 else "",
+                "Daily": d_sig,
+                "Weekly": w_sig,
+                "DFresh": d_fresh,
+                "WFresh": w_fresh,
                 "DCross": d_cross,
                 "DCrossAgo": d_cross_ago,
                 "WCross": w_cross,
                 "WCrossAgo": w_cross_ago,
                 "DTurnAgo": d_turn_ago,
                 "WTurnAgo": w_turn_ago,
-                "EMA20": s_ema20,
-                "EMA50": s_ema50,
-                "EMA100": s_ema100,
-                "EMA200": s_ema200,
+                "EMA20": ema20,
+                "EMA50": ema50,
+                "EMA100": ema100,
+                "EMA200": ema200,
                 "RSState": rs_state,
                 "RSPos": rs_pos,
-                "RSCross": "UP" if rs_pos == "Y" else "DN",
-                "RSCrossAgo": 1,
+                "RSCross": rs_cross,
+                "RSCrossAgo": rs_cross_ago,
                 "RS_Score": rs_score,
                 "RS_Rank": 50,
-                "DelivPct": 45,
-                "DelivHigh": "N",
-                "RSI_D": rsi_d,
-                "RSI_W": rsi_d,
-                "RSI_M": 50,
-                "RSI40Cross": "UP" if rsi_d > 40 else "",
-                "RSI40CrossAgo": 1,
-                "RSI50Cross": "UP" if rsi_d > 50 else "",
-                "RSI50CrossAgo": 1,
-                "RSI60Cross": "UP" if rsi_d > 60 else "",
-                "RSI60CrossAgo": 1,
-                "DConfirmed": d_conf,
-                "WConfirmed": w_conf,
-                "DLine": d_line_val,
-                "DUpper": d_upper_val,
-                "DLower": d_lower_val,
-                "WLine": w_line_val,
-                "WUpper": w_upper_val,
-                "WLower": w_lower_val,
+                "DelivPct": "",
+                "DelivHigh": "",
+                "RSI_D": rsi_d_val,
+                "RSI_W": rsi_w_val,
+                "RSI_M": rsi_m_val,
+                "RSI40Cross": r40_c,
+                "RSI40CrossAgo": r40_ago,
+                "RSI50Cross": r50_c,
+                "RSI50CrossAgo": r50_ago,
+                "RSI60Cross": r60_c,
+                "RSI60CrossAgo": r60_ago,
+                "DConfirmed": d_confirmed,
+                "WConfirmed": w_confirmed,
+                "DLine": round(float(d_line_s.iloc[-1]), 2),
+                "DUpper": round(float(d_upper_s.iloc[-1]), 2),
+                "DLower": round(float(d_lower_s.iloc[-1]), 2),
+                "WLine": round(float(w_line_s.iloc[-1]), 2),
+                "WUpper": round(float(w_upper_s.iloc[-1]), 2),
+                "WLower": round(float(w_lower_s.iloc[-1]), 2),
                 "SahilD": sahil_d,
                 "SahilDAgo": sahil_d_ago,
+                "SahilD_BO": sahil_d_bo,
+                "SahilD_TSL": sahil_d_tsl,
                 "SahilW": sahil_w,
-                "SahilWAgo": sahil_w_ago
+                "SahilWAgo": sahil_w_ago,
+                "SahilW_BO": sahil_w_bo,
+                "SahilW_TSL": sahil_w_tsl
             })
-        except Exception as err:
-            print(f"Error processing {t}: {err}")
+        except Exception as e:
+            print(f"Error processing {raw_sym}: {e}")
             continue
 
-    df_out = pd.DataFrame(out_rows)
+    # Calculate RS_Rank (0-100 percentile) for all stocks (excluding NIFTY 500 row at index 0)
+    if len(out_rows) > 1:
+        scores = pd.Series([row["RS_Score"] for row in out_rows[1:]])
+        ranks = (scores.rank(pct=True) * 100).round().astype(int)
+        for idx, r_val in enumerate(ranks):
+            out_rows[idx + 1]["RS_Rank"] = int(r_val)
 
-    # 1 to 99 Percentile RS Rank (NaN-Safe)
-    mask = df_out["Symbol"] != "NIFTY 500"
-    if mask.sum() > 0:
-        scores = pd.to_numeric(df_out.loc[mask, "RS_Score"], errors="coerce").fillna(0)
-        ranks = (scores.rank(pct=True) * 100).round(0).clip(1, 99).astype(int)
-        df_out.loc[mask, "RS_Rank"] = ranks
+    # Save Output Files (JSON & CSV)
+    with open("data.json", "w", encoding="utf-8") as jf:
+        json.dump(out_rows, jf, indent=2)
 
-    df_out.to_csv("flow.csv", index=False)
-    print(f"flow.csv તૈયાર થઈ ગયું છે! (કુલ {len(df_out)} સ્ટોક્સ + ETFs)")
-
-    update_nsdl_json()
+    pd.DataFrame(out_rows).to_csv("data.csv", index=False)
+    print(f"સ્કેનિંગ પૂર્ણ! કુલ {len(out_rows) - 1} સ્ટોક્સનો ડેટા data.json અને data.csv માં સેવ થયો.")
 
 if __name__ == "__main__":
     main()
