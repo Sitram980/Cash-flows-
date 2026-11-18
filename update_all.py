@@ -161,7 +161,7 @@ SECTOR_MAP = {
 }
 
 # ==========================================
-# 2. TECHNICAL INDICATOR & CHARTPRIME MKR HELPERS
+# 2. TECHNICAL INDICATOR & MKR / SAHIL BREAKOUT HELPERS
 # ==========================================
 def calculate_ema(series, span):
     return series.ewm(span=span, adjust=False).mean()
@@ -240,6 +240,53 @@ def analyze_mkr_signal(close_series, line_series):
     cross_ago = max(0, cross_ago - 1)
 
     return sig, turn_ago, cross, cross_ago
+
+def calculate_sahil_breakout(df, entry_len=20, exit_len=10):
+    """
+    Matches TradingView Sahil Breakout (20-bar Highest High BUY / 10-20 bar Lowest Low EXIT-SELL):
+    - Upper Green Line: Highest High of previous 20 bars
+    - Lower Red Line: Lowest Low of previous 10/20 bars
+    - Triggers BUY as soon as Close breaks above Upper Green Line (no restrictive volume block)
+    """
+    if len(df) < entry_len + 1:
+        return "", ""
+
+    high = df["High"]
+    low = df["Low"]
+    close = df["Close"]
+
+    upper = high.rolling(entry_len).max().shift(1)
+    lower_exit = low.rolling(exit_len).min().shift(1)
+    lower_20 = low.rolling(entry_len).min().shift(1)
+
+    state = ""
+    bars_ago = ""
+    last_sig_idx = None
+
+    for i in range(entry_len, len(df)):
+        c_val = close.iloc[i]
+        u_val = upper.iloc[i]
+        l_exit_val = lower_exit.iloc[i]
+        l_20_val = lower_20.iloc[i]
+
+        if pd.isna(u_val) or pd.isna(l_exit_val):
+            continue
+
+        if c_val > u_val:
+            if state != "BUY":
+                state = "BUY"
+                last_sig_idx = i
+        elif c_val < l_20_val:
+            if state != "SELL":
+                state = "SELL"
+                last_sig_idx = i
+        elif state == "BUY" and c_val < l_exit_val:
+            state = "SELL"
+            last_sig_idx = i
+
+    if last_sig_idx is not None:
+        bars_ago = (len(df) - 1) - last_sig_idx
+    return state, bars_ago
 
 # ==========================================
 # 3. FPIDATA.IN FPI AUTO-UPDATE (NO EXTERNAL DEPENDENCY)
@@ -371,12 +418,11 @@ def main():
         try:
             if t not in data:
                 continue
-            df = data[t].dropna(subset=["Close"])
+            df = data[t].dropna(subset=["Close", "High", "Low"])
             if len(df) < 50:
                 continue
 
             c = df["Close"]
-            v = df["Volume"].fillna(0)
             cur_price = round(float(c.iloc[-1]), 2)
 
             r1w = round(float((cur_price - c.iloc[-6]) / c.iloc[-6] * 100), 2) if len(c) >= 6 else 0.0
@@ -409,25 +455,17 @@ def main():
             daily_sig, d_turn_ago, d_cross, d_cross_ago = analyze_mkr_signal(c, d_line)
             d_conf = "Y" if (daily_sig == "BUY" and cur_price >= d_line_val) or (daily_sig == "SELL" and cur_price < d_line_val) else "N"
 
-            # --- SAHIL BREAKOUT: DAILY ---
-            high_20_d = c.iloc[-21:-1].max()
-            low_20_d = c.iloc[-21:-1].min()
-            vol_avg_20_d = v.iloc[-21:-1].mean()
+            # --- SAHIL BREAKOUT: DAILY (20-bar High BUY / 10-20 bar Low EXIT-SELL) ---
+            sahil_d, sahil_d_ago = calculate_sahil_breakout(df, entry_len=20, exit_len=10)
 
-            is_sahil_d_buy = (cur_price > high_20_d) and (vol_avg_20_d > 0) and (v.iloc[-1] >= (1.5 * vol_avg_20_d))
-            is_sahil_d_sell = (cur_price < low_20_d) and (vol_avg_20_d > 0) and (v.iloc[-1] >= (1.5 * vol_avg_20_d))
-
-            sahil_d = "BUY" if is_sahil_d_buy else ("SELL" if is_sahil_d_sell else "")
-            sahil_d_ago = 0 if sahil_d else ""
-
-            # --- WEEKLY CHARTPRIME MKR & BREAKOUT (W-FRI, Laplace 14, Deviation 2) ---
+            # --- WEEKLY CHARTPRIME MKR & SAHIL BREAKOUT (W-FRI) ---
             df_w = df.resample('W-FRI').agg({
                 'Open': 'first',
                 'High': 'max',
                 'Low': 'min',
                 'Close': 'last',
                 'Volume': 'sum'
-            }).dropna(subset=['Close'])
+            }).dropna(subset=['Close', 'High', 'Low'])
 
             sahil_w = ""
             sahil_w_ago = ""
@@ -442,17 +480,9 @@ def main():
 
             if len(df_w) >= 22:
                 w_c = df_w['Close']
-                w_v = df_w['Volume'].fillna(0)
                 w_cur = w_c.iloc[-1]
-                w_high_20 = w_c.iloc[-21:-1].max()
-                w_low_20 = w_c.iloc[-21:-1].min()
-                w_vol_avg_20 = w_v.iloc[-21:-1].mean()
 
-                is_sahil_w_buy = (w_cur > w_high_20) and (w_vol_avg_20 > 0) and (w_v.iloc[-1] >= (1.5 * w_vol_avg_20))
-                is_sahil_w_sell = (w_cur < w_low_20) and (w_vol_avg_20 > 0) and (w_v.iloc[-1] >= (1.5 * w_vol_avg_20))
-
-                sahil_w = "BUY" if is_sahil_w_buy else ("SELL" if is_sahil_w_sell else "")
-                sahil_w_ago = 0 if sahil_w else ""
+                sahil_w, sahil_w_ago = calculate_sahil_breakout(df_w, entry_len=20, exit_len=10)
 
                 w_line_s, w_up_s, w_lo_s = calculate_mkr(w_c, bandwidth=14, deviation=2.0, repaint=True)
                 w_line_val = round(float(w_line_s.iloc[-1]), 2)
