@@ -1,256 +1,268 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Capital Flow Map — NSE Sectors</title>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#f6f7f9;--fg:#1a1d21;--mut:#6b7280;--card:#fff;--rbg:#fdeef1;--rbd:#f2c0cc;--rc:#b0103a;--gbg:#eefaf2;--gbd:#bfe8cf;--gc:#0a7a3d}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--fg:#e8eaed;--mut:#9aa0a6;--card:#1a1e24;--rbg:#2a1519;--rbd:#5a2530;--rc:#ff6b8b;--gbg:#122318;--gbd:#24503a;--gc:#4ade80}}
-:root[data-theme="dark"]{--bg:#111418;--fg:#e8eaed;--mut:#9aa0a6;--card:#1a1e24;--rbg:#2a1519;--rbd:#5a2530;--rc:#ff6b8b;--gbg:#122318;--gbd:#24503a;--gc:#4ade80}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-main{max-width:1000px;margin:auto;padding:16px}
-h1{font-size:13px;letter-spacing:.14em;text-align:center;margin:8px 0 2px}
+:root{--bg:#f6f7f9;--fg:#1a1d21;--mut:#6b7280;--card:#fff;--rbg:#fdeef1;--rbd:#f2c0cc;--rc:#b0103a;--gbg:#eefaf2;--gbd:#bfe8cf;--gc:#0a7a3d}
+@media(prefers-color-scheme:dark){:root{--bg:#111418;--fg:#e8eaed;--mut:#9aa0a6;--card:#1a1e24;--rbg:#2a1519;--rbd:#5a2530;--rc:#ff6b8b;--gbg:#122318;--gbd:#24503a;--gc:#4ade80}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:16px}h1{font-size:13px;letter-spacing:.14em;text-align:center;margin:8px 0 2px}
 .sub{text-align:center;color:var(--mut);font-size:12px;margin-bottom:12px}
-.bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
-.bar button,.bar label{border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer}
+.bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.bar button,.bar label{border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer}
 .bar button.on{background:var(--fg);color:var(--bg)}
 .note{background:var(--card);border:1px dashed var(--mut);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--mut);margin-bottom:14px;text-align:center}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
 .hd{border-radius:10px;padding:12px;margin-bottom:10px;font-weight:700}
 .out .hd,.out details{background:var(--rbg);border:1px solid var(--rbd)}.in .hd,.in details{background:var(--gbg);border:1px solid var(--gbd)}
 .out{--c:var(--rc);--b:var(--rbd)}.in{--c:var(--gc);--b:var(--gbd)}.hd{color:var(--c)}.hd small{font-weight:400;color:var(--mut);margin-left:6px}
-details{border-radius:10px;padding:12px 14px;margin-bottom:10px}
-summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px}summary::-webkit-details-marker{display:none}
+details{border-radius:10px;padding:12px 14px;margin-bottom:10px}summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px}summary::-webkit-details-marker{display:none}
 .rk{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
 .nm{flex:1;min-width:0}.nm b{font-size:15px}.nm span{display:block;font-size:11px;color:var(--mut)}
 .rt{text-align:right;color:var(--c)}.rt b{font-size:20px;display:block}.rt span{font-size:11px}
-.st{margin-top:10px;border-top:1px solid var(--b);padding-top:8px}.st h4{margin:0 0 4px;font-size:10px;letter-spacing:.06em;color:var(--mut)}
-.st div{display:flex;justify-content:space-between;padding:3px 0}.st b{color:var(--c)}.sc{max-height:240px;overflow-y:auto}.pn{background:var(--card);border:1px solid var(--mut);border-radius:12px;padding:12px 14px;margin-bottom:16px}.pn h3{margin:0 0 8px;font-size:14px}.pn .bar{margin:6px 0 10px;justify-content:flex-start}.pn .bar button{padding:4px 12px;font-size:12px}.sl{max-height:320px;overflow-y:auto}.sr{padding:7px 0;border-top:1px solid var(--mut)}.sr b{font-size:14px}.sr small{display:block;color:var(--mut);font-size:11px}.sr .r{float:right;font-weight:700}.sg{font-style:normal;font-size:10px;font-weight:600;border:1px solid;border-radius:8px;padding:0 6px;margin-right:4px}.sg.b{color:var(--gc)}.sg.s{color:var(--rc)}.cp{font-style:normal;font-size:9px;border:1px solid var(--mut);color:var(--mut);border-radius:8px;padding:0 5px;margin-left:4px}
+.st{margin-top:10px;border-top:1px solid var(--b);padding-top:8px}.st h4{margin:0 0 4px;font-size:10px;color:var(--mut)}
+.st div{display:flex;justify-content:space-between;padding:3px 0}.st b{color:var(--c)}.sc{max-height:240px;overflow-y:auto}
+.pn{background:var(--card);border:1px solid var(--mut);border-radius:12px;padding:12px 14px;margin-bottom:16px}.pn h3{margin:0 0 8px;font-size:14px}.pn .bar{margin:6px 0 10px;justify-content:flex-start}
+.sl{max-height:320px;overflow-y:auto}.sr{padding:7px 0;border-top:1px solid var(--mut)}.sr b{font-size:14px}.sr small{display:block;color:var(--mut);font-size:11px}.sr .r{float:right;font-weight:700}
+.sg{font-style:normal;font-size:10px;font-weight:600;border:1px solid;border-radius:8px;padding:0 6px;margin-right:4px}.sg.b{color:var(--gc)}.sg.s{color:var(--rc)}
+.cp{font-style:normal;font-size:9px;border:1px solid var(--mut);color:var(--mut);border-radius:8px;padding:0 5px;margin-left:4px}
 </style></head><body><main>
-<h1>CAPITAL FLOW MAP</h1>
-<div class="sub" id="sub"></div>
-<section id="top5" class="pn" style="display:none"></section>
-<section id="wl" class="pn" style="display:none"></section>
+<h1>CAPITAL FLOW MAP</h1><div class="sub" id="sub"></div>
+<section id="top5" class="pn" style="display:none"></section><section id="wl" class="pn" style="display:none"></section>
 <div class="bar"><button id="simpleBtn">🎯 Simple Mode</button></div>
 <div id="advWrap">
 <div class="bar" style="margin-bottom:8px"><input id="sq" type="text" placeholder="🔍 Search stock or sector..." style="flex:1;min-width:200px;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:14px"></div>
-<div id="sres" class="pn" style="display:none"></div>
-<div class="bar" id="tabs"></div>
-<div class="bar"><label style="position:relative;overflow:hidden">📂 Load my data (CSV)<input id="f" type="file" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer"></label><button id="pb">📋 Paste CSV / NSDL</button></div>
-<div id="pw" style="display:none;margin-bottom:14px"><textarea id="ta" rows="6" style="width:100%;border:1px solid var(--mut);border-radius:8px;background:var(--card);color:var(--fg);padding:8px;font:12px monospace" placeholder="Paste flow.csv OR copied NSDL Fortnightly FPI page text here"></textarea><div class="bar" style="margin-top:8px"><button id="pgo">Load pasted data</button></div></div>
+<div id="sres" class="pn" style="display:none"></div><div class="bar" id="tabs"></div>
+<div class="bar"><label style="position:relative;overflow:hidden">📂 Load CSV<input id="f" type="file" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer"></label><button id="pb">📋 Paste CSV / NSDL</button></div>
+<div id="pw" style="display:none;margin-bottom:14px"><textarea id="ta" rows="5" style="width:100%;border:1px solid var(--mut);border-radius:8px;background:var(--card);color:var(--fg);padding:8px;font:12px monospace" placeholder="Paste flow.csv OR copied NSDL Fortnightly FPI page text here"></textarea><div class="bar" style="margin-top:8px"><button id="pgo">Load pasted data</button></div></div>
 <div class="note" id="note">Connecting live market feeds...</div>
-<section id="short" class="pn" style="display:none"></section>
-<section id="sigp" class="pn" style="display:none"></section>
-<section id="rot" class="pn" style="display:none;overflow-x:auto"></section>
-<section id="trend" class="pn" style="display:none"></section>
-<section id="sahil" class="pn" style="display:none"></section>
-<section id="wlView" class="pn" style="display:none"></section>
+<section id="short" class="pn" style="display:none"></section><section id="sigp" class="pn" style="display:none"></section>
+<section id="rot" class="pn" style="display:none;overflow-x:auto"></section><section id="trend" class="pn" style="display:none"></section>
+<section id="sahil" class="pn" style="display:none"></section><section id="wlView" class="pn" style="display:none"></section>
 <div class="grid" id="mainGrid"><section class="out"><div class="hd">🔴 MONEY FLOWING OUT<small>investors selling</small></div><div id="out"></div></section>
 <section class="in"><div class="hd">🟢 MONEY FLOWING IN<small>investors buying</small></div><div id="in"></div></section></div>
-</div>
-</main>
+</div></main>
+<script>window.onerror=function(m,u,l){var n=document.getElementById("note");if(n)n.textContent="JS Error: "+m+" (line "+l+")";};</script>
 <script>
-const PERIODS=[["1W","1 Week"],["1M","1 Month"],["3M","3 Months"],["6M","6 Months"]];
+const PERIODS=[["1W","1 Week"],["1M","1 Month"],["3M","3 Months"],["6M","6 Months"]],CAPS=["Large","Mid","Small","Micro"];
 let sig="All",cap="All",mode="price",view="top",period="1M",rows=[],bench={};
-
-const SAMPLE={
-  "Automobile and Auto Components":"MARUTI,M&M,BAJAJ-AUTO|TVSMOTOR,ASHOKLEY,BALKRISIND|SANSERA,GABRIEL,SUBROS|JAMNAAUTO,SUPRAJIT",
-  "Capital Goods":"SIEMENS,ABB,HAL|CUMMINSIND,BHEL,POLYCAB,APARINDS|KIRLOSENG,GRSE,TEGA|WENDT,ELECON",
-  "Chemicals":"PIDILITIND,SRF,UPL|DEEPAKNTR,TATACHEM,AARTIIND|NEOGEN,FINEORG,CLEAN|BODALCHEM,ANDHRAPET,GSFC",
-  "Construction":"LT,NBCC,IRB|KEC,NCC,RVNL|PNCINFRA,HGINFRA,KALPATARU|ASHOKA,GPTINFRA",
-  "Construction Materials":"ULTRACEMCO,AMBUJACEM,SHREECEM|DALBHARAT,JKCEMENT,RAMCOCEM|HEIDELBERG,STARCEMENT,NUVOCO|SAURASHCEM,DECCANCEM",
-  "Consumer Durables":"TITAN,HAVELLS,DIXON|VOLTAS,CROMPTON,BLUESTARCO|SYMPHONY,ORIENTELEC,AMBER|BUTTERFLY,IFBIND",
-  "Consumer Services":"TRENT,DMART,INDHOTEL|NYKAA,JUBLFOOD,LEMONTREE|WESTLIFE,DEVYANI,SAPPHIRE|BARBEQUE,KHADIM",
-  "Diversified":"3MINDIA,GODREJIND,DCMSHRIRAM|BALMERLAWRI,GRAVITA|SHIVALIK,HINDCOPPER|ANDREWYULE,MODIRUBBER",
-  "Fast Moving Consumer Goods":"ITC,HINDUNILVR,NESTLEIND|BRITANNIA,DABUR,COLPAL|EMAMILTD,BIKAJI,GILLETTE|HERITGFOOD,TASTYBITE",
-  "Financial Services":"HDFCBANK,ICICIBANK,SBIN|AUBANK,FEDERALBNK,MUTHOOTFIN|CREDITACC,UJJIVANSFB,CDSL|MANAPPURAM,GEOJITFSL",
-  "Forest Materials":"CENTURYPLY,GREENPANEL,GREENPLY|STYLAMIND,ARCHIDPLY",
-  "Healthcare":"SUNPHARMA,CIPLA,DRREDDY|LUPIN,ALKEM,AUROPHARMA|GRANULES,JBCHEPHARM,LAURUSLABS|NATCOPHARM,ORCHPHARMA",
-  "Information Technology":"TCS,INFY,HCLTECH|PERSISTENT,COFORGE,MPHASIS|SONATSOFTW,ZENSARTECH,BSOFT|DATAMATICS,CIGNITITEC",
-  "Media, Entertainment & Publication":"ZEEL,SUNTV,PVRINOX|NETWORK18,TV18BRDCST,HATHWAY|DBCORP,NAZARA,SAREGAMA|TVTODAY,UFO",
-  "Metals & Mining":"TATASTEEL,JSWSTEEL,HINDALCO|VEDL,NMDC,JINDALSTEL|SAIL,NATIONALUM,APLAPOLLO|GPIL,MAHSEAMLES",
-  "Oil, Gas & Consumable Fuels":"RELIANCE,ONGC,BPCL|IOC,GAIL,PETRONET|IGL,MGL,GUJGASLTD|GULFOILLUB,CASTROLIND",
-  "Power":"NTPC,POWERGRID,TATAPOWER|ADANIPOWER,JSWENERGY,TORNTPOWER|CESC,NLCINDIA,JPPOWER|RTNPOWER,GIPCL",
-  "Realty":"DLF,GODREJPROP,OBEROIRLTY|PRESTIGE,LODHA,PHOENIXLTD|BRIGADE,SOBHA,MAHLIFE|ANANTRAJ,SUNTECK",
-  "Services":"ADANIPORTS,INDIGO,IRCTC|CONCOR,DELHIVERY,GMRAIRPORT|REDINGTON,BLUEDART,TCIEXP|ALLCARGO,GATEWAY",
-  "Telecommunication":"BHARTIARTL,INDUSTOWER,IDEA|TATACOMM,HFCL,TEJASNET|ROUTE,GTLINFRA,ITI|OPTIEMUS,UNITECH",
-  "Textiles":"PAGEIND,KPRMILL,TRIDENT|WELSPUNLIV,VTL,ARVIND|SUTLEJTEX,GOKEX,SHIVTEX|FILATEX,BANSWARA",
-  "Utilities":"ADANIGREEN,NHPC,SJVN|ADANIENSOL,SUZLON,INOXWIND|WAAREEENER,ORIENTGEN|RPOWER,KPIGREEN",
-  "ETFs":"NIFTYBEES,JUNIORBEES,BANKBEES,ITBEES,PHARMABEES|MID150BEES,PSUBNKBEES,MOM100,ALPHA,MODEFENCE|HDFCSML250,GOLDBEES,SILVERBEES,MON100"
-};
-const CAPS=["Large","Mid","Small","Micro"];
-
-let NSDL_HISTORY={
-  "Healthcare":[-2445,-418,601,-4501,1435,4101,3654,2910,3021,2114],
-  "Power":[4956,-1157,476,-2577,-3743,-1267,-1596,-1164,-389,-1653],
-  "Telecommunication":[-1908,-2542,2127,373,-720,-2454,-3271,-3322,-1661,-991],
-  "Consumer Services":[-2434,-365,-1630,-1852,3081,7361,2840,3398,5019,422],
-  "Chemicals":[-121,-700,90,-773,-514,-114,532,315,543,228],
-  "Fast Moving Consumer Goods":[-229,-1625,-1936,-5063,-474,-1106,478,-189,-1727,-2029],
-  "Automobile and Auto Components":[-1775,-357,-2175,-9044,-1324,-6936,2372,4405,-1299,-2670],
-  "Construction Materials":[-670,-1207,-434,-2426,-650,1574,871,384,-250,-358],
-  "Construction":[2199,-991,-220,-603,3484,403,-1602,-404,442,930],
-  "Services":[-362,7019,185,302,2592,2405,-1,590,1193,905],
-  "Oil, Gas & Consumable Fuels":[-3351,-6885,-2093,-10488,-2789,258,-513,490,-2251,-2385],
-  "Diversified":[3,33,-14,-13,7,29,-1,-18,-4,-23],
-  "Information Technology":[-2887,-1643,-268,-6733,-733,60,3298,2530,1573,-960],
-  "Financial Services":[-11704,-17960,-5181,-11263,14634,1975,-2869,6535,3959,-6204],
-  "Metals & Mining":[2416,1698,4999,-4722,-4371,5993,-1056,720,1087,-681],
-  "Consumer Durables":[441,-1162,-287,-634,2564,2384,4958,1472,2431,-397],
-  "Capital Goods":[4667,2645,154,-2586,-1442,-2657,-3618,-1556,2162,-108],
-  "Realty":[-206,-430,30,-1093,1893,2072,-279,-1014,420,-762],
-  "Utilities":[-12,-28,-19,7,216,119,-163,7,-38,194],
-  "Textiles":[-48,-112,39,-146,241,248,206,1,-294,10],
-  "Forest Materials":[73,-41,1,-12,-12,-11,40,-9,-7,7],
-  "Media, Entertainment & Publication":[-149,-12,-110,-232,-127,-289,24,-6,72,-93]
-};
+const SAMPLE={"Automobile and Auto Components":"MARUTI,M&M,BAJAJ-AUTO|TVSMOTOR,ASHOKLEY","Capital Goods":"SIEMENS,ABB,HAL|CUMMINSIND,BHEL,POLYCAB,APARINDS","Chemicals":"PIDILITIND,SRF,UPL|DEEPAKNTR,TATACHEM","Construction":"LT,NBCC,IRB|KEC,RVNL","Construction Materials":"ULTRACEMCO,AMBUJACEM|DALBHARAT,JKCEMENT","Consumer Durables":"TITAN,HAVELLS,DIXON|VOLTAS,CROMPTON","Consumer Services":"TRENT,DMART,INDHOTEL|NYKAA,JUBLFOOD","Diversified":"3MINDIA,GODREJIND|HINDCOPPER,DCMSHRIRAM","Fast Moving Consumer Goods":"ITC,HINDUNILVR,NESTLEIND|BRITANNIA,DABUR","Financial Services":"HDFCBANK,ICICIBANK,SBIN|AUBANK,FEDERALBNK","Forest Materials":"CENTURYPLY|GREENPANEL,GREENPLY","Healthcare":"SUNPHARMA,CIPLA,DRREDDY|LUPIN,ALKEM","Information Technology":"TCS,INFY,HCLTECH|PERSISTENT,COFORGE","Media, Entertainment & Publication":"ZEEL,SUNTV,PVRINOX|SAREGAMA,NAZARA","Metals & Mining":"TATASTEEL,JSWSTEEL,HINDALCO|VEDL,NMDC","Oil, Gas & Consumable Fuels":"RELIANCE,ONGC,BPCL|IOC,GAIL","Power":"NTPC,POWERGRID,TATAPOWER|ADANIPOWER,JSWENERGY","Realty":"DLF,GODREJPROP,LODHA|OBEROIRLTY,PRESTIGE","Services":"ADANIPORTS,INDIGO|IRCTC,CONCOR","Telecommunication":"BHARTIARTL,INDUSTOWER|IDEA,TATACOMM","Textiles":"PAGEIND|KPRMILL,TRIDENT","Utilities":"ADANIGREEN,ADANIENSOL|NHPC,SUZLON","ETFs":"NIFTYBEES,JUNIORBEES,BANKBEES,ITBEES|GOLDBEES,SILVERBEES,MON100"};
+let NSDL_HISTORY={"Healthcare":[-2445,-418,601,-4501,1435,4101,3654,2910,3021,2114],"Power":[4956,-1157,476,-2577,-3743,-1267,-1596,-1164,-389,-1653],"Telecommunication":[-1908,-2542,2127,373,-720,-2454,-3271,-3322,-1661,-991],"Consumer Services":[-2434,-365,-1630,-1852,3081,7361,2840,3398,5019,422],"Chemicals":[-121,-700,90,-773,-514,-114,532,315,543,228],"Fast Moving Consumer Goods":[-229,-1625,-1936,-5063,-474,-1106,478,-189,-1727,-2029],"Automobile and Auto Components":[-1775,-357,-2175,-9044,-1324,-6936,2372,4405,-1299,-2670],"Construction Materials":[-670,-1207,-434,-2426,-650,1574,871,384,-250,-358],"Construction":[2199,-991,-220,-603,3484,403,-1602,-404,442,930],"Services":[-362,7019,185,302,2592,2405,-1,590,1193,905],"Oil, Gas & Consumable Fuels":[-3351,-6885,-2093,-10488,-2789,258,-513,490,-2251,-2385],"Diversified":[3,33,-14,-13,7,29,-1,-18,-4,-23],"Information Technology":[-2887,-1643,-268,-6733,-733,60,3298,2530,1573,-960],"Financial Services":[-11704,-17960,-5181,-11263,14634,1975,-2869,6535,3959,-6204],"Metals & Mining":[2416,1698,4999,-4722,-4371,5993,-1056,720,1087,-681],"Consumer Durables":[441,-1162,-287,-634,2564,2384,4958,1472,2431,-397],"Capital Goods":[4667,2645,154,-2586,-1442,-2657,-3618,-1556,2162,-108],"Realty":[-206,-430,30,-1093,1893,2072,-279,-1014,420,-762],"Utilities":[-12,-28,-19,7,216,119,-163,7,-38,194],"Textiles":[-48,-112,39,-146,241,248,206,1,-294,10],"Forest Materials":[73,-41,1,-12,-12,-11,40,-9,-7,7],"Media, Entertainment & Publication":[-149,-12,-110,-232,-127,-289,24,-6,72,-93]};
 let NSDL_DATE="16–31 Oct 2026";
-let NSDL={"Information Technology":[2599,398397],"Services":[262,186896],"Media, Entertainment & Publication":[252,11084],"Diversified":[43,3626],"Chemicals":[41,119343],
-"Utilities":[-34,2725],"Forest Materials":[-50,1176],"Textiles":[-59,21265],"Construction Materials":[-564,94263],"Realty":[-578,111753],
-"Consumer Durables":[-586,179333],"Construction":[-1224,112879],"Power":[-1732,235832],"Consumer Services":[-1931,287273],
-"Oil, Gas & Consumable Fuels":[-3680,429974],"Metals & Mining":[-3693,263323],"Capital Goods":[-3886,476822],"Telecommunication":[-3928,343057],
-"Healthcare":[-5497,504679],"Automobile and Auto Components":[-6533,477593],"Fast Moving Consumer Goods":[-8172,268394],"Financial Services":[-8634,2035663]};
-
-try{
-  const savedNsdl=JSON.parse(localStorage.getItem("cfm_nsdl_v1")||"null");
-  if(savedNsdl&&savedNsdl.data){
-    NSDL=savedNsdl.data;
-    if(savedNsdl.date)NSDL_DATE=savedNsdl.date;
-    if(savedNsdl.history)NSDL_HISTORY=savedNsdl.history;
-  }
-}catch(e){}
+let NSDL={"Information Technology":[2599,398397],"Services":[262,186896],"Media, Entertainment & Publication":[252,11084],"Diversified":[43,3626],"Chemicals":[41,119343],"Utilities":[-34,2725],"Forest Materials":[-50,1176],"Textiles":[-59,21265],"Construction Materials":[-564,94263],"Realty":[-578,111753],"Consumer Durables":[-586,179333],"Construction":[-1224,112879],"Power":[-1732,235832],"Consumer Services":[-1931,287273],"Oil, Gas & Consumable Fuels":[-3680,429974],"Metals & Mining":[-3693,263323],"Capital Goods":[-3886,476822],"Telecommunication":[-3928,343057],"Healthcare":[-5497,504679],"Automobile and Auto Components":[-6533,477593],"Fast Moving Consumer Goods":[-8172,268394],"Financial Services":[-8634,2035663]};
+try{const sv=JSON.parse(localStorage.getItem("cfm_nsdl_v1")||"null");if(sv&&sv.data){NSDL=sv.data;if(sv.date)NSDL_DATE=sv.date;if(sv.history)NSDL_HISTORY=sv.history;}}catch(e){}
 let FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));
-
-function seeded(s){return()=>(s=Math.imul(s^s>>>15,1|s),s=s+Math.imul(s^s>>>7,61|s)^s,((s^s>>>14)>>>0)/4294967296)}
 
 const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const avg=a=>(a&&a.length)?a.reduce((x,y)=>x+y,0)/a.length:0;
 const fmt=n=>Math.abs(n||0).toLocaleString("en-IN");
 const capOf=v=>/micro/i.test(v||"")?"Micro":/mid/i.test(v||"")?"Mid":/small/i.test(v||"")?"Small":/large/i.test(v||"")?"Large":"";
-
-function resolveSym(val){
-  let s = (val||"").trim().toUpperCase().replace(/\.NS$/,"").replace(/\s+/g,"");
-  if(!s) return "";
-  if(s === "APAR" || s === "APARINDUSTRIES" || s === "APARINDS") return "APARINDS";
-  if(s === "TATAPOWER" || s === "TATA-POWER") return "TATAPOWER";
-  const exact = rows.find(x => x.Symbol.toUpperCase() === s || x.Symbol.toUpperCase() === s + ".NS");
-  if(exact) return exact.Symbol.replace(".NS","");
-  const partial = rows.find(x => x.Symbol.toUpperCase().startsWith(s) || s.startsWith(x.Symbol.toUpperCase()));
-  if(partial) return partial.Symbol.replace(".NS","");
-  return s;
-}
+const ago=n=>n===""||n===undefined||n===null?"":Number(n)===0?"today":Number(n)===1?"1 bar ago":n+" bars ago";
+function resolveSym(v){let s=(v||"").trim().toUpperCase().replace(/\.NS$/,"").replace(/\s+/g,"");if(!s)return"";if(s==="APAR"||s==="APARINDUSTRIES")return"APARINDS";const ex=rows.find(x=>x.Symbol.toUpperCase()===s);if(ex)return ex.Symbol;const pt=rows.find(x=>x.Symbol.toUpperCase().startsWith(s));return pt?pt.Symbol:s;}
 
 function sample(){
-  const r=seeded(7),out=[];
-  for(const [ind,txt] of Object.entries(SAMPLE)){
-    const base=(r()-.5)*16;
-    txt.split("|").forEach((grp,ci)=>{
-      const vol=1+ci*.5;
-      grp.split(",").forEach(sym=>{
-        const isUp=r()>0.45;
-        const px=+(120+r()*2400).toFixed(1);
-        const rankVal=Math.floor(20+r()*78);
-        const o={
-          Symbol:sym,Industry:ind,Cap:CAPS[ci]||"Mid",Price:px,
-          Daily:isUp?"BUY":"SELL",Weekly:isUp?"BUY":"SELL",
-          DFresh:r()>0.7?"★":"",WFresh:r()>0.7?"★":"",
-          DCross:isUp?"UP":"DN",DCrossAgo:Math.floor(r()*5),
-          WCross:isUp?"UP":"DN",WCrossAgo:Math.floor(r()*5),
-          DTurnAgo:Math.floor(r()*5),WTurnAgo:Math.floor(r()*5),
-          EMA20:isUp?"Above":"Below",EMA50:isUp?"Above":"Below",
-          EMA100:isUp?"Above":"Below",EMA200:isUp?"Above":"Below",
-          RSState:isUp?"Rising":"Falling",RSPos:isUp?"Y":"N",
-          RSCross:isUp?"UP":"DN",RSCrossAgo:Math.floor(r()*10),
-          RS_Score:+(base*1.5).toFixed(1),RS_Rank:rankVal,
-          DelivPct:Math.floor(32+r()*45),DelivHigh:r()>0.65?"Y":"N",
-          RSI_D:Math.floor(36+r()*32),RSI_W:Math.floor(40+r()*28),RSI_M:50,
-          RSI40Cross:isUp?"UP":"",RSI40CrossAgo:2,
-          RSI50Cross:isUp?"UP":"",RSI50CrossAgo:3,
-          RSI60Cross:isUp?"UP":"",RSI60CrossAgo:4,
-          DConfirmed:"Y",WConfirmed:"Y",
-          DLine:+(px*0.98).toFixed(1),DUpper:+(px*1.08).toFixed(1),DLower:+(px*0.94).toFixed(1),
-          WLine:+(px*0.96).toFixed(1),WUpper:+(px*1.12).toFixed(1),WLower:+(px*0.90).toFixed(1),
-          SahilD:isUp?"BUY":"SELL",SahilDAgo:Math.floor(r()*5),
-          SahilD_BO:+(px*1.03).toFixed(1),SahilD_TSL:+(px*0.93).toFixed(1),
-          SahilW:isUp?"BUY":"SELL",SahilWAgo:Math.floor(r()*5),
-          SahilW_BO:+(px*1.06).toFixed(1),SahilW_TSL:+(px*0.90).toFixed(1)
-        };
-        for(const [p,m] of [["1W",.4],["1M",1],["3M",2.2],["6M",3.5]]){
-          o[p]=+(base*m+(r()-.5)*10*m*vol).toFixed(1);
-        }
-        out.push(o);
-      });
-    });
-  }
+  const out=[];let k=1;
+  for(const [ind,txt] of Object.entries(SAMPLE)){txt.split("|").forEach((grp,ci)=>{grp.split(",").forEach(sym=>{k=(k*17+13)%100;const up=k>45,px=+(150+k*18).toFixed(1);out.push({Symbol:sym,Industry:ind,Cap:CAPS[ci]||"Mid",Price:px,"1W":+(up?2.1:-1.8),"1M":+(up?5.4:-4.2),"3M":+(up?11.2:-7.5),"6M":+(up?18:-9.1),Daily:up?"BUY":"SELL",Weekly:up?"BUY":"SELL",DFresh:"",WFresh:"",DCross:up?"UP":"DN",DCrossAgo:k%4,WCross:up?"UP":"DN",WCrossAgo:k%4,DTurnAgo:k%4,WTurnAgo:k%4,EMA20:up?"Above":"Below",EMA50:up?"Above":"Below",RSState:up?"Rising":"Falling",RSPos:up?"Y":"N",RS_Rank:Math.max(10,k),RSI_D:up?62:38,DConfirmed:"Y",WConfirmed:"Y",DLine:+(px*0.97).toFixed(1),DUpper:+(px*1.08).toFixed(1),DLower:+(px*0.93).toFixed(1),SahilD:up?"BUY":"SELL",SahilDAgo:k%4,SahilD_BO:+(px*1.03).toFixed(1),SahilD_TSL:+(px*0.92).toFixed(1),SahilW:up?"BUY":"SELL",SahilWAgo:k%4,SahilW_BO:+(px*1.06).toFixed(1),SahilW_TSL:+(px*0.89).toFixed(1)});});});}
   return out;
 }
-
 function splitCSV(l){const o=[];let c="",q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===","&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o}
-function parseCSV(t){
-  const clean=t.replace(/^\uFEFF/,"").trim();
-  const L=clean.split(/\r?\n/).filter(l=>l.trim().length>0);
-  if(!L.length)return[];
-  const h=splitCSV(L.shift()).map(x=>x.trim());
-  return L.map(l=>{const c=splitCSV(l),o={};h.forEach((k,i)=>o[k]=c[i]?c[i].trim():"");return o;});
-}
-
+function parseCSV(t){const L=t.replace(/^\uFEFF/,"").trim().split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const h=splitCSV(L.shift()).map(x=>x.trim());return L.map(l=>{const c=splitCSV(l),o={};h.forEach((k,i)=>o[k]=c[i]?c[i].trim():"");return o;});}
 const canon=x=>{const n=(x||"").replace(/,/g,"").trim();return Object.keys(NSDL).find(k=>k.replace(/,/g,"")===n)||(x||"").trim()};
 
 function load(recs){
   bench={};rows=[];
   for(const r of recs){
-    const o={Symbol:r.Symbol||r.index||r["Unnamed: 0"]||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DTurnAgo:r.DTurnAgo!==""&&r.DTurnAgo!==undefined?+r.DTurnAgo:"",WTurnAgo:r.WTurnAgo!==""&&r.WTurnAgo!==undefined?+r.WTurnAgo:"",DCrossAgo:r.DCrossAgo!==""&&r.DCrossAgo!==undefined?+r.DCrossAgo:"",DCross:(r.DCross||"").toUpperCase(),WCrossAgo:r.WCrossAgo!==""&&r.WCrossAgo!==undefined?+r.WCrossAgo:"",WCross:(r.WCross||"").toUpperCase(),Price:parseFloat(r.Price)||"",EMA20:r.EMA20||"",EMA50:r.EMA50||"",EMA100:r.EMA100||"",EMA200:r.EMA200||"",RSState:r.RSState||"",RSCrossAgo:r.RSCrossAgo!==""&&r.RSCrossAgo!==undefined?+r.RSCrossAgo:"",RSCross:(r.RSCross||"").toUpperCase(),RSPos:(r.RSPos||"").toUpperCase(),RS_Score:parseFloat(r.RS_Score)||0,RS_Rank:parseInt(r.RS_Rank)||50,DelivPct:parseFloat(r.DelivPct)||"",DelivHigh:(r.DelivHigh||"").toUpperCase(),RSI_D:parseFloat(r.RSI_D),RSI_W:parseFloat(r.RSI_W),RSI_M:parseFloat(r.RSI_M),RSI40CrossAgo:r.RSI40CrossAgo!==""&&r.RSI40CrossAgo!==undefined?+r.RSI40CrossAgo:"",RSI40Cross:(r.RSI40Cross||"").toUpperCase(),RSI50CrossAgo:r.RSI50CrossAgo!==""&&r.RSI50CrossAgo!==undefined?+r.RSI50CrossAgo:"",RSI50Cross:(r.RSI50Cross||"").toUpperCase(),RSI60CrossAgo:r.RSI60CrossAgo!==""&&r.RSI60CrossAgo!==undefined?+r.RSI60CrossAgo:"",RSI60Cross:(r.RSI60Cross||"").toUpperCase(),DConfirmed:(r.DConfirmed||"").toUpperCase(),WConfirmed:(r.WConfirmed||"").toUpperCase(),DLine:parseFloat(r.DLine),DUpper:parseFloat(r.DUpper),DLower:parseFloat(r.DLower),WLine:parseFloat(r.WLine),WUpper:parseFloat(r.WUpper),WLower:parseFloat(r.WLower),SahilD:(r.SahilD||"").toUpperCase(),SahilDAgo:r.SahilDAgo!==""&&r.SahilDAgo!==undefined?+r.SahilDAgo:"",SahilD_BO:r.SahilD_BO||"",SahilD_TSL:r.SahilD_TSL||"",SahilW:(r.SahilW||"").toUpperCase(),SahilWAgo:r.SahilWAgo!==""&&r.SahilWAgo!==undefined?+r.SahilWAgo:"",SahilW_BO:r.SahilW_BO||"",SahilW_TSL:r.SahilW_TSL||""};
+    const o={Symbol:r.Symbol||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Price:parseFloat(r.Price)||"",Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DFresh:r.DFresh||"",WFresh:r.WFresh||"",DTurnAgo:r.DTurnAgo!==""&&r.DTurnAgo!==undefined?+r.DTurnAgo:"",WTurnAgo:r.WTurnAgo!==""&&r.WTurnAgo!==undefined?+r.WTurnAgo:"",DCross:(r.DCross||"").toUpperCase(),DCrossAgo:r.DCrossAgo!==""&&r.DCrossAgo!==undefined?+r.DCrossAgo:"",WCross:(r.WCross||"").toUpperCase(),WCrossAgo:r.WCrossAgo!==""&&r.WCrossAgo!==undefined?+r.WCrossAgo:"",EMA20:r.EMA20||"",EMA50:r.EMA50||"",RSState:r.RSState||"",RSPos:(r.RSPos||"").toUpperCase(),RS_Rank:parseInt(r.RS_Rank)||50,RSI_D:parseFloat(r.RSI_D),DConfirmed:(r.DConfirmed||"").toUpperCase(),WConfirmed:(r.WConfirmed||"").toUpperCase(),DLine:parseFloat(r.DLine),DUpper:parseFloat(r.DUpper),DLower:parseFloat(r.DLower),SahilD:(r.SahilD||"").toUpperCase(),SahilDAgo:r.SahilDAgo!==""&&r.SahilDAgo!==undefined?+r.SahilDAgo:"",SahilD_BO:r.SahilD_BO||"",SahilD_TSL:r.SahilD_TSL||"",SahilW:(r.SahilW||"").toUpperCase(),SahilWAgo:r.SahilWAgo!==""&&r.SahilWAgo!==undefined?+r.SahilWAgo:"",SahilW_BO:r.SahilW_BO||"",SahilW_TSL:r.SahilW_TSL||""};
     PERIODS.forEach(([p])=>o[p]=parseFloat(r[p]));
     if(/^NIFTY ?500$/i.test(o.Symbol))PERIODS.forEach(([p])=>bench[p]=o[p]);
     else if(o.Industry&&!isNaN(o[period]))rows.push(o);
   }
-  PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.length?v.reduce((a,b)=>a+b,0)/v.length:0}});
-
-  const uniqueRanks = new Set(rows.map(x => x.RS_Rank).filter(x => !isNaN(x)));
-  if (uniqueRanks.size <= 1) {
-    const valid = rows.filter(x => !isNaN(x["1M"]) && !isNaN(x["3M"]));
-    valid.forEach(x => {
-      const r1 = isNaN(x["1M"]) ? 0 : x["1M"];
-      const r3 = isNaN(x["3M"]) ? 0 : x["3M"];
-      const r6 = isNaN(x["6M"]) ? r3 : x["6M"];
-      x._calcScore = (0.4 * r3) + (0.3 * r6) + (0.3 * r1);
-    });
-    valid.sort((a, b) => a._calcScore - b._calcScore);
-    const n = valid.length;
-    valid.forEach((x, idx) => {
-      x.RS_Rank = Math.max(1, Math.min(99, Math.round(((idx + 1) / n) * 100)));
-    });
-  }
-
-  renderTop5();
-  render();
+  PERIODS.forEach(([p])=>{if(bench[p]==null){const v=rows.map(x=>x[p]).filter(x=>!isNaN(x));bench[p]=v.length?avg(v):0}});
+  renderTop5();render();
 }
 
-function buyScore(r,sm){
-  let s=0;const R=[];
-  if(r.Daily==="BUY"&&r.DConfirmed==="Y"){s+=2;R.push("Daily confirmed BUY")}
-  if(r.Weekly==="BUY"&&r.WConfirmed==="Y"){s+=2;R.push("Weekly confirmed BUY")}
-  if(!isNaN(r.RSI_D)&&r.RSI_D>40&&r.RSI_D<70){s+=1;R.push("RSI healthy")}
-  if(r.RSPos==="Y"){s+=1;R.push("RS+ beating Nifty 500")}
-  if(r.RSState==="Rising"){s+=1;R.push("RS rising")}
-  if(r.RS_Rank>=80){s+=1;R.push("Top RS Rank ("+r.RS_Rank+"/100)")}
-  if(r.DelivHigh==="Y"){s+=1;R.push("high delivery %")}
-  const fresh=(r.DTurnAgo!==""&&r.DTurnAgo<=2)||(r.WTurnAgo!==""&&r.WTurnAgo<=1)||(r.DCross==="UP"&&r.DCrossAgo!==""&&r.DCrossAgo<=3);
-  if(fresh){s+=1;R.push("fresh signal")}
-  if(!isNaN(r["1M"])&&r["1M"]>sm){s+=1;R.push("beats its sector")}
-  return{score:s,reasons:R};
-}
-
-function slTarget(r){
-  if(isNaN(r.DLine))return null;
-  const ext=!isNaN(r.DUpper)&&r.Price>r.DUpper;
-  return{sl:r.DLower,target:r.DUpper,line:r.DLine,extended:ext};
-}
-
+function buyScore(r,sm){let s=0,R=[];if(r.Daily==="BUY"&&r.DConfirmed==="Y"){s+=2;R.push("Daily BUY")}if(r.Weekly==="BUY"&&r.WConfirmed==="Y"){s+=2;R.push("Weekly BUY")}if(!isNaN(r.RSI_D)&&r.RSI_D>40&&r.RSI_D<70){s+=1;R.push("RSI healthy")}if(r.RSPos==="Y"){s+=1;R.push("RS+")}if(r.RSState==="Rising"){s+=1;R.push("RS rising")}if(r.RS_Rank>=80){s+=1;R.push("RS "+r.RS_Rank)}if((r.DTurnAgo!==""&&r.DTurnAgo<=2)||(r.WTurnAgo!==""&&r.WTurnAgo<=1)){s+=1;R.push("fresh")}if(!isNaN(r["1M"])&&r["1M"]>sm){s+=1;R.push("beats sector")}return{score:s,reasons:R};}
+function slTarget(r){return isNaN(r.DLine)?null:{sl:r.DLower,target:r.DUpper};}
 function wlGet(){try{return JSON.parse(localStorage.getItem("cfm_watchlist_v1")||"{}")}catch(e){return{}}}
 function wlSet(sym,status,price){try{const w=wlGet();w[sym]={status,price:price||"",added:new Date().toISOString().slice(0,10)};localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist();if(mode==="watchlist")renderWatchlistTab()}
 function wlRemove(sym){try{const w=wlGet();delete w[sym];localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist();if(mode==="watchlist")renderWatchlistTab()}
-function watchBtns(sym,price){
-  let st="";try{st=(wlGet()[sym]||{}).status||""}catch(e){}
-  return `<button data-wl="watch" data-sym="${esc(sym)}" data-px="${price||""}" style="padding:3px 8px;font-size:10px;border-radius:10px;border:1px solid var(--mut);background:${st==="watch"?"var(--fg)":"var(--card)"};color:${st==="watch"?"var(--bg)":"var(--fg)"}">${st==
+function watchBtns(sym,price){const st=(wlGet()[sym]||{}).status||"";return`<button data-wl="watch" data-sym="${esc(sym)}" data-px="${price||""}" style="padding:3px 8px;font-size:10px;border-radius:10px;border:1px solid var(--mut);background:${st==="watch"?"var(--fg)":"var(--card)"};color:${st==="watch"?"var(--bg)":"var(--fg)"}">${st==="watch"?"★ Watching":"☆ Watch"}</button> <button data-wl="bought" data-sym="${esc(sym)}" data-px="${price||""}" style="padding:3px 8px;font-size:10px;border-radius:10px;border:1px solid var(--mut);background:${st==="bought"?"var(--gc)":"var(--card)"};color:${st==="bought"?"#fff":"var(--fg)"}">${st==="bought"?"✓ Bought":"Mark Bought"}</button>`;}
+
+function renderWatchlist(){
+  const el=document.getElementById("wl"),w=wlGet(),syms=Object.keys(w);el.style.display="block";
+  const lines=syms.map(sym=>{const rec=w[sym],r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase()),now=r?r.Price:"",chg=(now&&rec.price)?((now-rec.price)/rec.price*100):null;return`<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:16px;cursor:pointer">✕</button><b>${esc(sym)}</b> <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i>${r?` <span class="cp">RS:${r.RS_Rank}</span>`:""}<small>${now?"₹"+now:""}${chg!==null?" ("+(chg>=0?"+":"")+chg.toFixed(1)+"%)":""}${r?" · Daily "+r.Daily+" · Weekly "+r.Weekly:""}</small></div>`;}).join("");
+  el.innerHTML=`<h3>⭐ My Watchlist</h3><div style="display:flex;gap:8px;margin:8px 0;max-width:360px"><input id="wlHomeInput" type="text" placeholder="Symbol (e.g. APARINDS)..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;font-size:12px;text-transform:uppercase"><button id="wlHomeAddBtn" style="border:1px solid var(--mut);background:var(--fg);color:var(--bg);border-radius:20px;padding:6px 14px;cursor:pointer;font-weight:700;font-size:12px">+ Add</button></div><div class="sl">${lines||"<small style='color:var(--mut)'>No stocks yet.</small>"}</div>`;
+  const add=()=>{const inp=document.getElementById("wlHomeInput");if(!inp)return;const v=resolveSym(inp.value);if(!v)return;const f=rows.find(x=>x.Symbol.toUpperCase()===v.toUpperCase());wlSet(v,"watch",f?f.Price:"");inp.value="";};
+  document.getElementById("wlHomeAddBtn").onclick=add;document.getElementById("wlHomeInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add();}};
+}
+
+function renderWatchlistTab(){
+  hideAll("wlView");const el=document.getElementById("wlView"),w=wlGet(),syms=Object.keys(w);
+  const cards=syms.map(sym=>{const rec=w[sym],r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase()),now=r?r.Price:"",st=r?slTarget(r):null;return`<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:18px;cursor:pointer">✕</button><b>${esc(sym)}</b> · ₹${now||"—"} ${r?`<span class="cp">RS:${r.RS_Rank}</span>`:""}<div style="margin:6px 0"><span class="sg ${r&&r.Daily==="BUY"?"b":"s"}">Daily ${r?r.Daily:"—"}</span><span class="sg ${r&&r.Weekly==="BUY"?"b":"s"}">Weekly ${r?r.Weekly:"—"}</span></div>${st?`<small>SL ~₹${st.sl} · Target ~₹${st.target}</small>`:""}</div>`;}).join("");
+  el.innerHTML=`<h3>⭐ My Watchlist — Live Signals</h3><div style="display:flex;gap:8px;margin:10px 0;max-width:400px"><input id="wlAddInput" type="text" placeholder="Symbol..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:13px;text-transform:uppercase"><button id="wlAddBtn" style="border:1px solid var(--mut);background:var(--fg);color:var(--bg);border-radius:20px;padding:8px 16px;cursor:pointer;font-weight:700">+ Add</button></div><div class="sl">${cards||"<small>Watchlist is empty.</small>"}</div>`;
+  const add=()=>{const inp=document.getElementById("wlAddInput");if(!inp)return;const v=resolveSym(inp.value);if(!v)return;const f=rows.find(x=>x.Symbol.toUpperCase()===v.toUpperCase());wlSet(v,"watch",f?f.Price:"");inp.value="";};
+  document.getElementById("wlAddBtn").onclick=add;document.getElementById("wlAddInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add();}};
+  document.getElementById("tabs").innerHTML=bar(false);
+}
+
+document.addEventListener("click",e=>{const d=e.target.dataset;if(d.wl)wlSet(d.sym,d.wl,parseFloat(d.px)||"");else if(d.wlrm)wlRemove(d.wlrm);});
+let simpleMode=false;document.getElementById("simpleBtn").onclick=()=>{simpleMode=!simpleMode;document.getElementById("advWrap").style.display=simpleMode?"none":"block";document.getElementById("simpleBtn").textContent=simpleMode?"🔍 Advanced Mode":"🎯 Simple Mode";};
+
+function renderTop5(){
+  const el=document.getElementById("top5");if(!rows.some(x=>x.Daily)){el.style.display="none";renderWatchlist();return;}el.style.display="block";
+  const secAvg={};rows.forEach(r=>{(secAvg[r.Industry]??=[]).push(r["1M"])});Object.keys(secAvg).forEach(k=>{const v=secAvg[k].filter(x=>!isNaN(x));secAvg[k]=v.length?avg(v):0;});
+  const picks=rows.filter(r=>r.Daily==="BUY"&&r.DConfirmed==="Y"&&r.Weekly==="BUY"&&r.WConfirmed==="Y").map(r=>{const {score,reasons}=buyScore(r,secAvg[r.Industry]||0),st=slTarget(r);return{r,score,reasons,st};}).sort((a,b)=>b.score-a.score||b.r["1M"]-a.r["1M"]).slice(0,5);
+  el.innerHTML=`<h3>🎯 Today's Top 5 Picks — Daily+Weekly BUY</h3><div class="sl">${picks.length?picks.map((o,i)=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.score}/10</span><b>${i+1}. ${esc(o.r.Symbol)}</b> <span class="cp">RS:${o.r.RS_Rank}</span><small>${esc(o.r.Industry)} · 1M ${o.r["1M"]>=0?"+":""}${o.r["1M"].toFixed(1)}%</small><small>${o.reasons.join(" · ")}</small>${o.st?`<small>SL ~₹${o.st.sl} · Target ~₹${o.st.target}</small>`:""}<div style="margin-top:4px">${watchBtns(o.r.Symbol,o.r.Price)}</div></div>`).join(""):"<small>No confirmed Daily+Weekly BUY stocks right now.</small>"}</div>`;
+  renderWatchlist();
+}
+
+const sigOK=x=>sig==="All"||(sig==="D"&&x.Daily==="BUY")||(sig==="W"&&x.Weekly==="BUY")||(sig==="DW"&&x.Daily==="BUY"&&x.Weekly==="BUY")||(sig==="DS"&&x.Daily==="SELL")||(sig==="WS"&&x.Weekly==="SELL")||(sig==="DWS"&&x.Daily==="SELL"&&x.Weekly==="SELL");
+const chip=(t,v,f)=>v?`<i class="sg ${v==="BUY"?"b":"s"}">${t} ${v}${f?" ★":""}</i>`:"";
+
+function card(i,name,stocks,inflow){
+  const m=avg(stocks.map(s=>s[period])),b=bench[period]||0,rel=m-b,beat=stocks.filter(s=>s[period]>b).length,top=stocks.filter(sigOK).sort((a,c)=>inflow?c[period]-a[period]:a[period]-c[period]);
+  return`<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>${stocks.length} stocks · ${beat} beat Nifty 500</span>${FPI[name]?`<span>FPI holdings ₹${fmt(FPI[name])} Cr</span>`:""}</span><span class="rt"><b>${m>=0?"+":""}${m.toFixed(1)}%</b><span>${rel>=0?"▲ OUT":"▼ UNDER"} Nifty 500 by ${Math.abs(rel).toFixed(1)}%</span></span></summary><div class="st"><h4>${top.length} OF ${stocks.length} STOCKS</h4><div class="sc">${top.map(s=>`<div><span>${esc(s.Symbol)} <span class="cp">RS:${s.RS_Rank}</span><br>${chip("D",s.Daily,s.DFresh)}${chip("W",s.Weekly,s.WFresh)}</span><b>${s[period]>=0?"+":""}${s[period].toFixed(1)}%</b></div>`).join("")}</div></div></details>`;
+}
+
+function cardF(i,name,flow,auc,inflow){return`<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>FPI ₹${fmt(auc)} Cr</span></span><span class="rt"><b>${flow>=0?"+":"−"}₹${fmt(flow)} Cr</b><span>${auc>0?(flow/auc*100).toFixed(2):"0"}%</span></span></summary><div class="st"><h4>NSDL NET FPI EQUITY FLOW · ${NSDL_DATE}</h4><div><span>${inflow?"Net bought":"Net sold"}</span><b>₹${fmt(flow)} Cr</b></div><div><span>Holdings</span><b>₹${fmt(auc)} Cr</b></div></div></details>`;}
+
+function applyNsdlPaste(txt,manualDate){
+  const mDate=txt.match(/(\d{1,2}\s*[–-]\s*\d{1,2}\s+[A-Za-z]{3,9}\s+20\d\d|[A-Za-z]{3,9}\s+\d{1,2}\s*[–-]\s*\d{1,2},?\s+20\d\d|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+20\d\d|\d{1,2}[-/\s](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[-/\s]20\d\d)/i);
+  const dt=(manualDate&&manualDate.trim())?manualDate.trim():(mDate?mDate[1]:"1–15 Nov 2026");
+  const flat=txt.replace(/\s+/g," ").replace(/,/g,"").replace(/₹/g,"").replace(/Cr/g,"");
+  const secs=Object.keys(NSDL).sort((a,b)=>b.length-a.length),pos=[],occ=[];
+  for(const s of secs){const rx=new RegExp(s.replace(/,/g,"").replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),m=rx.exec(flat);if(m){const st=m.index,en=st+m[0].length;if(!occ.some(([a,b])=>st<b&&en>a)){pos.push([st,en,s]);occ.push([st,en]);}}}
+  pos.sort((a,b)=>a[0]-b[0]);
+  if(pos.length<5){alert("NSDL ટેબલનો ડેટા મળ્યો નથી. NSDL પેજ પર Select All કરીને Copy કરો.");return false;}
+  const nextData={...NSDL};
+  for(let i=0;i<pos.length;i++){
+    const [st,en,s]=pos[i],nextSt=i+1<pos.length?pos[i+1][0]:Math.min(flat.length,en+450);
+    let nums=(flat.slice(en,nextSt).match(/[+-]?\d+(?:\.\d+)?/g)||[]).map(Number);
+    if((nums.length===37||nums.length===35||nums.length===19||nums.length===13||nums.length===3)&&nums[nums.length-1]>=1&&nums[nums.length-1]<=25)nums=nums.slice(0,-1);
+    if(nums.length>=28)nextData[s]=[nums[12],nums[nums.length-12]];
+    else if(nums.length>=14)nextData[s]=[nums[6],nums[nums.length-6]];
+    else if(nums.length>=8)nextData[s]=[nums[4],nums[nums.length-4]];
+    else if(nums.length>=2)nextData[s]=[nums[0],nums[1]];
+    else if(nums.length===1)nextData[s]=[nums[0],NSDL[s]?NSDL[s][1]:50000];
+    if(NSDL_HISTORY[s])NSDL_HISTORY[s]=[...NSDL_HISTORY[s].slice(-9),nextData[s][0]];
+  }
+  NSDL=nextData;NSDL_DATE=dt;FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));
+  try{localStorage.setItem("cfm_nsdl_v1",JSON.stringify({source:"paste",date:NSDL_DATE,data:NSDL,history:NSDL_HISTORY}));}catch(e){}
+  mode="fpi";render();note("NSDL FPI updated: "+NSDL_DATE+" ("+pos.length+" sectors)");return true;
+}
+
+function renderF(){
+  hideAll("grid");const secs=Object.entries(NSDL).sort((a,b)=>a[1][0]-b[1][0]),neg=secs.filter(x=>x[1][0]<0),pos=secs.filter(x=>x[1][0]>=0).reverse(),all=view==="all";
+  const O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
+  document.getElementById("out").innerHTML=`<div class="bar" style="justify-content:flex-start;margin-bottom:8px"><button id="nsdlToggleBtn" style="font-weight:700">📋 Update NSDL Data (Paste)</button></div>
+  <div id="nsdlPasteBox" style="display:none;background:var(--card);border:1px solid var(--mut);border-radius:10px;padding:10px;margin-bottom:10px">
+    <small style="color:var(--mut);display:block;margin-bottom:6px">1. <a href="https://www.fpi.nsdl.co.in/web/Reports/FPI_Fortnightly_Selection.aspx" target="_blank" style="color:var(--gc)">NSDL Fortnightly Report</a> ખોલી Select All → Copy કરો.<br>2. નીચે Paste કરીને Apply દબાવો:</small>
+    <input id="nsdlDateIn" type="text" value="${esc(NSDL_DATE==="16–31 Oct 2026"?"1–15 Nov 2026":NSDL_DATE)}" style="width:100%;margin-bottom:6px;border:1px solid var(--mut);border-radius:8px;background:var(--bg);color:var(--fg);padding:6px 8px;font-size:12px">
+    <textarea id="nsdlTa" rows="4" style="width:100%;border:1px solid var(--mut);border-radius:8px;background:var(--bg);color:var(--fg);padding:6px;font:12px monospace" placeholder="NSDL પેજનો કોપી કરેલો ડેટા અહીં Paste કરો..."></textarea>
+    <div class="bar" style="margin:6px 0 0;justify-content:flex-start"><button id="nsdlApplyBtn" class="on">✓ Apply NSDL Data</button><button id="nsdlCopyJsonBtn">📄 Copy nsdl.json</button></div>
+  </div>`+O.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],false)).join("");
+  document.getElementById("in").innerHTML=I.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],true)).join("");
+  const t=secs.reduce((a,x)=>a+x[1][0],0);
+  document.getElementById("sub").textContent=`FPI net equity flow · ${NSDL_DATE} · all sectors ${t>=0?"+":"−"}₹${fmt(t)} Cr · source: NSDL`;
+  document.getElementById("tabs").innerHTML=bar(false);
+  document.getElementById("nsdlToggleBtn").onclick=()=>{const b=document.getElementById("nsdlPasteBox");b.style.display=b.style.display==="none"?"block":"none";};
+  document.getElementById("nsdlApplyBtn").onclick=()=>{const v=document.getElementById("nsdlTa").value,d=document.getElementById("nsdlDateIn").value;if(v.trim())applyNsdlPaste(v,d);};
+  document.getElementById("nsdlCopyJsonBtn").onclick=()=>{const j=JSON.stringify({date:NSDL_DATE,data:NSDL,history:NSDL_HISTORY},null,2);navigator.clipboard.writeText(j).then(()=>alert("nsdl.json કોપી થઈ ગયું!"));};
+}
+
+function bar(showP){
+  return`<button class="${mode==="price"?"on":""}" data-m="price">Price return</button><button class="${mode==="fpi"?"on":""}" data-m="fpi">FPI net flow (NSDL)</button><button class="${mode==="rotation"?"on":""}" data-m="rotation">Sector Rotation</button><button class="${mode==="trend"?"on":""}" data-m="trend">Trend Scanner</button><button class="${mode==="sahil"?"on":""}" data-m="sahil">Breakout Scanner</button><button class="${mode==="watchlist"?"on":""}" data-m="watchlist">⭐ Watchlist</button>`+(showP?PERIODS.map(([p,l])=>`<button class="${p===period?"on":""}" data-p="${p}">${l}</button>`).join(""):"")+(showP?["All",...CAPS].map(c=>`<button class="${c===cap?"on":""}" data-c="${c}">${c==="All"?"All caps":c+" cap"}</button>`).join(""):"")+(showP?[["All","All signals"],["D","Daily BUY"],["W","Weekly BUY"],["DW","Daily+Weekly BUY"],["DS","Daily SELL"],["WS","Weekly SELL"],["DWS","Daily+Weekly SELL"]].map(([k,l])=>`<button class="${k===sig?"on":""}" data-s="${k}">${l}</button>`).join(""):"")+`<button class="${view==="top"?"on":""}" data-v="top">Top 5 sectors</button><button class="${view==="all"?"on":""}" data-v="all">All sectors</button>`;
+}
+
+let sm="BUY",mkrTf="D",mkrFresh=true,so=false;
+function mkrInfo(x){
+  const b=sm==="BUY",isD=mkrTf==="D",sigVal=isD?x.Daily:x.Weekly;if(sigVal!==sm)return null;
+  const tRaw=isD?x.DTurnAgo:x.WTurnAgo,cDir=isD?x.DCross:x.WCross,cRaw=isD?x.DCrossAgo:x.WCrossAgo;
+  const tAge=(tRaw!==""&&tRaw!==undefined&&!isNaN(tRaw))?Number(tRaw):999;
+  const cAge=(cDir===(b?"UP":"DN")&&cRaw!==""&&cRaw!==undefined&&!isNaN(cRaw))?Number(cRaw):999;
+  const minAgo=Math.min(tAge,cAge),R=[],tfLabel=isD?"Daily":"Weekly";
+  if(tAge!==999)R.push(`${tfLabel} line ${b?"up":"down"} (${ago(tAge)})`);
+  if(cAge!==999)R.push(`${tfLabel} crossed ${b?"above":"below"} line (${ago(cAge)})`);
+  if(!R.length)R.push(`${tfLabel} ${sm}`);
+  return{R,minAgo};
+}
+function renderSig(all,inSet,outSet){
+  const el=document.getElementById("sigp"),b=sm==="BUY";el.style.display="block";
+  const it=all.map(x=>{const info=mkrInfo(x);if(!info)return null;if(mkrFresh&&info.minAgo>3)return null;const ins=inSet?inSet.has(x.Industry):false,outs=outSet?outSet.has(x.Industry):false;if(so&&!ins)return null;return{x,R:info.R,minAgo:info.minAgo,ins,outs};}).filter(Boolean).sort((a,c)=>a.minAgo-c.minAgo||(c.x.RS_Rank||50)-(a.x.RS_Rank||50));
+  el.innerHTML=`<h3>${b?"▲ Multi Kernel Regression BUY":"▼ Multi Kernel Regression SELL"} (${mkrTf==="D"?"Daily":"Weekly"}) — ${it.length} stocks</h3>
+  <div class="bar"><button class="${mkrTf==="D"?"on":""}" data-mtf="D">Daily</button><button class="${mkrTf==="W"?"on":""}" data-mtf="W">Weekly</button><button class="${b?"on":""}" data-sm="BUY">BUY ▲</button><button class="${!b?"on":""}" data-sm="SELL">SELL ▼</button><button class="${mkrFresh?"on":""}" data-mfr="1">Fresh (0–3 bars)</button><button class="${!mkrFresh?"on":""}" data-mfr="0">All Active</button><button class="${!so?"on":""}" data-so="0">All sectors</button><button class="${so?"on":""}" data-so="1">Money-inflow only</button></div>
+  <div class="sl">${it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.minAgo<999?` <i class="sg ${b?"b":"s"}">${ago(o.minAgo)}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}${o.outs?` <i class="sg s">money out</i>`:""}<small>${esc(o.x.Industry)} · RS ${o.x.RS_Rank} · ₹${o.x.Price||"—"}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No fresh MKR signals in 0–3 bars. Tap 'All Active'.</small>"}</div>`;
+}
+document.getElementById("sigp").onclick=e=>{const d=e.target.dataset;if(d.mtf){mkrTf=d.mtf;render()}else if(d.sm){sm=d.sm;render()}else if(d.mfr!==undefined){mkrFresh=d.mfr==="1";render()}else if(d.so!==undefined){so=d.so==="1";render()}};
+
+function renderShort(all){
+  const el=document.getElementById("short");el.style.display="block";const G={};all.forEach(r=>(G[r.Industry]??=[]).push(r));
+  const secs=Object.entries(G).filter(([,v])=>v.length>=3).map(([n,v])=>{const m1=avg(v.map(x=>x["1M"])),m3=avg(v.map(x=>x["3M"])),d=v.filter(x=>x.Daily==="BUY").length/v.length,w=v.filter(x=>x.Weekly==="BUY").length/v.length,fl=NSDL[n]?NSDL[n][0]:null;const score=(m1>(bench["1M"]||0)?1:0)+(m3>(bench["3M"]||0)?1:0)+(fl!==null&&fl>0?1:0)+(d>=.5?1:0)+(w>=.5?1:0);return{n,v,m1,score};}).sort((a,b)=>b.score-a.score||b.m1-a.m1).slice(0,5);
+  el.innerHTML=`<h3>🎯 Shortlist — Top Sectors</h3>${secs.map((o,i)=>`<div class="sr"><span class="r">${o.score}/5</span><b>${i+1}. ${esc(o.n)}</b><small>1M avg ${(o.m1>=0?"+":"")+o.m1.toFixed(1)}% · ${o.v.length} stocks</small></div>`).join("")}`;
+}
+
+function doSearch(){
+  const q=document.getElementById("sq").value.trim().toLowerCase(),el=document.getElementById("sres");if(!q){el.style.display="none";return;}el.style.display="block";
+  const bySym=rows.filter(r=>r.Symbol.toLowerCase().includes(q));
+  el.innerHTML=`<h3>Search "${esc(q)}"</h3><div class="sl">${bySym.slice(0,25).map(r=>{const st=slTarget(r);return`<div class="sr"><b>${esc(r.Symbol)}</b> <span class="cp">RS:${r.RS_Rank}</span> <small>₹${r.Price||"—"} · ${esc(r.Industry)}</small><small>Daily: ${r.Daily} (${ago(r.DTurnAgo)}) · Weekly: ${r.Weekly} (${ago(r.WTurnAgo)})</small>${st?`<small>SL: ₹${st.sl} · Target: ₹${st.target}</small>`:""}<div style="margin-top:4px">${watchBtns(r.Symbol,r.Price)}</div></div>`;}).join("")||"<small>No match found.</small>"}</div>`;
+}
+document.getElementById("sq").oninput=doSearch;
+
+function hideAll(except){["short","sigp","rot","trend","sahil","wlView","mainGrid"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=(id==="mainGrid"?(except==="grid"?"grid":"none"):(id===except?"block":"none"));});}
+const streakOf=hist=>{if(!hist||!hist.length)return"";const sign=hist[hist.length-1]>=0;let n=0;for(let i=hist.length-1;i>=0;i--){if((hist[i]>=0)===sign)n++;else break;}return n>=2?`${n}x ${sign?"BUY":"SELL"}`:"";};
+
+function renderRotation(){
+  hideAll("rot");const el=document.getElementById("rot"),G={};rows.forEach(r=>{if(!isNaN(r["1M"]))(G[r.Industry]??=[]).push(r);});
+  const rowsHtml=Object.entries(G).filter(([,v])=>v.length>=2).map(([n,v])=>{const m1=avg(v.map(x=>x["1M"])),m3=avg(v.map(x=>x["3M"])),vs3=m3-(bench["3M"]||0),sig=(m1>(bench["1M"]||0)&&m3>(bench["3M"]||0))?["Leading","gc"]:(m1>(bench["1M"]||0))?["Improving","gc"]:["Lagging","rc"],upPct=v.filter(x=>x.Daily==="BUY").length/v.length*100,streak=streakOf(NSDL_HISTORY[n]);return{n,vs3,sig,upPct,streak};}).sort((a,b)=>b.vs3-a.vs3);
+  el.innerHTML=`<h3>Sector Rotation vs Nifty 500</h3><div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap"><tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px">Sector</th><th style="padding:6px">VS NIFTY (3M)</th><th style="padding:6px">SIGNAL</th><th style="padding:6px">UPTREND %</th><th style="padding:6px">FPI STREAK</th></tr>${rowsHtml.map(r=>`<tr><td style="padding:6px"><b>${esc(r.n)}</b></td><td style="padding:6px;color:var(--${r.vs3>=0?"gc":"rc"})">${r.vs3>=0?"+":""}${r.vs3.toFixed(1)}%</td><td style="padding:6px"><i class="sg ${r.sig[1]==="gc"?"b":"s"}">${r.sig[0]}</i></td><td style="padding:6px">${r.upPct.toFixed(0)}%</td><td style="padding:6px;font-weight:700;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td></tr>`).join("")}</table></div>`;
+  document.getElementById("tabs").innerHTML=bar(false);
+}
+
+let tcap="All",trs="All";
+function renderTrend(){
+  hideAll("trend");const el=document.getElementById("trend"),q=(document.getElementById("sq").value||"").trim().toLowerCase();
+  let list=rows.filter(r=>r.Price);if(tcap!=="All")list=list.filter(r=>r.Cap===tcap);if(trs==="RS80")list=list.filter(r=>r.RS_Rank>=80);if(q)list=list.filter(r=>r.Symbol.toLowerCase().includes(q)||(r.Industry||"").toLowerCase().includes(q));
+  list.sort((a,b)=>(b.RS_Rank||50)-(a.RS_Rank||50));
+  el.innerHTML=`<h3>Trend Scanner (${list.length} stocks)</h3><div class="bar">${["All",...CAPS].map(c=>`<button class="${c===tcap?"on":""}" data-tc="${c}">${c}</button>`).join("")}<button class="${trs==="RS80"?"on":""}" data-trs="${trs==="RS80"?"All":"RS80"}">RS ≥ 80</button></div><div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap"><tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px">Stock</th><th style="padding:6px">RS</th><th style="padding:6px">Sector</th><th style="padding:6px">Price</th><th style="padding:6px">Daily</th><th style="padding:6px">Weekly</th></tr>${list.slice(0,60).map(r=>`<tr><td style="padding:6px"><b>${esc(r.Symbol)}</b></td><td style="padding:6px;font-weight:700">${r.RS_Rank}</td><td style="padding:6px">${esc(r.Industry)}</td><td style="padding:6px">₹${r.Price}</td><td style="padding:6px"><i class="sg ${r.Daily==="BUY"?"b":"s"}">${r.Daily}</i></td><td style="padding:6px"><i class="sg ${r.Weekly==="BUY"?"b":"s"}">${r.Weekly}</i></td></tr>`).join("")}</table></div>`;
+  document.getElementById("tabs").innerHTML=bar(false);
+}
+document.getElementById("trend").onclick=e=>{const d=e.target.dataset;if(d.tc){tcap=d.tc;renderTrend()}else if(d.trs){trs=d.trs;renderTrend()}};
+
+let sahilTf="D",sahilFresh=true;
+function renderSahil(){
+  hideAll("sahil");const el=document.getElementById("sahil"),fld=sahilTf==="W"?"SahilW":"SahilD",agoFld=sahilTf==="W"?"SahilWAgo":"SahilDAgo",boFld=sahilTf==="W"?"SahilW_BO":"SahilD_BO",tslFld=sahilTf==="W"?"SahilW_TSL":"SahilD_TSL";
+  const getAge=r=>(r[agoFld]!==""&&r[agoFld]!==undefined&&!isNaN(r[agoFld]))?Number(r[agoFld]):999;
+  const isOk=r=>r[fld]&&(!sahilFresh||getAge(r)<=3);
+  const byFresh=(a,b)=>(getAge(a)-getAge(b))||((b.RS_Rank||50)-(a.RS_Rank||50));
+  const buys=rows.filter(r=>r[fld]==="BUY"&&isOk(r)).sort(byFresh),sells=rows.filter(r=>r[fld]==="SELL"&&isOk(r)).sort(byFresh);
+  el.innerHTML=`<h3>Breakout Scanner (${sahilTf==="W"?"Weekly":"Daily"} · 55/20)</h3><div class="bar"><button class="${sahilTf==="D"?"on":""}" data-stf="D">Daily</button><button class="${sahilTf==="W"?"on":""}" data-stf="W">Weekly</button><button class="${sahilFresh?"on":""}" data-sfr="1">Fresh (0–3 bars)</button><button class="${!sahilFresh?"on":""}" data-sfr="0">All Active</button></div><div class="grid"><div><h4 style="color:var(--rc)">EXIT / SELL — ${sells.length}</h4><div class="sl">${sells.map(r=>`<div class="sr"><b>${esc(r.Symbol)}</b>${getAge(r)<999?` <i class="sg s">${ago(getAge(r))}</i>`:""} <span class="cp">RS:${r.RS_Rank}</span> · ₹${r.Price||"—"}<small>${esc(r.Industry)}${r[tslFld]?" · TSL: ₹"+r[tslFld]:""}</small></div>`).join("")||"<small>None in 0–3 bars.</small>"}</div></div><div><h4 style="color:var(--gc)">BREAKOUT BUY — ${buys.length}</h4><div class="sl">${buys.map(r=>`<div class="sr"><b>${esc(r.Symbol)}</b>${getAge(r)<999?` <i class="sg b">${ago(getAge(r))}</i>`:""} <span class="cp">RS:${r.RS_Rank}</span> · ₹${r.Price||"—"}<small>${esc(r.Industry)}${r[boFld]?" · High: ₹"+r[boFld]:""}${r[tslFld]?" · TSL: ₹"+r[tslFld]:""}</small></div>`).join("")||"<small>None in 0–3 bars.</small>"}</div></div></div>`;
+  document.getElementById("tabs").innerHTML=bar(false);
+}
+document.getElementById("sahil").onclick=e=>{const d=e.target.dataset;if(d.stf){sahilTf=d.stf;renderSahil()}else if(d.sfr!==undefined){sahilFresh=d.sfr==="1";renderSahil()}};
+
+function render(){
+  if(mode==="rotation")return renderRotation();if(mode==="trend")return renderTrend();if(mode==="sahil")return renderSahil();if(mode==="watchlist")return renderWatchlistTab();if(mode==="fpi")return renderF();
+  hideAll("grid");const g={};rows.forEach(r=>{if((cap==="All"||r.Cap===cap)&&!isNaN(r[period]))(g[r.Industry]??=[]).push(r);});
+  const secs=Object.entries(g).filter(([,v])=>v.length>=(cap==="All"?3:2)).map(([n,v])=>[n,v,avg(v.map(x=>x[period]))]).sort((a,b)=>a[2]-b[2]);
+  const all=view==="all",neg=secs.filter(x=>x[2]<0),pos=secs.filter(x=>x[2]>=0).reverse(),O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
+  document.getElementById("out").innerHTML=O.map(([n,v],i)=>card(i+1,n,v,false)).join("")||"<div class='note'>None</div>";
+  document.getElementById("in").innerHTML=I.map(([n,v],i)=>card(i+1,n,v,true)).join("")||"<div class='note'>None</div>";
+  renderShort(Object.values(g).flat());renderSig(Object.values(g).flat(),new Set(I.map(x=>x[0])),new Set(O.map(x=>x[0])));
+  const b=bench[period]||0;document.getElementById("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT (left) and INTO (right)`;
+  document.getElementById("tabs").innerHTML=bar(true);
+}
+
+let cur=sample();
+document.getElementById("tabs").onclick=e=>{const d=e.target.dataset;if(d.p){period=d.p;load(cur)}else if(d.v){view=d.v;render()}else if(d.m){mode=d.m;render()}else if(d.c){cap=d.c;render()}else if(d.s){sig=d.s;render()}};
+const note=t=>document.getElementById("note").textContent=t;
+function useCSV(text,name){
+  if(/Financial Services/i.test(text)&&/Automobile and Auto Components/i.test(text)&&!/^Symbol,Industry/i.test(text.trim())){if(applyNsdlPaste(text))return;}
+  try{const recs=parseCSV(text);if(!recs.length||!("Industry" in recs[0])||!("1M" in recs[0]))throw 0;cur=recs;load(cur);note("Showing: "+name+" ("+recs.length+" stocks)");}catch(e){note("Could not parse CSV.");}
+}
+document.getElementById("f").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(t=>useCSV(t,f.name));};
+document.getElementById("pb").onclick=()=>{const w=document.getElementById("pw");w.style.display=w.style.display==="none"?"block":"none";};
+document.getElementById("pgo").onclick=()=>useCSV(document.getElementById("ta").value,"pasted data");
+
+load(cur);
+fetch("nsdl.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{let hp=false;try{const sv=JSON.parse(localStorage.getItem("cfm_nsdl_v1")||"null");if(sv&&sv.source==="paste")hp=true;}catch(e){}if(hp)return;if(j.data)NSDL=j.data;if(j.date)NSDL_DATE=j.date;if(j.history)NSDL_HISTORY=j.history;FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));render();}).catch(()=>{});
+fetch("flow.csv",{cache:"no-store"}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{useCSV(t,"flow.csv");note("Live data · updated automatically after market close");}).catch(()=>{});
+</script></body></html>
