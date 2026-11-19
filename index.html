@@ -745,7 +745,8 @@ try {
 } catch(err) {
   console.error("Init load error:", err);
 }
-
+try{const savedNsdl=JSON.parse(localStorage.getItem("cfm_nsdl_v1")||"null");if(savedNsdl&&savedNsdl.data){NSDL=savedNsdl.data;NSDL_DATE=savedNsdl.date||NSDL_DATE;if(savedNsdl.history)NSDL_HISTORY=savedNsdl.history;FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));}}catch(e){}
+  
 fetch("nsdl.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{
   if(j.data)NSDL=j.data;
   if(j.date)NSDL_DATE=j.date;
