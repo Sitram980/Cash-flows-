@@ -29,7 +29,7 @@ SECTOR_MAP = {
     "forest": "Forest Materials", "healthcare": "Healthcare", "health care": "Healthcare",
     "information technology": "Information Technology", "technology": "Information Technology",
     "media": "Media, Entertainment & Publication", "communication": "Telecommunication",
-    "metals": "Metals & Mining", "oil, gas": "Oil, Gas & Consumable Fuels",
+    "metals": "Metals & Mining", "oil, gas & consumable fuels": "Oil, Gas & Consumable Fuels",
     "oil gas": "Oil, Gas & Consumable Fuels", "energy": "Oil, Gas & Consumable Fuels",
     "power": "Power", "utilities": "Utilities", "realty": "Realty", "real estate": "Realty",
     "services": "Services", "telecommunication": "Telecommunication", "telecom": "Telecommunication",
@@ -211,7 +211,11 @@ def main():
     def get_df(t):
         try:
             df = data[t].dropna(subset=["Close"]) if isinstance(data.columns, pd.MultiIndex) else data.dropna(subset=["Close"])
-            return df if len(df) >= 30 else None
+            if len(df) < 30:
+                return None
+            df = df.copy()
+            df.index = pd.to_datetime(df.index).tz_localize(None)
+            return df
         except Exception:
             return None
 
@@ -235,7 +239,7 @@ def main():
         wc = c.resample("W-FRI").last().dropna()
         wh = h.resample("W-FRI").max().dropna()
         wl = l.resample("W-FRI").min().dropna()
-        mc = c.resample("M").last().dropna()
+        mc = c.groupby([c.index.year, c.index.month]).last().dropna()
 
         dsig, dfresh, dtago, dcross, dcago, dline = analyze_mkr(c, 8.0)
         wsig, wfresh, wtago, wcross, wcago, _ = analyze_mkr(wc, 8.0)
@@ -298,4 +302,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+        
