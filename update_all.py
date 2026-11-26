@@ -1,4 +1,4 @@
-import os, io, traceback
+import os, io
 from datetime import datetime, timedelta, timezone
 import numpy as np
 import pandas as pd
@@ -60,8 +60,8 @@ def calc_atr(h, l, c, period=14):
     pc = c.shift(1)
     tr = pd.concat([h - l, (h - pc).abs(), (l - pc).abs()], axis=1).max(axis=1)
     v = tr.ewm(alpha=1.0/period, min_periods=period, adjust=False).mean().iloc[-1]
-    fallback = float((h - l).iloc[-1]) if len(h) else 0.0
-    return float(v) if pd.notna(v) else (fallback if pd.notna(fallback) else 0.0)
+    fb = float((h - l).iloc[-1]) if len(h) else 0.0
+    return float(v) if pd.notna(v) else (fb if pd.notna(fb) else 0.0)
 
 def kernel_reg(prices, h=8.0, r=8.0):
     y = np.asarray(prices, dtype=float)[-120:]
@@ -146,7 +146,6 @@ def fetch_nse_delivery():
                     if sym and pd.notna(val) and 0 < val <= 100:
                         dmap[sym] = round(float(val), 1)
                 if len(dmap) > 100:
-                    print(f"NSE Bhavcopy delivery loaded ({ds}): {len(dmap)}")
                     return dmap
         except Exception:
             pass
@@ -160,11 +159,9 @@ def fetch_nse_delivery():
                         if 0 < val <= 100:
                             dmap[p[2].upper()] = round(val, 1)
                 if len(dmap) > 100:
-                    print(f"NSE MTO delivery loaded ({ds}): {len(dmap)}")
                     return dmap
         except Exception:
             pass
-    print("NSE direct delivery unavailable from cloud IP; using institutional accumulation proxy.")
     return dmap
 
 def get_symbols():
@@ -209,13 +206,10 @@ def pct_ret(s, b):
     return round((c / p - 1.0) * 100.0, 2) if p > 0 else np.nan
 
 def to_series(col):
-    if isinstance(col, pd.DataFrame):
-        return col.iloc[:, 0]
-    return col
+    return col.iloc[:, 0] if isinstance(col, pd.DataFrame) else col
 
 def main():
     sym_meta = get_symbols()
-    print(f"Loaded {len(sym_meta)} symbols.")
     deliv_live = fetch_nse_delivery()
     deliv_prev = {}
     if os.path.exists("flow.csv"):
@@ -229,9 +223,8 @@ def main():
         except Exception:
             pass
 
-    tickers = ["^CRSLDX"] + [f"{s}.NS" for s in sym_meta]
+    tickers = ["^CRSLDX", "^NSEI"] + [f"{s}.NS" for s in sym_meta]
     data = yf.download(tickers, period="18mo", interval="1d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
-    print("Yahoo Finance download complete.")
 
     def get_df(t):
         try:
@@ -250,8 +243,28 @@ def main():
         except Exception:
             return None
 
-    bdf = get_df("^CRSLDX")
-    bclose = to_series(bdf["Close"]).dropna() if bdf is not None else None
+    stock_dfs = {}
+    for sym in sym_meta:
+        df = get_df(f"{sym}.NS")
+        if df is not None:
+            stock_dfs[sym] = df
+
+    # Build infallible benchmark: ^CRSLDX -> ^NSEI -> live Nifty 500 median index
+    bclose = None
+    for bt in ("^CRSLDX", "^NSEI"):
+        bdf = get_df(bt)
+        if bdf is not None:
+            bc = to_series(bdf["Close"]).dropna()
+            if len(bc) >= 200:
+                bclose = bc
+                print(f"Using benchmark {bt} ({len(bc)} bars)")
+                break
+    if bclose is None and stock_dfs:
+        all_c = pd.DataFrame({s: to_series(d["Close"]).astype(float) for s, d in stock_dfs.items()})
+        med_ret = all_c.pct_change().median(axis=1).fillna(0.0)
+        bclose = 10000.0 * (1.0 + med_ret).cumprod()
+        print(f"Using composite Nifty 500 benchmark ({len(bclose)} bars)")
+
     out_rows = []
     if bclose is not None and len(bclose) >= 30:
         out_rows.append({
@@ -260,12 +273,11 @@ def main():
         })
 
     mrs_raw = {}
-    errors = 0
     for sym, (ind, cap) in sym_meta.items():
+        df = stock_dfs.get(sym)
+        if df is None:
+            continue
         try:
-            df = get_df(f"{sym}.NS")
-            if df is None:
-                continue
             c = to_series(df["Close"]).astype(float)
             h = to_series(df["High"]).astype(float).fillna(c)
             l = to_series(df["Low"]).astype(float).fillna(c)
@@ -329,13 +341,10 @@ def main():
                 "SahilW": sw, "SahilWAgo": sw_ago, "SahilW_BO": sw_bo, "SahilW_TSL": sw_tsl,
             })
         except Exception as e:
-            errors += 1
-            if errors <= 5:
-                print(f"Warn {sym}: {e}")
+            print(f"Warn {sym}: {e}")
 
-    print(f"Processed {len(out_rows)} rows (skipped {errors} errors).")
     if len(out_rows) < 50:
-        raise RuntimeError(f"Too few rows ({len(out_rows)}); aborting to protect flow.csv")
+        raise RuntimeError(f"Too few rows ({len(out_rows)}); keeping existing flow.csv")
 
     if mrs_raw:
         srk = pd.Series(mrs_raw).rank(pct=True) * 98.0 + 1.0
@@ -344,8 +353,8 @@ def main():
                 rw["RS_Rank"] = int(round(srk[rw["Symbol"]]))
 
     pd.DataFrame(out_rows).to_csv("flow.csv", index=False)
-    print("Successfully saved flow.csv!")
+    print(f"Saved flow.csv ({len(out_rows)} rows), RS Rising: {sum(1 for r in out_rows if r.get('RSState')=='Rising')}")
 
 if __name__ == "__main__":
     main()
-        
+                                           
