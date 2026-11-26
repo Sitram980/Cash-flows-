@@ -25,12 +25,14 @@ details{border-radius:10px;padding:12px 14px;margin-bottom:10px}summary{list-sty
 .sl{max-height:320px;overflow-y:auto}.sr{padding:7px 0;border-top:1px solid var(--mut)}.sr b{font-size:14px}.sr small{display:block;color:var(--mut);font-size:11px}.sr .r{float:right;font-weight:700}
 .sg{font-style:normal;font-size:10px;font-weight:600;border:1px solid;border-radius:8px;padding:0 6px;margin-right:4px}.sg.b{color:var(--gc)}.sg.s{color:var(--rc)}
 .cp{font-style:normal;font-size:9px;border:1px solid var(--mut);color:var(--mut);border-radius:8px;padding:0 5px;margin-left:4px}
+.inp{border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:7px 13px;font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}th,td{padding:6px;text-align:left}tr:first-child{color:var(--mut);border-bottom:1px solid var(--mut)}
 </style></head><body><main>
 <h1>CAPITAL FLOW MAP</h1><div class="sub" id="sub">Loading...</div>
 <section id="top5" class="pn" style="display:none"></section><section id="wl" class="pn" style="display:none"></section>
 <div class="bar"><button id="simpleBtn">🎯 Simple Mode</button></div>
 <div id="advWrap">
-<div class="bar" style="margin-bottom:8px"><input id="sq" type="text" placeholder="🔍 Search stock or sector..." style="flex:1;min-width:200px;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:14px"></div>
+<div class="bar" style="margin-bottom:8px"><input id="sq" class="inp" type="text" placeholder="🔍 Search stock or sector..." style="flex:1;min-width:200px;font-size:14px"></div>
 <div id="sres" class="pn" style="display:none"></div><div class="bar" id="tabs"></div>
 <div class="bar"><label style="position:relative;overflow:hidden">📂 Load CSV / NSDL<input id="f" type="file" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer"></label><button id="pb">📋 Paste CSV / NSDL</button></div>
 <div id="pw" style="display:none;margin-bottom:14px"><textarea id="ta" rows="5" style="width:100%;border:1px solid var(--mut);border-radius:8px;background:var(--card);color:var(--fg);padding:8px;font:12px monospace" placeholder="Paste flow.csv OR copied NSDL Fortnightly FPI page text here"></textarea><div class="bar" style="margin-top:8px"><button id="pgo">Load pasted data</button></div></div>
@@ -43,11 +45,12 @@ details{border-radius:10px;padding:12px 14px;margin-bottom:10px}summary{list-sty
 </div></main>
 <script>
 const PERIODS=[["1W","1 Week"],["1M","1 Month"],["3M","3 Months"],["6M","6 Months"]],CAPS=["Large","Mid","Small","Micro"];
-let sig="All",cap="All",mode="price",view="top",period="1M",rows=[],bench={},NSDL_DATE="16–31 Oct 2026",NSDL_HISTORY={};
+let sig="All",cap="All",mode="price",view="top",period="1M",rows=[],bench={},NSDL_DATE="16–31 Oct 2026",NSDL_HISTORY={},cur=[];
 let NSDL={"Information Technology":[2599,398397],"Services":[262,186896],"Media, Entertainment & Publication":[252,11084],"Diversified":[43,3626],"Chemicals":[41,119343],"Utilities":[-34,2725],"Forest Materials":[-50,1176],"Textiles":[-59,21265],"Construction Materials":[-564,94263],"Realty":[-578,111753],"Consumer Durables":[-586,179333],"Construction":[-1224,112879],"Power":[-1732,235832],"Consumer Services":[-1931,287273],"Oil, Gas & Consumable Fuels":[-3680,429974],"Metals & Mining":[-3693,263323],"Capital Goods":[-3886,476822],"Telecommunication":[-3928,343057],"Healthcare":[-5497,504679],"Automobile and Auto Components":[-6533,477593],"Fast Moving Consumer Goods":[-8172,268394],"Financial Services":[-8634,2035663]};
 try{const sv=JSON.parse(localStorage.getItem("cfm_nsdl_v1")||"null");if(sv&&sv.data){NSDL=sv.data;if(sv.date)NSDL_DATE=sv.date;if(sv.history)NSDL_HISTORY=sv.history;}}catch(e){}
 let FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));
 
+const $=id=>document.getElementById(id);
 const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const avg=a=>(a&&a.length)?a.reduce((x,y)=>x+y,0)/a.length:0;
 const fmt=n=>Math.abs(n||0).toLocaleString("en-IN");
@@ -64,8 +67,7 @@ function load(recs){
   for(const r of recs){
     const o={
       Symbol:r.Symbol||"?",Industry:canon(r.Industry),Cap:capOf(r.Cap),Price:parseFloat(r.Price)||"",
-      Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),
-      DFresh:r.DFresh||"",WFresh:r.WFresh||"",
+      Daily:(r.Daily||"").toUpperCase(),Weekly:(r.Weekly||"").toUpperCase(),DFresh:r.DFresh||"",WFresh:r.WFresh||"",
       DTurnAgo:r.DTurnAgo!==""&&r.DTurnAgo!=null?+r.DTurnAgo:"",WTurnAgo:r.WTurnAgo!==""&&r.WTurnAgo!=null?+r.WTurnAgo:"",
       DCross:(r.DCross||"").toUpperCase(),DCrossAgo:r.DCrossAgo!==""&&r.DCrossAgo!=null?+r.DCrossAgo:"",
       WCross:(r.WCross||"").toUpperCase(),WCrossAgo:r.WCrossAgo!==""&&r.WCrossAgo!=null?+r.WCrossAgo:"",
@@ -92,7 +94,7 @@ function buyScore(r,sm){
   if(r.Weekly==="BUY"&&r.WConfirmed==="Y"){s+=2;R.push("Weekly BUY")}
   if(!isNaN(r.RSI_D)&&r.RSI_D>40&&r.RSI_D<70){s+=1;R.push("RSI D:"+r.RSI_D+(isNaN(r.RSI_W)?"":" W:"+r.RSI_W))}
   if(r.RSPos==="Y"){s+=1;R.push("RS+")}
-  if(r.RSState==="Rising"){s+=1;R.push("RS rising")}
+  if(/rising/i.test(r.RSState)){s+=1;R.push("RS rising")}
   if(r.RS_Rank>=80){s+=1;R.push("RS "+r.RS_Rank)}
   if(r.DelivHigh==="Y"||(r.DelivPct&&r.DelivPct>=50)){s+=1;R.push("Deliv "+r.DelivPct+"%")}
   if((r.DTurnAgo!==""&&r.DTurnAgo<=2)||(r.WTurnAgo!==""&&r.WTurnAgo<=1)){s+=1;R.push("fresh")}
@@ -102,13 +104,12 @@ function buyScore(r,sm){
 const slTarget=r=>isNaN(r.DLine)?null:{sl:r.DLower,target:r.DUpper};
 const rsiStr=r=>(!isNaN(r.RSI_D)||!isNaN(r.RSI_W))?`RSI D:${isNaN(r.RSI_D)?"—":r.RSI_D} W:${isNaN(r.RSI_W)?"—":r.RSI_W}`:"";
 const delivStr=r=>r.DelivPct?`Deliv:${r.DelivPct}%${r.DelivHigh==="Y"?"🔥":""}`:"";
-
+const rsTag=r=>`${r.RSPos==="Y"?` <i class="sg b">RS+</i>`:""}${/rising/i.test(r.RSState)?` <i class="sg b">RS rising</i>`:""}`;
 function flowTag(r){
   if(!r)return"";
   const indRows=r.Industry&&r.Industry!=="Others"?rows.filter(x=>x.Industry===r.Industry&&!isNaN(x[period])):[];
   const val=indRows.length?avg(indRows.map(x=>x[period])):r[period];
-  if(isNaN(val))return"";
-  return val>=0?`<i class="sg b">money in</i>`:`<i class="sg s">money out</i>`;
+  return isNaN(val)?"":(val>=0?`<i class="sg b">money in</i>`:`<i class="sg s">money out</i>`);
 }
 
 const wlGet=()=>{try{return JSON.parse(localStorage.getItem("cfm_watchlist_v1")||"{}")}catch(e){return{}}};
@@ -116,41 +117,41 @@ const wlSet=(sym,status,price)=>{try{const w=wlGet();w[sym]={status,price:price|
 const wlRemove=sym=>{try{const w=wlGet();delete w[sym];localStorage.setItem("cfm_watchlist_v1",JSON.stringify(w))}catch(e){}renderWatchlist();if(mode==="watchlist")renderWatchlistTab()};
 const watchBtns=(sym,price)=>{const st=(wlGet()[sym]||{}).status||"";return`<button data-wl="watch" data-sym="${esc(sym)}" data-px="${price||""}">${st==="watch"?"★ Watching":"☆ Watch"}</button> <button data-wl="bought" data-sym="${esc(sym)}" data-px="${price||""}">${st==="bought"?"✓ Bought":"Mark Bought"}</button>`;};
 
+function bindAdd(inId,btnId){
+  const add=()=>{const inp=$(inId);if(!inp)return;const v=resolveSym(inp.value);if(!v)return;const f=rows.find(x=>x.Symbol.toUpperCase()===v.toUpperCase());wlSet(v,"watch",f?f.Price:"");inp.value="";};
+  $(btnId).onclick=add;$(inId).onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add();}};
+}
+
 function renderWatchlist(){
-  const el=document.getElementById("wl"),w=wlGet(),syms=Object.keys(w);el.style.display="block";
+  const el=$("wl"),w=wlGet(),syms=Object.keys(w);el.style.display="block";
   const lines=syms.map(sym=>{
     const rec=w[sym],r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase()),now=r?r.Price:"";
-    const chg=(now&&rec.price)?((now-rec.price)/rec.price*100):null;
-    const meta=r?[rsiStr(r),delivStr(r)].filter(Boolean).join(" · "):"";
+    const chg=(now&&rec.price)?((now-rec.price)/rec.price*100):null,meta=r?[rsiStr(r),delivStr(r)].filter(Boolean).join(" · "):"";
     const badges=r?`<div style="margin-top:4px"><span class="sg ${r.Daily==="BUY"?"b":"s"}">Daily ${r.Daily}</span><span class="sg ${r.Weekly==="BUY"?"b":"s"}">Weekly ${r.Weekly}</span>${flowTag(r)}</div>`:"";
-    return`<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:16px">✕</button><b>${esc(sym)}</b> <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i>${r?` <span class="cp">RS:${r.RS_Rank}</span>`:""}<small>${now?"₹"+now:""}${chg!==null?" ("+(chg>=0?"+":"")+chg.toFixed(1)+"%)":""}${meta?" · "+meta:""}</small>${badges}</div>`;
+    return`<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:16px">✕</button><b>${esc(sym)}</b> <i class="cp">${rec.status==="bought"?"Bought":"Watching"}</i>${r?` <span class="cp">RS:${r.RS_Rank}</span>${rsTag(r)}`:""}<small>${now?"₹"+now:""}${chg!==null?" ("+(chg>=0?"+":"")+chg.toFixed(1)+"%)":""}${meta?" · "+meta:""}</small>${badges}</div>`;
   }).join("");
-  el.innerHTML=`<h3>⭐ My Watchlist</h3><div style="display:flex;gap:8px;margin:8px 0;max-width:360px"><input id="wlHomeInput" type="text" placeholder="Symbol (e.g. APARINDS)..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;font-size:12px;text-transform:uppercase"><button id="wlHomeAddBtn" class="on">+ Add</button></div><div class="sl">${lines||"<small style='color:var(--mut)'>No stocks yet.</small>"}</div>`;
-  const add=()=>{const inp=document.getElementById("wlHomeInput");if(!inp)return;const v=resolveSym(inp.value);if(!v)return;const f=rows.find(x=>x.Symbol.toUpperCase()===v.toUpperCase());wlSet(v,"watch",f?f.Price:"");inp.value="";};
-  document.getElementById("wlHomeAddBtn").onclick=add;document.getElementById("wlHomeInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add();}};
+  el.innerHTML=`<h3>⭐ My Watchlist</h3><div style="display:flex;gap:8px;margin:8px 0;max-width:360px"><input id="wlHomeInput" class="inp" type="text" placeholder="Symbol (e.g. APARINDS)..." style="flex:1;font-size:12px;text-transform:uppercase"><button id="wlHomeAddBtn" class="on">+ Add</button></div><div class="sl">${lines||"<small style='color:var(--mut)'>No stocks yet.</small>"}</div>`;
+  bindAdd("wlHomeInput","wlHomeAddBtn");
 }
 
 function renderWatchlistTab(){
-  hideAll("wlView");const el=document.getElementById("wlView"),w=wlGet(),syms=Object.keys(w);
+  hideAll("wlView");const el=$("wlView"),w=wlGet(),syms=Object.keys(w);
   const cards=syms.map(sym=>{
-    const rec=w[sym],r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase()),now=r?r.Price:"",st=r?slTarget(r):null;
-    const meta=r?[rsiStr(r),delivStr(r)].filter(Boolean).join(" · "):"";
-    return`<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:18px">✕</button><b>${esc(sym)}</b> · ₹${now||"—"} ${r?`<span class="cp">RS:${r.RS_Rank}</span>`:""}<div style="margin:6px 0"><span class="sg ${r&&r.Daily==="BUY"?"b":"s"}">Daily ${r?r.Daily:"—"}</span><span class="sg ${r&&r.Weekly==="BUY"?"b":"s"}">Weekly ${r?r.Weekly:"—"}</span>${flowTag(r)}</div>${meta?`<small>${meta}</small>`:""}${st?`<small>SL ~₹${st.sl} · Target ~₹${st.target}</small>`:""}</div>`;
+    const rec=w[sym],r=rows.find(x=>x.Symbol.toUpperCase()===sym.toUpperCase()),now=r?r.Price:"",st=r?slTarget(r):null,meta=r?[rsiStr(r),delivStr(r)].filter(Boolean).join(" · "):"";
+    return`<div class="sr"><button data-wlrm="${esc(sym)}" style="float:right;border:none;background:none;color:var(--mut);font-size:18px">✕</button><b>${esc(sym)}</b> · ₹${now||"—"} ${r?`<span class="cp">RS:${r.RS_Rank}</span>${rsTag(r)}`:""}<div style="margin:6px 0"><span class="sg ${r&&r.Daily==="BUY"?"b":"s"}">Daily ${r?r.Daily:"—"}</span><span class="sg ${r&&r.Weekly==="BUY"?"b":"s"}">Weekly ${r?r.Weekly:"—"}</span>${flowTag(r)}</div>${meta?`<small>${meta}</small>`:""}${st?`<small>SL ~₹${st.sl} · Target ~₹${st.target}</small>`:""}</div>`;
   }).join("");
-  el.innerHTML=`<h3>⭐ My Watchlist</h3><div style="display:flex;gap:8px;margin:10px 0;max-width:400px"><input id="wlAddInput" type="text" placeholder="Symbol..." style="flex:1;border:1px solid var(--mut);background:var(--card);color:var(--fg);border-radius:20px;padding:8px 14px;font-size:13px;text-transform:uppercase"><button id="wlAddBtn" class="on">+ Add</button></div><div class="sl">${cards||"<small>Watchlist is empty.</small>"}</div>`;
-  const add=()=>{const inp=document.getElementById("wlAddInput");if(!inp)return;const v=resolveSym(inp.value);if(!v)return;const f=rows.find(x=>x.Symbol.toUpperCase()===v.toUpperCase());wlSet(v,"watch",f?f.Price:"");inp.value="";};
-  document.getElementById("wlAddBtn").onclick=add;document.getElementById("wlAddInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add();}};
-  document.getElementById("tabs").innerHTML=bar(false);
+  el.innerHTML=`<h3>⭐ My Watchlist</h3><div style="display:flex;gap:8px;margin:10px 0;max-width:400px"><input id="wlAddInput" class="inp" type="text" placeholder="Symbol..." style="flex:1;text-transform:uppercase"><button id="wlAddBtn" class="on">+ Add</button></div><div class="sl">${cards||"<small>Watchlist is empty.</small>"}</div>`;
+  bindAdd("wlAddInput","wlAddBtn");$("tabs").innerHTML=bar(false);
 }
 
 document.addEventListener("click",e=>{const d=e.target.dataset;if(d.wl)wlSet(d.sym,d.wl,parseFloat(d.px)||"");else if(d.wlrm)wlRemove(d.wlrm);});
-let simpleMode=false;document.getElementById("simpleBtn").onclick=()=>{simpleMode=!simpleMode;document.getElementById("advWrap").style.display=simpleMode?"none":"block";document.getElementById("simpleBtn").textContent=simpleMode?"🔍 Advanced Mode":"🎯 Simple Mode";};
+let simpleMode=false;$("simpleBtn").onclick=()=>{simpleMode=!simpleMode;$("advWrap").style.display=simpleMode?"none":"block";$("simpleBtn").textContent=simpleMode?"🔍 Advanced Mode":"🎯 Simple Mode";};
 
 function renderTop5(){
-  const el=document.getElementById("top5");if(!rows.some(x=>x.Daily)){el.style.display="none";renderWatchlist();return;}el.style.display="block";
+  const el=$("top5");if(!rows.some(x=>x.Daily)){el.style.display="none";renderWatchlist();return;}el.style.display="block";
   const secAvg={};rows.forEach(r=>{(secAvg[r.Industry]??=[]).push(r["1M"])});Object.keys(secAvg).forEach(k=>{const v=secAvg[k].filter(x=>!isNaN(x));secAvg[k]=v.length?avg(v):0;});
   const picks=rows.filter(r=>r.Daily==="BUY"&&r.DConfirmed==="Y"&&r.Weekly==="BUY"&&r.WConfirmed==="Y").map(r=>{const {score,reasons}=buyScore(r,secAvg[r.Industry]||0),st=slTarget(r);return{r,score,reasons,st};}).sort((a,b)=>b.score-a.score||b.r["1M"]-a.r["1M"]).slice(0,5);
-  el.innerHTML=`<h3>🎯 Today's Top 5 Picks — Daily+Weekly BUY</h3><div class="sl">${picks.length?picks.map((o,i)=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.score}/10</span><b>${i+1}. ${esc(o.r.Symbol)}</b> <span class="cp">RS:${o.r.RS_Rank}</span><small>${esc(o.r.Industry)} · 1M ${o.r["1M"]>=0?"+":""}${o.r["1M"].toFixed(1)}% · ${rsiStr(o.r)} · ${delivStr(o.r)}</small><small>${o.reasons.join(" · ")}</small>${o.st?`<small>SL ~₹${o.st.sl} · Target ~₹${o.st.target}</small>`:""}<div class="bar" style="margin:4px 0 0">${watchBtns(o.r.Symbol,o.r.Price)}</div></div>`).join(""):"<small>No confirmed Daily+Weekly BUY stocks right now.</small>"}</div>`;
+  el.innerHTML=`<h3>🎯 Today's Top 5 Picks — Daily+Weekly BUY</h3><div class="sl">${picks.length?picks.map((o,i)=>`<div class="sr"><span class="r" style="color:var(--gc)">${o.score}/10</span><b>${i+1}. ${esc(o.r.Symbol)}</b> <span class="cp">RS:${o.r.RS_Rank}</span>${rsTag(o.r)}<small>${esc(o.r.Industry)} · 1M ${o.r["1M"]>=0?"+":""}${o.r["1M"].toFixed(1)}% · ${rsiStr(o.r)} · ${delivStr(o.r)}</small><small>${o.reasons.join(" · ")}</small>${o.st?`<small>SL ~₹${o.st.sl} · Target ~₹${o.st.target}</small>`:""}<div class="bar" style="margin:4px 0 0">${watchBtns(o.r.Symbol,o.r.Price)}</div></div>`).join(""):"<small>No confirmed Daily+Weekly BUY stocks right now.</small>"}</div>`;
   renderWatchlist();
 }
 
@@ -158,8 +159,8 @@ const sigOK=x=>sig==="All"||(sig==="D"&&x.Daily==="BUY")||(sig==="W"&&x.Weekly==
 const chip=(t,v,f)=>v?`<i class="sg ${v==="BUY"?"b":"s"}">${t} ${v}${f?" ★":""}</i>`:"";
 
 function card(i,name,stocks,inflow){
-  const m=avg(stocks.map(s=>s[period])),b=bench[period]||0,rel=m-b,beat=stocks.filter(s=>s[period]>b).length,top=stocks.filter(sigOK).sort((a,c)=>inflow?c[period]-a[period]:a[period]-c[period]);
-  return`<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>${stocks.length} stocks · ${beat} beat Nifty 500</span>${FPI[name]?`<span>FPI ₹${fmt(FPI[name])} Cr</span>`:""}</span><span class="rt"><b>${m>=0?"+":""}${m.toFixed(1)}%</b><span>${rel>=0?"▲ OUT":"▼ UNDER"} Nifty 500 by ${Math.abs(rel).toFixed(1)}%</span></span></summary><div class="st"><h4>${top.length} OF ${stocks.length} STOCKS</h4><div class="sc">${top.map(s=>`<div><span>${esc(s.Symbol)} <span class="cp">RS:${s.RS_Rank}</span> <span class="cp">${rsiStr(s)}</span> <span class="cp">${delivStr(s)}</span><br>${chip("D",s.Daily,s.DFresh)}${chip("W",s.Weekly,s.WFresh)}</span><b>${s[period]>=0?"+":""}${s[period].toFixed(1)}%</b></div>`).join("")}</div></div></details>`;
+    const m=avg(stocks.map(s=>s[period])),b=bench[period]||0,rel=m-b,beat=stocks.filter(s=>s[period]>b).length,top=stocks.filter(sigOK).sort((a,c)=>inflow?c[period]-a[period]:a[period]-c[period]);
+  return`<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>${stocks.length} stocks · ${beat} beat Nifty 500</span>${FPI[name]?`<span>FPI ₹${fmt(FPI[name])} Cr</span>`:""}</span><span class="rt"><b>${m>=0?"+":""}${m.toFixed(1)}%</b><span>${rel>=0?"▲ OUT":"▼ UNDER"} Nifty 500 by ${Math.abs(rel).toFixed(1)}%</span></span></summary><div class="st"><h4>${top.length} OF ${stocks.length} STOCKS</h4><div class="sc">${top.map(s=>`<div><span>${esc(s.Symbol)} <span class="cp">RS:${s.RS_Rank}</span>${rsTag(s)} <span class="cp">${rsiStr(s)}</span> <span class="cp">${delivStr(s)}</span><br>${chip("D",s.Daily,s.DFresh)}${chip("W",s.Weekly,s.WFresh)}</span><b>${s[period]>=0?"+":""}${s[period].toFixed(1)}%</b></div>`).join("")}</div></div></details>`;
 }
 
 function cardF(i,name,flow,auc,inflow){return`<details><summary><span class="rk">${i}</span><span class="nm"><b>${esc(name)}</b><span>FPI ₹${fmt(auc)} Cr</span></span><span class="rt"><b>${flow>=0?"+":"−"}₹${fmt(flow)} Cr</b><span>${auc>0?(flow/auc*100).toFixed(2):"0"}%</span></span></summary><div class="st"><h4>NSDL NET FPI EQUITY FLOW · ${NSDL_DATE}</h4><div><span>${inflow?"Net bought":"Net sold"}</span><b>₹${fmt(flow)} Cr</b></div><div><span>Holdings</span><b>₹${fmt(auc)} Cr</b></div></div></details>`;}
@@ -167,19 +168,17 @@ function cardF(i,name,flow,auc,inflow){return`<details><summary><span class="rk"
 function applyNsdlPaste(txt,manualDate){
   const rawClean=txt.replace(/=\r?\n/g,"").replace(/=3D/g,"=").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&");
   const mHdr=[...rawClean.matchAll(/Net Investment\s+([A-Za-z]+\s+\d{1,2}\s*[–-]\s*\d{1,2},?\s+20\d\d)/gi)];
-  const autoDt=mHdr.length?mHdr[mHdr.length-1][1]:"1–15 Nov 2026";
-  const dt=(manualDate&&manualDate.trim())?manualDate.trim():autoDt;
+  const dt=(manualDate&&manualDate.trim())?manualDate.trim():(mHdr.length?mHdr[mHdr.length-1][1]:"1–15 Nov 2026");
   const flat=rawClean.replace(/—/g," 0 ").replace(/–/g,"-").replace(/−/g,"-").replace(/\s+/g," ").replace(/,/g,"").replace(/₹/g,"").replace(/Cr/g,"");
   const secs=Object.keys(NSDL).sort((a,b)=>b.length-a.length),pos=[],occ=[];
+  for(const s of secs){const rx=new RegExp(s.replace(/,/g,"").replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),m=rx.exec(flat);if(m){const st=m.index,en=st+m[0].length;if(!occ.some(([a,b])=>st<b&&en>a)){pos.push([st,en,s]);occ.push([st,en]);}}}
   pos.sort((a,b)=>a[0]-b[0]);
-  if(pos.length<2){alert("NSDL ડેટા મળ્યો નથી.");return false;}
+  if(pos.length<2){alert("NSDL data malyo nathi.");return false;}
   const nextData={...NSDL};
   for(let i=0;i<pos.length;i++){
     const [st,en,s]=pos[i],nextSt=i+1<pos.length?pos[i+1][0]:Math.min(flat.length,en+1500);
     const rawTok=flat.slice(en,nextSt).match(/[+-]?\d+(?:\.\d+)?/g)||[];
-    let nums=rawTok.map(Number);
-    const prevAuc=NSDL[s]?NSDL[s][1]:50000;
-    let flow=0,auc=prevAuc,prevFlow=null;
+    let nums=rawTok.map(Number);const prevAuc=NSDL[s]?NSDL[s][1]:50000;let flow=0,auc=prevAuc,prevFlow=null;
     if(nums.length>=96){nums=nums.slice(0,96);const B=24;prevFlow=nums[B];flow=nums[2*B];auc=nums[3*B]>0?nums[3*B]:prevAuc;}
     else{
       if(nums.length>=4&&nums.length%3===1&&nums[nums.length-1]>=1&&nums[nums.length-1]<=25){nums=nums.slice(0,-1);rawTok.pop();}
@@ -189,7 +188,7 @@ function applyNsdlPaste(txt,manualDate){
       else if(nums.length===1)flow=nums[0];
     }
     nextData[s]=[flow,auc];
-    if(NSDL_HISTORY[s]){if(prevFlow!==null)NSDL_HISTORY[s]=[...NSDL_HISTORY[s].slice(-8),prevFlow,flow];else NSDL_HISTORY[s]=[...NSDL_HISTORY[s].slice(-9),flow];}
+    if(NSDL_HISTORY[s])NSDL_HISTORY[s]=prevFlow!==null?[...NSDL_HISTORY[s].slice(-8),prevFlow,flow]:[...NSDL_HISTORY[s].slice(-9),flow];
   }
   NSDL=nextData;NSDL_DATE=dt;FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));
   try{localStorage.setItem("cfm_nsdl_v1",JSON.stringify({source:"paste",date:NSDL_DATE,data:NSDL,history:NSDL_HISTORY}));}catch(e){}
@@ -199,20 +198,20 @@ function applyNsdlPaste(txt,manualDate){
 function renderF(){
   hideAll("grid");const secs=Object.entries(NSDL).sort((a,b)=>a[1][0]-b[1][0]),neg=secs.filter(x=>x[1][0]<0),pos=secs.filter(x=>x[1][0]>=0).reverse(),all=view==="all";
   const O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
-  document.getElementById("out").innerHTML=`<div class="bar" style="justify-content:flex-start;margin-bottom:8px"><button id="nsdlToggleBtn" style="font-weight:700">📋 Update NSDL Data (Paste)</button></div>
+  $("out").innerHTML=`<div class="bar" style="justify-content:flex-start;margin-bottom:8px"><button id="nsdlToggleBtn" style="font-weight:700">📋 Update NSDL Data (Paste)</button></div>
   <div id="nsdlPasteBox" style="display:none;background:var(--card);border:1px solid var(--mut);border-radius:10px;padding:10px;margin-bottom:10px">
     <small style="color:var(--mut);display:block;margin-bottom:6px">1. <a href="https://www.fpi.nsdl.co.in/web/Reports/FPI_Fortnightly_Selection.aspx" target="_blank" style="color:var(--gc)">NSDL Fortnightly Report</a> kholi Select All → Copy karo.<br>2. Niche Paste karine Apply dabavo:</small>
     <input id="nsdlDateIn" type="text" value="${esc(NSDL_DATE==="16–31 Oct 2026"?"1–15 Nov 2026":NSDL_DATE)}" style="width:100%;margin-bottom:6px;border:1px solid var(--mut);border-radius:8px;background:var(--bg);color:var(--fg);padding:6px 8px;font-size:12px">
     <textarea id="nsdlTa" rows="4" style="width:100%;border:1px solid var(--mut);border-radius:8px;background:var(--bg);color:var(--fg);padding:6px;font:12px monospace" placeholder="NSDL page no copy karelo data ahi Paste karo..."></textarea>
     <div class="bar" style="margin:6px 0 0;justify-content:flex-start"><button id="nsdlApplyBtn" class="on">✓ Apply NSDL Data</button><button id="nsdlCopyJsonBtn">📄 Copy nsdl.json</button></div>
   </div>`+O.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],false)).join("");
-  document.getElementById("in").innerHTML=I.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],true)).join("");
+  $("in").innerHTML=I.map(([n,v],i)=>cardF(i+1,n,v[0],v[1],true)).join("");
   const t=secs.reduce((a,x)=>a+x[1][0],0);
-  document.getElementById("sub").textContent=`FPI net equity flow · ${NSDL_DATE} · all sectors ${t>=0?"+":"−"}₹${fmt(t)} Cr · source: NSDL`;
-  document.getElementById("tabs").innerHTML=bar(false);
-  document.getElementById("nsdlToggleBtn").onclick=()=>{const b=document.getElementById("nsdlPasteBox");b.style.display=b.style.display==="none"?"block":"none";};
-  document.getElementById("nsdlApplyBtn").onclick=()=>{const v=document.getElementById("nsdlTa").value,d=document.getElementById("nsdlDateIn").value;if(v.trim())applyNsdlPaste(v,d);};
-  document.getElementById("nsdlCopyJsonBtn").onclick=()=>{const j=JSON.stringify({date:NSDL_DATE,data:NSDL,history:NSDL_HISTORY},null,2);navigator.clipboard.writeText(j).then(()=>alert("nsdl.json copy thai gayu!"));};
+  $("sub").textContent=`FPI net equity flow · ${NSDL_DATE} · all sectors ${t>=0?"+":"−"}₹${fmt(t)} Cr · source: NSDL`;
+  $("tabs").innerHTML=bar(false);
+  $("nsdlToggleBtn").onclick=()=>{const b=$("nsdlPasteBox");b.style.display=b.style.display==="none"?"block":"none";};
+  $("nsdlApplyBtn").onclick=()=>{const v=$("nsdlTa").value,d=$("nsdlDateIn").value;if(v.trim())applyNsdlPaste(v,d);};
+  $("nsdlCopyJsonBtn").onclick=()=>{navigator.clipboard.writeText(JSON.stringify({date:NSDL_DATE,data:NSDL,history:NSDL_HISTORY},null,2)).then(()=>alert("nsdl.json copy thai gayu!"));};
 }
 
 function bar(showP){
@@ -231,96 +230,93 @@ function mkrInfo(x){
   return{R,minAgo};
 }
 function renderSig(all,inSet,outSet){
-  const el=document.getElementById("sigp"),b=sm==="BUY";el.style.display="block";
+  const el=$("sigp"),b=sm==="BUY";el.style.display="block";
   const it=all.map(x=>{const info=mkrInfo(x);if(!info)return null;if(mkrFresh&&info.minAgo>3)return null;const ins=inSet?inSet.has(x.Industry):false,outs=outSet?outSet.has(x.Industry):false;if(so&&!ins)return null;return{x,R:info.R,minAgo:info.minAgo,ins,outs};}).filter(Boolean).sort((a,c)=>a.minAgo-c.minAgo||(c.x.RS_Rank||50)-(a.x.RS_Rank||50));
   el.innerHTML=`<h3>${b?"▲ Multi Kernel Regression BUY":"▼ Multi Kernel Regression SELL"} (${mkrTf==="D"?"Daily":"Weekly"}) — ${it.length} stocks</h3>
   <div class="bar"><button class="${mkrTf==="D"?"on":""}" data-mtf="D">Daily</button><button class="${mkrTf==="W"?"on":""}" data-mtf="W">Weekly</button><button class="${b?"on":""}" data-sm="BUY">BUY ▲</button><button class="${!b?"on":""}" data-sm="SELL">SELL ▼</button><button class="${mkrFresh?"on":""}" data-mfr="1">Fresh (0–3 bars)</button><button class="${!mkrFresh?"on":""}" data-mfr="0">All Active</button><button class="${!so?"on":""}" data-so="0">All sectors</button><button class="${so?"on":""}" data-so="1">Money-inflow only</button></div>
-  <div class="sl">${it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.minAgo<999?` <i class="sg ${b?"b":"s"}">${ago(o.minAgo)}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}${o.outs?` <i class="sg s">money out</i>`:""}<small>${esc(o.x.Industry)} · RS ${o.x.RS_Rank} · ₹${o.x.Price||"—"} · ${rsiStr(o.x)} · ${delivStr(o.x)}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No fresh MKR signals in 0–3 bars. Tap 'All Active'.</small>"}</div>`;
+  <div class="sl">${it.map(o=>`<div class="sr"><span class="r" style="color:var(--${o.x[period]>=0?"gc":"rc"})">${o.x[period]>=0?"+":""}${o.x[period].toFixed(1)}%</span><b>${esc(o.x.Symbol)}</b>${o.minAgo<999?` <i class="sg ${b?"b":"s"}">${ago(o.minAgo)}</i>`:""}${o.ins?` <i class="sg b">money in</i>`:""}${o.outs?` <i class="sg s">money out</i>`:""}${rsTag(o.x)}<small>${esc(o.x.Industry)} · RS ${o.x.RS_Rank} · ₹${o.x.Price||"—"} · ${rsiStr(o.x)} · ${delivStr(o.x)}</small><small>${o.R.join(" · ")}</small></div>`).join("")||"<small>No fresh MKR signals in 0–3 bars. Tap 'All Active'.</small>"}</div>`;
 }
-document.getElementById("sigp").onclick=e=>{const d=e.target.dataset;if(d.mtf){mkrTf=d.mtf;render()}else if(d.sm){sm=d.sm;render()}else if(d.mfr!==undefined){mkrFresh=d.mfr==="1";render()}else if(d.so!==undefined){so=d.so==="1";render()}};
+$("sigp").onclick=e=>{const d=e.target.dataset;if(d.mtf){mkrTf=d.mtf;render()}else if(d.sm){sm=d.sm;render()}else if(d.mfr!==undefined){mkrFresh=d.mfr==="1";render()}else if(d.so!==undefined){so=d.so==="1";render()}};
 
 function renderShort(all){
-  const el=document.getElementById("short");el.style.display="block";const G={};all.forEach(r=>(G[r.Industry]??=[]).push(r));
+  const el=$("short");el.style.display="block";const G={};all.forEach(r=>(G[r.Industry]??=[]).push(r));
   const secs=Object.entries(G).filter(([,v])=>v.length>=3).map(([n,v])=>{const m1=avg(v.map(x=>x["1M"])),m3=avg(v.map(x=>x["3M"])),d=v.filter(x=>x.Daily==="BUY").length/v.length,w=v.filter(x=>x.Weekly==="BUY").length/v.length,fl=NSDL[n]?NSDL[n][0]:null;const score=(m1>(bench["1M"]||0)?1:0)+(m3>(bench["3M"]||0)?1:0)+(fl!==null&&fl>0?1:0)+(d>=.5?1:0)+(w>=.5?1:0);return{n,v,m1,score};}).sort((a,b)=>b.score-a.score||b.m1-a.m1).slice(0,5);
   el.innerHTML=`<h3>🎯 Shortlist — Top Sectors</h3>${secs.map((o,i)=>`<div class="sr"><span class="r">${o.score}/5</span><b>${i+1}. ${esc(o.n)}</b><small>1M avg ${(o.m1>=0?"+":"")+o.m1.toFixed(1)}% · ${o.v.length} stocks</small></div>`).join("")}`;
 }
 
 function doSearch(){
-  const q=document.getElementById("sq").value.trim().toLowerCase(),el=document.getElementById("sres");if(!q){el.style.display="none";return;}el.style.display="block";
-  const bySym=rows.filter(r=>r.Symbol.toLowerCase().includes(q));
-  el.innerHTML=`<h3>Search "${esc(q)}"</h3><div class="sl">${bySym.slice(0,25).map(r=>{const st=slTarget(r);return`<div class="sr"><b>${esc(r.Symbol)}</b> <span class="cp">RS:${r.RS_Rank}</span> <span class="cp">${rsiStr(r)}</span> <span class="cp">${delivStr(r)}</span> <small>₹${r.Price||"—"} · ${esc(r.Industry)}</small><small>Daily: ${r.Daily} (${ago(r.DTurnAgo)}) · Weekly: ${r.Weekly} (${ago(r.WTurnAgo)}) · EMA20: ${r.EMA20||"—"} · EMA50: ${r.EMA50||"—"}</small>${st?`<small>SL: ₹${st.sl} · Target: ₹${st.target}</small>`:""}<div class="bar" style="margin:4px 0 0">${watchBtns(r.Symbol,r.Price)}</div></div>`;}).join("")||"<small>No match found.</small>"}</div>`;
+  const q=$("sq").value.trim().toLowerCase(),el=$("sres");if(!q){el.style.display="none";return;}el.style.display="block";
+  const bySym=rows.filter(r=>r.Symbol.toLowerCase().includes(q)||(r.Industry||"").toLowerCase().includes(q));
+  el.innerHTML=`<h3>Search "${esc(q)}"</h3><div class="sl">${bySym.slice(0,25).map(r=>{const st=slTarget(r);return`<div class="sr"><b>${esc(r.Symbol)}</b> <span class="cp">RS:${r.RS_Rank}</span>${rsTag(r)} <span class="cp">${rsiStr(r)}</span> <span class="cp">${delivStr(r)}</span> <small>₹${r.Price||"—"} · ${esc(r.Industry)}</small><small>Daily: ${r.Daily} (${ago(r.DTurnAgo)}) · Weekly: ${r.Weekly} (${ago(r.WTurnAgo)}) · EMA20: ${r.EMA20||"—"} · EMA50: ${r.EMA50||"—"}</small>${st?`<small>SL: ₹${st.sl} · Target: ₹${st.target}</small>`:""}<div class="bar" style="margin:4px 0 0">${watchBtns(r.Symbol,r.Price)}</div></div>`;}).join("")||"<small>No match found.</small>"}</div>`;
 }
-document.getElementById("sq").oninput=doSearch;
+$("sq").oninput=doSearch;
 
-function hideAll(except){["short","sigp","rot","trend","sahil","wlView","mainGrid"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=(id==="mainGrid"?(except==="grid"?"grid":"none"):(id===except?"block":"none"));});}
+function hideAll(except){["short","sigp","rot","trend","sahil","wlView","mainGrid"].forEach(id=>{const e=$(id);if(e)e.style.display=(id==="mainGrid"?(except==="grid"?"grid":"none"):(id===except?"block":"none"));});}
 const streakOf=hist=>{if(!hist||!hist.length)return"";const sign=hist[hist.length-1]>=0;let n=0;for(let i=hist.length-1;i>=0;i--){if((hist[i]>=0)===sign)n++;else break;}return n>=2?`${n}x ${sign?"BUY":"SELL"}`:"";};
 
 function renderRotation(){
-  hideAll("rot");const el=document.getElementById("rot"),G={};rows.forEach(r=>{if(!isNaN(r["1M"]))(G[r.Industry]??=[]).push(r);});
+  hideAll("rot");const el=$("rot"),G={};rows.forEach(r=>{if(!isNaN(r["1M"]))(G[r.Industry]??=[]).push(r);});
   const rowsHtml=Object.entries(G).filter(([,v])=>v.length>=2).map(([n,v])=>{const m1=avg(v.map(x=>x["1M"])),m3=avg(v.map(x=>x["3M"])),vs3=m3-(bench["3M"]||0),sig=(m1>(bench["1M"]||0)&&m3>(bench["3M"]||0))?["Leading","gc"]:(m1>(bench["1M"]||0))?["Improving","gc"]:["Lagging","rc"],upPct=v.filter(x=>x.Daily==="BUY").length/v.length*100,streak=streakOf(NSDL_HISTORY[n]);return{n,vs3,sig,upPct,streak};}).sort((a,b)=>b.vs3-a.vs3);
-  el.innerHTML=`<h3>Sector Rotation vs Nifty 500</h3><div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap"><tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px">Sector</th><th style="padding:6px">VS NIFTY (3M)</th><th style="padding:6px">SIGNAL</th><th style="padding:6px">UPTREND %</th><th style="padding:6px">FPI STREAK</th></tr>${rowsHtml.map(r=>`<tr><td style="padding:6px"><b>${esc(r.n)}</b></td><td style="padding:6px;color:var(--${r.vs3>=0?"gc":"rc"})">${r.vs3>=0?"+":""}${r.vs3.toFixed(1)}%</td><td style="padding:6px"><i class="sg ${r.sig[1]==="gc"?"b":"s"}">${r.sig[0]}</i></td><td style="padding:6px">${r.upPct.toFixed(0)}%</td><td style="padding:6px;font-weight:700;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td></tr>`).join("")}</table></div>`;
-  document.getElementById("tabs").innerHTML=bar(false);
+  el.innerHTML=`<h3>Sector Rotation vs Nifty 500</h3><div style="overflow-x:auto"><table><tr><th>Sector</th><th>VS NIFTY (3M)</th><th>SIGNAL</th><th>UPTREND %</th><th>FPI STREAK</th></tr>${rowsHtml.map(r=>`<tr><td><b>${esc(r.n)}</b></td><td style="color:var(--${r.vs3>=0?"gc":"rc"})">${r.vs3>=0?"+":""}${r.vs3.toFixed(1)}%</td><td><i class="sg ${r.sig[1]==="gc"?"b":"s"}">${r.sig[0]}</i></td><td>${r.upPct.toFixed(0)}%</td><td style="font-weight:700;color:var(--${r.streak.includes("BUY")?"gc":r.streak.includes("SELL")?"rc":"fg"})">${r.streak||"—"}</td></tr>`).join("")}</table></div>`;
+  $("tabs").innerHTML=bar(false);
 }
+
 let tcap="All",trs="All";
 function renderTrend(){
-  hideAll("trend");const el=document.getElementById("trend"),q=(document.getElementById("sq").value||"").trim().toLowerCase();
+  hideAll("trend");const el=$("trend"),q=($("sq").value||"").trim().toLowerCase();
   let list=rows.filter(r=>r.Price);
   if(tcap!=="All")list=list.filter(r=>r.Cap===tcap);
   if(trs==="RS80")list=list.filter(r=>r.RS_Rank>=80);
-  if(trs==="Rising")list=list.filter(r=>r.RSState==="Rising");
+  if(trs==="Rising")list=list.filter(r=>/rising/i.test(r.RSState));
   if(trs==="RS+")list=list.filter(r=>r.RSPos==="Y");
   if(trs==="Deliv")list=list.filter(r=>r.DelivHigh==="Y"||(r.DelivPct&&r.DelivPct>=50));
   if(trs==="RSI60")list=list.filter(r=>!isNaN(r.RSI_D)&&r.RSI_D>=60&&!isNaN(r.RSI_W)&&r.RSI_W>=60);
   if(q)list=list.filter(r=>r.Symbol.toLowerCase().includes(q)||(r.Industry||"").toLowerCase().includes(q));
   list.sort((a,b)=>(b.RS_Rank||50)-(a.RS_Rank||50));
   const cell=v=>v?`<span style="color:var(--${v==="Above"?"gc":"rc"})">${v}</span>`:"—";
-  const rsTag=r=>`${r.RSPos==="Y"?` <i class="sg b">RS+</i>`:""}${r.RSState==="Rising"?` <i class="sg b">RS rising</i>`:""}`;
   el.innerHTML=`<h3>Trend Scanner (${list.length} stocks)</h3>
   <div class="bar">${["All",...CAPS].map(c=>`<button class="${c===tcap?"on":""}" data-tc="${c}">${c}</button>`).join("")}</div>
   <div class="bar">${[["All","All"],["RS80","RS ≥ 80"],["Rising","RS Rising"],["RS+","RS+"],["RSI60","RSI D&W ≥ 60"],["Deliv","High Deliv"]].map(([k,l])=>`<button class="${trs===k?"on":""}" data-trs="${k}">${l}</button>`).join("")}</div>
-  <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap"><tr style="color:var(--mut);text-align:left;border-bottom:1px solid var(--mut)"><th style="padding:6px">Stock</th><th style="padding:6px">RS</th><th style="padding:6px">Sector</th><th style="padding:6px">Price</th><th style="padding:6px">Daily</th><th style="padding:6px">Weekly</th><th style="padding:6px">20d</th><th style="padding:6px">50d</th><th style="padding:6px">RSI (D/W)</th><th style="padding:6px">Deliv %</th></tr>${list.slice(0,60).map(r=>`<tr><td style="padding:6px"><b>${esc(r.Symbol)}</b>${rsTag(r)}</td><td style="padding:6px;font-weight:700;color:var(--${r.RS_Rank>=80?"gc":r.RS_Rank<50?"rc":"fg"})">${r.RS_Rank}</td><td style="padding:6px">${esc(r.Industry)}</td><td style="padding:6px">₹${r.Price}</td><td style="padding:6px"><i class="sg ${r.Daily==="BUY"?"b":"s"}">${r.Daily}</i></td><td style="padding:6px"><i class="sg ${r.Weekly==="BUY"?"b":"s"}">${r.Weekly}</i></td><td style="padding:6px">${cell(r.EMA20)}</td><td style="padding:6px">${cell(r.EMA50)}</td><td style="padding:6px">${isNaN(r.RSI_D)?"—":r.RSI_D} / ${isNaN(r.RSI_W)?"—":r.RSI_W}</td><td style="padding:6px">${r.DelivPct?r.DelivPct+"%":"—"}</td></tr>`).join("")}</table></div>`;
-  document.getElementById("tabs").innerHTML=bar(false);
+  <div style="overflow-x:auto"><table><tr><th>Stock</th><th>RS</th><th>Sector</th><th>Price</th><th>Daily</th><th>Weekly</th><th>20d</th><th>50d</th><th>RSI (D/W)</th><th>Deliv %</th></tr>${list.slice(0,60).map(r=>`<tr><td><b>${esc(r.Symbol)}</b>${rsTag(r)}</td><td style="font-weight:700;color:var(--${r.RS_Rank>=80?"gc":r.RS_Rank<50?"rc":"fg"})">${r.RS_Rank}</td><td>${esc(r.Industry)}</td><td>₹${r.Price}</td><td><i class="sg ${r.Daily==="BUY"?"b":"s"}">${r.Daily}</i></td><td><i class="sg ${r.Weekly==="BUY"?"b":"s"}">${r.Weekly}</i></td><td>${cell(r.EMA20)}</td><td>${cell(r.EMA50)}</td><td>${isNaN(r.RSI_D)?"—":r.RSI_D} / ${isNaN(r.RSI_W)?"—":r.RSI_W}</td><td>${r.DelivPct?r.DelivPct+"%":"—"}</td></tr>`).join("")}</table></div>`;
+  $("tabs").innerHTML=bar(false);
 }
-
-}
-document.getElementById("trend").onclick=e=>{const d=e.target.dataset;if(d.tc){tcap=d.tc;renderTrend()}else if(d.trs){trs=d.trs;renderTrend()}};
+$("trend").onclick=e=>{const d=e.target.dataset;if(d.tc){tcap=d.tc;renderTrend()}else if(d.trs){trs=d.trs;renderTrend()}};
 
 let sahilTf="D",sahilFresh=true;
 function renderSahil(){
-  hideAll("sahil");const el=document.getElementById("sahil"),fld=sahilTf==="W"?"SahilW":"SahilD",agoFld=sahilTf==="W"?"SahilWAgo":"SahilDAgo",boFld=sahilTf==="W"?"SahilW_BO":"SahilD_BO",tslFld=sahilTf==="W"?"SahilW_TSL":"SahilD_TSL";
+  hideAll("sahil");const el=$("sahil"),fld=sahilTf==="W"?"SahilW":"SahilD",agoFld=sahilTf==="W"?"SahilWAgo":"SahilDAgo",boFld=sahilTf==="W"?"SahilW_BO":"SahilD_BO",tslFld=sahilTf==="W"?"SahilW_TSL":"SahilD_TSL";
   const getAge=r=>(r[agoFld]!==""&&r[agoFld]!=null&&!isNaN(r[agoFld]))?+r[agoFld]:999;
   const isOk=r=>r[fld]&&(!sahilFresh||getAge(r)<=3);
   const byFresh=(a,b)=>(getAge(a)-getAge(b))||((b.RS_Rank||50)-(a.RS_Rank||50));
   const buys=rows.filter(r=>r[fld]==="BUY"&&isOk(r)).sort(byFresh),sells=rows.filter(r=>r[fld]==="SELL"&&isOk(r)).sort(byFresh);
-  el.innerHTML=`<h3>Breakout Scanner (${sahilTf==="W"?"Weekly":"Daily"} · 55/20)</h3><div class="bar"><button class="${sahilTf==="D"?"on":""}" data-stf="D">Daily</button><button class="${sahilTf==="W"?"on":""}" data-stf="W">Weekly</button><button class="${sahilFresh?"on":""}" data-sfr="1">Fresh (0–3 bars)</button><button class="${!sahilFresh?"on":""}" data-sfr="0">All Active</button></div><div class="grid"><div><h4 style="color:var(--rc)">EXIT / SELL — ${sells.length}</h4><div class="sl">${sells.map(r=>`<div class="sr"><b>${esc(r.Symbol)}</b>${getAge(r)<999?` <i class="sg s">${ago(getAge(r))}</i>`:""} <span class="cp">RS:${r.RS_Rank}</span> · ₹${r.Price||"—"}<small>${esc(r.Industry)} · ${rsiStr(r)} · ${delivStr(r)}${r[tslFld]?" · TSL: ₹"+r[tslFld]:""}</small></div>`).join("")||"<small>None in 0–3 bars.</small>"}</div></div><div><h4 style="color:var(--gc)">BREAKOUT BUY — ${buys.length}</h4><div class="sl">${buys.map(r=>`<div class="sr"><b>${esc(r.Symbol)}</b>${getAge(r)<999?` <i class="sg b">${ago(getAge(r))}</i>`:""} <span class="cp">RS:${r.RS_Rank}</span> · ₹${r.Price||"—"}<small>${esc(r.Industry)} · ${rsiStr(r)} · ${delivStr(r)}${r[boFld]?" · High: ₹"+r[boFld]:""}${r[tslFld]?" · TSL: ₹"+r[tslFld]:""}</small></div>`).join("")||"<small>None in 0–3 bars.</small>"}</div></div></div>`;
-  document.getElementById("tabs").innerHTML=bar(false);
+  el.innerHTML=`<h3>Breakout Scanner (${sahilTf==="W"?"Weekly":"Daily"} · 55/20)</h3><div class="bar"><button class="${sahilTf==="D"?"on":""}" data-stf="D">Daily</button><button class="${sahilTf==="W"?"on":""}" data-stf="W">Weekly</button><button class="${sahilFresh?"on":""}" data-sfr="1">Fresh (0–3 bars)</button><button class="${!sahilFresh?"on":""}" data-sfr="0">All Active</button></div><div class="grid"><div><h4 style="color:var(--rc)">EXIT / SELL — ${sells.length}</h4><div class="sl">${sells.map(r=>`<div class="sr"><b>${esc(r.Symbol)}</b>${getAge(r)<999?` <i class="sg s">${ago(getAge(r))}</i>`:""} <span class="cp">RS:${r.RS_Rank}</span>${rsTag(r)} · ₹${r.Price||"—"}<small>${esc(r.Industry)} · ${rsiStr(r)} · ${delivStr(r)}${r[tslFld]?" · TSL: ₹"+r[tslFld]:""}</small></div>`).join("")||"<small>None in 0–3 bars.</small>"}</div></div><div><h4 style="color:var(--gc)">BREAKOUT BUY — ${buys.length}</h4><div class="sl">${buys.map(r=>`<div class="sr"><b>${esc(r.Symbol)}</b>${getAge(r)<999?` <i class="sg b">${ago(getAge(r))}</i>`:""} <span class="cp">RS:${r.RS_Rank}</span>${rsTag(r)} · ₹${r.Price||"—"}<small>${esc(r.Industry)} · ${rsiStr(r)} · ${delivStr(r)}${r[boFld]?" · High: ₹"+r[boFld]:""}${r[tslFld]?" · TSL: ₹"+r[tslFld]:""}</small></div>`).join("")||"<small>None in 0–3 bars.</small>"}</div></div></div>`;
+  $("tabs").innerHTML=bar(false);
 }
-document.getElementById("sahil").onclick=e=>{const d=e.target.dataset;if(d.stf){sahilTf=d.stf;renderSahil()}else if(d.sfr!==undefined){sahilFresh=d.sfr==="1";renderSahil()}};
+$("sahil").onclick=e=>{const d=e.target.dataset;if(d.stf){sahilTf=d.stf;renderSahil()}else if(d.sfr!==undefined){sahilFresh=d.sfr==="1";renderSahil()}};
 
 function render(){
   if(mode==="rotation")return renderRotation();if(mode==="trend")return renderTrend();if(mode==="sahil")return renderSahil();if(mode==="watchlist")return renderWatchlistTab();if(mode==="fpi")return renderF();
   hideAll("grid");const g={};rows.forEach(r=>{if((cap==="All"||r.Cap===cap)&&!isNaN(r[period]))(g[r.Industry]??=[]).push(r);});
   const secs=Object.entries(g).filter(([,v])=>v.length>=(cap==="All"?3:2)).map(([n,v])=>[n,v,avg(v.map(x=>x[period]))]).sort((a,b)=>a[2]-b[2]);
   const all=view==="all",neg=secs.filter(x=>x[2]<0),pos=secs.filter(x=>x[2]>=0).reverse(),O=all?neg:secs.slice(0,5),I=all?pos:secs.slice(-5).reverse();
-  document.getElementById("out").innerHTML=O.map(([n,v],i)=>card(i+1,n,v,false)).join("")||"<div class='note'>None</div>";
-  document.getElementById("in").innerHTML=I.map(([n,v],i)=>card(i+1,n,v,true)).join("")||"<div class='note'>None</div>";
+  $("out").innerHTML=O.map(([n,v],i)=>card(i+1,n,v,false)).join("")||"<div class='note'>None</div>";
+  $("in").innerHTML=I.map(([n,v],i)=>card(i+1,n,v,true)).join("")||"<div class='note'>None</div>";
   renderShort(Object.values(g).flat());renderSig(Object.values(g).flat(),new Set(I.map(x=>x[0])),new Set(O.map(x=>x[0])));
-  const b=bench[period]||0;document.getElementById("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT (left) and INTO (right)`;
-  document.getElementById("tabs").innerHTML=bar(true);
+  const b=bench[period]||0;$("sub").textContent=`${PERIODS.find(p=>p[0]===period)[1]} · Nifty 500 ${b>=0?"+":""}${b.toFixed(1)}% · money moved OUT (left) and INTO (right)`;
+  $("tabs").innerHTML=bar(true);
 }
 
-let cur=[];
-document.getElementById("tabs").onclick=e=>{const d=e.target.dataset;if(d.p){period=d.p;load(cur)}else if(d.v){view=d.v;render()}else if(d.m){mode=d.m;render()}else if(d.c){cap=d.c;render()}else if(d.s){sig=d.s;render()}};
-const note=t=>document.getElementById("note").textContent=t;
+$("tabs").onclick=e=>{const d=e.target.dataset;if(d.p){period=d.p;load(cur)}else if(d.v){view=d.v;render()}else if(d.m){mode=d.m;render()}else if(d.c){cap=d.c;render()}else if(d.s){sig=d.s;render()}};
+const note=t=>$("note").textContent=t;
 function useCSV(text,name){
   if(!/^Symbol,Industry/i.test(text.trim())&&Object.keys(NSDL).some(k=>text.toLowerCase().includes(k.toLowerCase()))){if(applyNsdlPaste(text))return;}
   try{const recs=parseCSV(text);if(!recs.length||!("Industry" in recs[0])||!("1M" in recs[0]))throw 0;cur=recs;load(cur);note("Showing: "+name+" ("+recs.length+" stocks)");}catch(e){note("Could not parse pasted text.");}
 }
-document.getElementById("f").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(t=>useCSV(t,f.name));};
-document.getElementById("pb").onclick=()=>{const w=document.getElementById("pw");w.style.display=w.style.display==="none"?"block":"none";};
-document.getElementById("pgo").onclick=()=>useCSV(document.getElementById("ta").value,"pasted data");
+$("f").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(t=>useCSV(t,f.name));};
+$("pb").onclick=()=>{const w=$("pw");w.style.display=w.style.display==="none"?"block":"none";};
+$("pgo").onclick=()=>useCSV($("ta").value,"pasted data");
 
-render();
+try{renderWatchlist();render();}catch(e){$("sub").textContent="Ready";$("tabs").innerHTML=bar(true);}
 fetch("nsdl.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{let hp=false;try{const sv=JSON.parse(localStorage.getItem("cfm_nsdl_v1")||"null");if(sv&&sv.source==="paste")hp=true;}catch(e){}if(hp)return;if(j.data)NSDL=j.data;if(j.date)NSDL_DATE=j.date;if(j.history)NSDL_HISTORY=j.history;FPI=Object.fromEntries(Object.entries(NSDL).map(([k,v])=>[k,v[1]]));render();}).catch(()=>{});
 fetch("flow.csv?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{useCSV(t,"flow.csv");note("Live data · updated automatically after market close");}).catch(()=>{note("Could not load flow.csv");});
 </script></body></html>
