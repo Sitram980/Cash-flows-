@@ -1,4 +1,4 @@
-import os, io
+import os, io, traceback
 from datetime import datetime, timedelta, timezone
 import numpy as np
 import pandas as pd
@@ -60,7 +60,8 @@ def calc_atr(h, l, c, period=14):
     pc = c.shift(1)
     tr = pd.concat([h - l, (h - pc).abs(), (l - pc).abs()], axis=1).max(axis=1)
     v = tr.ewm(alpha=1.0/period, min_periods=period, adjust=False).mean().iloc[-1]
-    return float(v) if pd.notna(v) else float((h - l).iloc[-1])
+    fallback = float((h - l).iloc[-1]) if len(h) else 0.0
+    return float(v) if pd.notna(v) else (fallback if pd.notna(fallback) else 0.0)
 
 def kernel_reg(prices, h=8.0, r=8.0):
     y = np.asarray(prices, dtype=float)[-120:]
@@ -75,7 +76,7 @@ def analyze_mkr(cs, h=8.0):
         return "SELL", "N", "", "", "", np.nan
     yh = kernel_reg(y, h=h)
     dirs = np.where(np.diff(yh) >= 0, "BUY", "SELL")
-    curr = dirs[-1]
+    curr = str(dirs[-1])
     tago = 0
     for i in range(len(dirs) - 2, -1, -1):
         if dirs[i] != curr:
@@ -94,38 +95,46 @@ def analyze_mkr(cs, h=8.0):
     return curr, fresh, tago, cdir, cago, float(yh[-1])
 
 def analyze_sahil(hs, ls, cs, elen=55, xlen=20):
-    h, l, c = hs.values, ls.values, cs.values
-    n = len(c)
+    n = min(len(hs), len(ls), len(cs))
     if n < elen + 2:
         return "", "", "", ""
+    h = np.asarray(hs.values[-n:], dtype=float)
+    l = np.asarray(ls.values[-n:], dtype=float)
+    c = np.asarray(cs.values[-n:], dtype=float)
     st, lbar, bo, tsl = "", -1, "", ""
     for i in range(max(elen, n - 90), n):
-        hi55, lo20 = np.max(h[i-elen:i]), np.min(l[i-xlen:i])
+        hi55 = float(np.nanmax(h[i-elen:i]))
+        lo20 = float(np.nanmin(l[i-xlen:i]))
+        if np.isnan(hi55) or np.isnan(lo20) or np.isnan(c[i]):
+            continue
         if c[i] > hi55:
             if st != "BUY":
-                st, lbar, bo = "BUY", i, round(float(hi55), 2)
-            tsl = round(float(lo20), 2)
+                st, lbar, bo = "BUY", i, round(hi55, 2)
+            tsl = round(lo20, 2)
         elif c[i] < lo20:
             if st != "SELL":
-                st, lbar, bo = "SELL", i, round(float(lo20), 2)
-            tsl = round(float(np.max(h[i-xlen:i])), 2)
+                st, lbar, bo = "SELL", i, round(lo20, 2)
+            tsl = round(float(np.nanmax(h[i-xlen:i])), 2)
         elif st == "BUY":
-            tsl = round(float(lo20), 2)
+            tsl = round(lo20, 2)
         elif st == "SELL":
-            tsl = round(float(np.max(h[i-xlen:i])), 2)
+            tsl = round(float(np.nanmax(h[i-xlen:i])), 2)
     return st, ((n - 1 - lbar) if lbar >= 0 else ""), bo, tsl
 
 def fetch_nse_delivery():
     dmap = {}
     sess = requests.Session()
-    sess.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128.0.0.0", "Referer": "https://www.nseindia.com/"})
+    sess.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/128.0.0.0 Safari/537.36",
+        "Referer": "https://www.nseindia.com/"
+    })
     for d in range(8):
         dt = NOW_IST - timedelta(days=d)
         if dt.weekday() >= 5:
             continue
         ds = dt.strftime("%d%m%Y")
         try:
-            r = sess.get(f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{ds}.csv", timeout=12)
+            r = sess.get(f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{ds}.csv", timeout=10)
             if r.status_code == 200 and "DELIV_PER" in r.text:
                 dfb = pd.read_csv(io.StringIO(r.text))
                 dfb.columns = [c.strip() for c in dfb.columns]
@@ -137,11 +146,12 @@ def fetch_nse_delivery():
                     if sym and pd.notna(val) and 0 < val <= 100:
                         dmap[sym] = round(float(val), 1)
                 if len(dmap) > 100:
+                    print(f"NSE Bhavcopy delivery loaded ({ds}): {len(dmap)}")
                     return dmap
         except Exception:
             pass
         try:
-            r = sess.get(f"https://nsearchives.nseindia.com/archives/equities/mto/MTO_{ds}.DAT", timeout=12)
+            r = sess.get(f"https://nsearchives.nseindia.com/archives/equities/mto/MTO_{ds}.DAT", timeout=10)
             if r.status_code == 200 and "20," in r.text:
                 for ln in r.text.splitlines():
                     p = [x.strip() for x in ln.split(",")]
@@ -150,16 +160,21 @@ def fetch_nse_delivery():
                         if 0 < val <= 100:
                             dmap[p[2].upper()] = round(val, 1)
                 if len(dmap) > 100:
+                    print(f"NSE MTO delivery loaded ({ds}): {len(dmap)}")
                     return dmap
         except Exception:
             pass
+    print("NSE direct delivery unavailable from cloud IP; using institutional accumulation proxy.")
     return dmap
 
 def get_symbols():
     syms = {}
-    for u in ["https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv", "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"]:
+    for u in [
+        "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv",
+        "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
+    ]:
         try:
-            r = requests.get(u, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+            r = requests.get(u, headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
             if r.status_code == 200 and "Symbol" in r.text:
                 df = pd.read_csv(io.StringIO(r.text))
                 for idx, rw in df.iterrows():
@@ -171,11 +186,14 @@ def get_symbols():
         except Exception:
             pass
     if len(syms) < 100 and os.path.exists("flow.csv"):
-        old = pd.read_csv("flow.csv")
-        for _, rw in old.iterrows():
-            s = str(rw.get("Symbol", "")).strip().upper()
-            if s and not s.startswith("NIFTY"):
-                syms[s] = (map_sector(rw.get("Industry", "")), str(rw.get("Cap", "Mid")).strip() or "Mid")
+        try:
+            old = pd.read_csv("flow.csv")
+            for _, rw in old.iterrows():
+                s = str(rw.get("Symbol", "")).strip().upper()
+                if s and s != "NAN" and not s.startswith("NIFTY"):
+                    syms[s] = (map_sector(rw.get("Industry", "")), str(rw.get("Cap", "Mid")).strip() or "Mid")
+        except Exception:
+            pass
     if os.path.exists("extra_symbols.txt"):
         with open("extra_symbols.txt", encoding="utf-8") as f:
             for ln in f:
@@ -185,13 +203,19 @@ def get_symbols():
     return syms
 
 def pct_ret(s, b):
-    if len(s) <= b:
+    if s is None or len(s) <= b:
         return np.nan
     p, c = float(s.iloc[-1 - b]), float(s.iloc[-1])
     return round((c / p - 1.0) * 100.0, 2) if p > 0 else np.nan
 
+def to_series(col):
+    if isinstance(col, pd.DataFrame):
+        return col.iloc[:, 0]
+    return col
+
 def main():
     sym_meta = get_symbols()
+    print(f"Loaded {len(sym_meta)} symbols.")
     deliv_live = fetch_nse_delivery()
     deliv_prev = {}
     if os.path.exists("flow.csv"):
@@ -207,89 +231,111 @@ def main():
 
     tickers = ["^CRSLDX"] + [f"{s}.NS" for s in sym_meta]
     data = yf.download(tickers, period="18mo", interval="1d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
+    print("Yahoo Finance download complete.")
 
     def get_df(t):
         try:
-            df = data[t].dropna(subset=["Close"]) if isinstance(data.columns, pd.MultiIndex) else data.dropna(subset=["Close"])
-            if len(df) < 30:
+            if isinstance(data.columns, pd.MultiIndex):
+                if t not in data.columns.get_level_values(0):
+                    return None
+                df = data[t].copy()
+            else:
+                df = data.copy()
+            c = to_series(df["Close"]).dropna()
+            if len(c) < 30:
                 return None
-            df = df.copy()
+            df = df.loc[c.index].copy()
             df.index = pd.to_datetime(df.index).tz_localize(None)
             return df
         except Exception:
             return None
 
     bdf = get_df("^CRSLDX")
-    bclose = bdf["Close"] if bdf is not None else None
+    bclose = to_series(bdf["Close"]).dropna() if bdf is not None else None
     out_rows = []
-    if bclose is not None:
-        out_rows.append({"Symbol": "NIFTY 500", "Industry": "Index", "Cap": "", "Price": round(float(bclose.iloc[-1]), 2),
-                         "1W": pct_ret(bclose, 5), "1M": pct_ret(bclose, 21), "3M": pct_ret(bclose, 63), "6M": pct_ret(bclose, 126)})
+    if bclose is not None and len(bclose) >= 30:
+        out_rows.append({
+            "Symbol": "NIFTY 500", "Industry": "Index", "Cap": "", "Price": round(float(bclose.iloc[-1]), 2),
+            "1W": pct_ret(bclose, 5), "1M": pct_ret(bclose, 21), "3M": pct_ret(bclose, 63), "6M": pct_ret(bclose, 126)
+        })
 
     mrs_raw = {}
+    errors = 0
     for sym, (ind, cap) in sym_meta.items():
-        df = get_df(f"{sym}.NS")
-        if df is None:
-            continue
-        c, h, l = df["Close"], df["High"], df["Low"]
-        vol = df["Volume"] if "Volume" in df.columns else pd.Series(0, index=c.index)
-        px = round(float(c.iloc[-1]), 2)
-        r1w, r1m, r3m, r6m = pct_ret(c, 5), pct_ret(c, 21), pct_ret(c, 63), pct_ret(c, 126)
+        try:
+            df = get_df(f"{sym}.NS")
+            if df is None:
+                continue
+            c = to_series(df["Close"]).astype(float)
+            h = to_series(df["High"]).astype(float).fillna(c)
+            l = to_series(df["Low"]).astype(float).fillna(c)
+            vol = to_series(df["Volume"]).astype(float).fillna(0.0) if "Volume" in df.columns else pd.Series(0.0, index=c.index)
+            px = round(float(c.iloc[-1]), 2)
+            r1w, r1m, r3m, r6m = pct_ret(c, 5), pct_ret(c, 21), pct_ret(c, 63), pct_ret(c, 126)
 
-        wc = c.resample("W-FRI").last().dropna()
-        wh = h.resample("W-FRI").max().dropna()
-        wl = l.resample("W-FRI").min().dropna()
-        mc = c.groupby([c.index.year, c.index.month]).last().dropna()
+            wdf = pd.DataFrame({"High": h, "Low": l, "Close": c}).resample("W-FRI").agg({"High": "max", "Low": "min", "Close": "last"}).dropna()
+            wc, wh, wl = wdf["Close"], wdf["High"], wdf["Low"]
+            mc = c.groupby([c.index.year, c.index.month]).last().dropna()
 
-        dsig, dfresh, dtago, dcross, dcago, dline = analyze_mkr(c, 8.0)
-        wsig, wfresh, wtago, wcross, wcago, _ = analyze_mkr(wc, 8.0)
-        atr = calc_atr(h, l, c, 14)
+            dsig, dfresh, dtago, dcross, dcago, dline = analyze_mkr(c, 8.0)
+            wsig, wfresh, wtago, wcross, wcago, _ = analyze_mkr(wc, 8.0)
+            atr = calc_atr(h, l, c, 14)
 
-        rs_pos, rs_state = "N", "Falling"
-        mrs_score = r3m if pd.notna(r3m) else (r1m if pd.notna(r1m) else 0.0)
-        if bclose is not None:
-            al = pd.concat([c.rename("s"), bclose.rename("b")], axis=1).dropna()
-            if len(al) >= 60:
-                rat = al["s"] / al["b"]
-                mrs = ((rat / rat.rolling(252, min_periods=60).mean()) - 1.0) * 100.0
-                mc_rs = mrs.dropna()
-                if len(mc_rs) >= 6:
-                    rs_pos = "Y" if float(mc_rs.iloc[-1]) > 0 else "N"
-                    rs_state = "Rising" if float(mc_rs.iloc[-1]) > float(mc_rs.iloc[-6]) else "Falling"
-                    mrs_score = float(mc_rs.iloc[-1])
+            rs_pos, rs_state = "N", "Falling"
+            mrs_score = r3m if pd.notna(r3m) else (r1m if pd.notna(r1m) else 0.0)
+            if bclose is not None:
+                al = pd.concat([c.rename("s"), bclose.rename("b")], axis=1).dropna()
+                if len(al) >= 60:
+                    rat = al["s"] / al["b"]
+                    mrs = ((rat / rat.rolling(252, min_periods=60).mean()) - 1.0) * 100.0
+                    mc_rs = mrs.dropna()
+                    if len(mc_rs) >= 6:
+                        rs_pos = "Y" if float(mc_rs.iloc[-1]) > 0 else "N"
+                        rs_state = "Rising" if float(mc_rs.iloc[-1]) > float(mc_rs.iloc[-6]) else "Falling"
+                        mrs_score = float(mc_rs.iloc[-1])
 
-        if sym in deliv_live:
-            dp = deliv_live[sym]
-        elif sym in deliv_prev:
-            dp = deliv_prev[sym]
-        else:
-            v20 = float(vol.iloc[-20:].mean()) if len(vol) >= 20 else 0.0
-            vr = (float(vol.iloc[-1]) / v20) if v20 > 0 else 1.0
-            dp = round(min(85.0, max(25.0, 42.0 + (vr - 1.0) * 12.0)), 1)
+            if sym in deliv_live:
+                dp = deliv_live[sym]
+            elif sym in deliv_prev:
+                dp = deliv_prev[sym]
+            else:
+                v20 = float(vol.iloc[-20:].mean()) if len(vol) >= 20 else 0.0
+                vr = (float(vol.iloc[-1]) / v20) if v20 > 0 else 1.0
+                rng = float(h.iloc[-1] - l.iloc[-1])
+                clv = float((c.iloc[-1] - l.iloc[-1]) / rng) if rng > 0 else 0.5
+                dp = round(min(88.0, max(22.0, 38.0 + (vr - 1.0) * 10.0 + (clv - 0.5) * 18.0)), 1)
 
-        sd, sd_ago, sd_bo, sd_tsl = analyze_sahil(h, l, c, 55, 20)
-        sw, sw_ago, sw_bo, sw_tsl = analyze_sahil(wh, wl, wc, 55, 20)
-        ep = lambda sp: ("Above" if px >= float(c.ewm(span=sp, adjust=False).mean().iloc[-1]) else "Below") if len(c) >= sp else ""
+            sd, sd_ago, sd_bo, sd_tsl = analyze_sahil(h, l, c, 55, 20)
+            sw, sw_ago, sw_bo, sw_tsl = analyze_sahil(wh, wl, wc, 55, 20)
+            ep = lambda sp: ("Above" if px >= float(c.ewm(span=sp, adjust=False).mean().iloc[-1]) else "Below") if len(c) >= sp else ""
 
-        mrs_raw[sym] = mrs_score
-        out_rows.append({
-            "Symbol": sym, "Industry": ind, "Cap": cap, "Price": px,
-            "1W": r1w, "1M": r1m, "3M": r3m, "6M": r6m,
-            "Daily": dsig, "Weekly": wsig, "DFresh": dfresh, "WFresh": wfresh,
-            "DTurnAgo": dtago, "WTurnAgo": wtago, "DCross": dcross, "DCrossAgo": dcago,
-            "WCross": wcross, "WCrossAgo": wcago,
-            "EMA20": ep(20), "EMA50": ep(50), "EMA100": ep(100), "EMA200": ep(200),
-            "RSState": rs_state, "RSPos": rs_pos, "RS_Rank": 50,
-            "DelivPct": dp, "DelivHigh": "Y" if dp >= 55.0 else "N",
-            "RSI_D": calc_rsi(c, 14), "RSI_W": calc_rsi(wc, 14), "RSI_M": calc_rsi(mc, 14),
-            "DConfirmed": "Y" if (pd.notna(dline) and ((dsig == "BUY" and px >= dline) or (dsig == "SELL" and px <= dline))) else "N",
-            "WConfirmed": "Y" if len(wc) >= 2 and ((wsig == "BUY" and wc.iloc[-1] >= wc.iloc[-2]) or (wsig == "SELL" and wc.iloc[-1] <= wc.iloc[-2])) else "N",
-            "DLine": round(dline, 2) if pd.notna(dline) else "",
-            "DUpper": round(dline + 2.0 * atr, 2) if pd.notna(dline) else "",
-            "DLower": round(max(0.01, dline - 1.5 * atr), 2) if pd.notna(dline) else "",
-            "SahilD": sd, "SahilDAgo": sd_ago, "SahilD_BO": sd_bo, "SahilD_TSL": sd_tsl,
-            "SahilW": sw, "SahilWAgo": sw_ago, "SahilW_BO": sw_bo, "SahilW_TSL": sw_tsl,
-        })
+            mrs_raw[sym] = mrs_score
+            out_rows.append({
+                "Symbol": sym, "Industry": ind, "Cap": cap, "Price": px,
+                "1W": r1w, "1M": r1m, "3M": r3m, "6M": r6m,
+                "Daily": dsig, "Weekly": wsig, "DFresh": dfresh, "WFresh": wfresh,
+                "DTurnAgo": dtago, "WTurnAgo": wtago, "DCross": dcross, "DCrossAgo": dcago,
+                "WCross": wcross, "WCrossAgo": wcago,
+                "EMA20": ep(20), "EMA50": ep(50), "EMA100": ep(100), "EMA200": ep(200),
+                "RSState": rs_state, "RSPos": rs_pos, "RS_Rank": 50,
+                "DelivPct": dp, "DelivHigh": "Y" if dp >= 55.0 else "N",
+                "RSI_D": calc_rsi(c, 14), "RSI_W": calc_rsi(wc, 14), "RSI_M": calc_rsi(mc, 14),
+                "DConfirmed": "Y" if (pd.notna(dline) and ((dsig == "BUY" and px >= dline) or (dsig == "SELL" and px <= dline))) else "N",
+                "WConfirmed": "Y" if len(wc) >= 2 and ((wsig == "BUY" and wc.iloc[-1] >= wc.iloc[-2]) or (wsig == "SELL" and wc.iloc[-1] <= wc.iloc[-2])) else "N",
+                "DLine": round(dline, 2) if pd.notna(dline) else "",
+                "DUpper": round(dline + 2.0 * atr, 2) if pd.notna(dline) else "",
+                "DLower": round(max(0.01, dline - 1.5 * atr), 2) if pd.notna(dline) else "",
+                "SahilD": sd, "SahilDAgo": sd_ago, "SahilD_BO": sd_bo, "SahilD_TSL": sd_tsl,
+                "SahilW": sw, "SahilWAgo": sw_ago, "SahilW_BO": sw_bo, "SahilW_TSL": sw_tsl,
+            })
+        except Exception as e:
+            errors += 1
+            if errors <= 5:
+                print(f"Warn {sym}: {e}")
+
+    print(f"Processed {len(out_rows)} rows (skipped {errors} errors).")
+    if len(out_rows) < 50:
+        raise RuntimeError(f"Too few rows ({len(out_rows)}); aborting to protect flow.csv")
 
     if mrs_raw:
         srk = pd.Series(mrs_raw).rank(pct=True) * 98.0 + 1.0
@@ -298,7 +344,7 @@ def main():
                 rw["RS_Rank"] = int(round(srk[rw["Symbol"]]))
 
     pd.DataFrame(out_rows).to_csv("flow.csv", index=False)
-    print(f"Done: {len(out_rows)} rows written.")
+    print("Successfully saved flow.csv!")
 
 if __name__ == "__main__":
     main()
