@@ -1,270 +1,305 @@
-import os
-import json
-import re
-import urllib3
-import requests
-from bs4 import BeautifulSoup
-import yfinance as yf
-import pandas as pd
+import os, io
+from datetime import datetime, timedelta, timezone
 import numpy as np
+import pandas as pd
+import requests
+import yfinance as yf
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+IST = timezone(timedelta(hours=5, minutes=30))
+NOW_IST = datetime.now(IST)
 
-# --- NSDL FPI AUTO-SCRAPER ENGINE ---
-CANONICAL_SECTORS = [
+NSDL_SECTORS = {
     "Automobile and Auto Components", "Capital Goods", "Chemicals", "Construction",
     "Construction Materials", "Consumer Durables", "Consumer Services", "Diversified",
     "Fast Moving Consumer Goods", "Financial Services", "Forest Materials", "Healthcare",
     "Information Technology", "Media, Entertainment & Publication", "Metals & Mining",
     "Oil, Gas & Consumable Fuels", "Power", "Realty", "Services", "Telecommunication",
     "Textiles", "Utilities"
-]
-
-def clean_sector_name(raw_name):
-    norm = re.sub(r'[^a-zA-Z0-9]', '', raw_name).lower()
-    for can in CANONICAL_SECTORS:
-        if re.sub(r'[^a-zA-Z0-9]', '', can).lower() == norm:
-            return can
-    return None
-
-def fetch_nsdl_fpi_data():
-    """NSDL ના sectoral રિપોર્ટ પેજ પરથી લેટેસ્ટ ફોર્ટનાઈટ ડેટા સ્ક્રેપ કરે છે"""
-    urls = [
-        "https://www.fpi.nsdl.co.in/web/Reports/FortnightSectorwise.aspx",
-        "https://www.fpi.nsdl.co.in/web/Reports/MonthlySectorwise.aspx"
-    ]
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-    }
-
-    for url in urls:
-        try:
-            res = requests.get(url, headers=headers, verify=False, timeout=25)
-            if res.status_code != 200:
-                continue
-
-            soup = BeautifulSoup(res.text, 'lxml')
-            tables = soup.find_all('table')
-            
-            for tbl in tables:
-                text = tbl.get_text()
-                if "Financial Services" in text or "Information Technology" in text:
-                    # રિપોર્ટની તારીખ શોધવી (દા.ત. 16-31 Oct 2026 અથવા Oct 16, 2026)
-                    date_match = re.search(r'(\d{1,2}\s*[-–toTO]+\s*\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})', text)
-                    period_date = date_match.group(1).strip() if date_match else None
-
-                    extracted_data = {}
-                    rows = tbl.find_all('tr')
-                    for tr in rows:
-                        cols = [td.get_text(strip=True).replace(',', '') for td in tr.find_all(['td', 'th'])]
-                        if len(cols) >= 3:
-                            matched_sector = clean_sector_name(cols[0])
-                            if matched_sector:
-                                try:
-                                    # Equity Net Flow અને AUC કોલમ્સ
-                                    net_flow = int(float(cols[1]))
-                                    auc = int(float(cols[-1])) if len(cols) > 2 else 0
-                                    extracted_data[matched_sector] = [net_flow, auc]
-                                except (ValueError, IndexError):
-                                    continue
-                    
-                    if len(extracted_data) >= 15:
-                        return period_date, extracted_data
-        except Exception as e:
-            print(f"NSDL Scraping Notice on {url}: {e}")
-            continue
-
-    return None, None
-
-def update_nsdl_json_file():
-    json_path = "nsdl.json"
-    if not os.path.exists(json_path):
-        return
-
-    with open(json_path, "r", encoding="utf-8") as f:
-        curr_json = json.load(f)
-
-    latest_date, new_sector_data = fetch_nsdl_fpi_data()
-
-    if latest_date and latest_date != curr_json.get("date"):
-        print(f"નવો NSDL ડેટા મળ્યો: {latest_date}. nsdl.json અપડેટ થાય છે...")
-        curr_data = curr_json.get("data", {})
-        curr_hist = curr_json.get("history", {})
-
-        new_history = {}
-        for sec in CANONICAL_SECTORS:
-            past_list = curr_hist.get(sec, [])
-            new_val = new_sector_data.get(sec, [0, 0])[0]
-
-            # ૧૦ પખવાડિયાની હિસ્ટ્રી સાચવવી
-            updated_hist = past_list + [new_val]
-            if len(updated_hist) > 10:
-                updated_hist = updated_hist[-10:]
-            new_history[sec] = updated_hist
-
-        curr_json["date"] = latest_date
-        curr_json["data"] = new_sector_data
-        curr_json["history"] = new_history
-
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(curr_json, f, indent=1)
-        print("nsdl.json સફળતાપૂર્વક અપડેટ થઈ ગયું!")
-    else:
-        print("NSDL ડેટા પહેલેથી જ અપ-ટુ-ડેટ છે અથવા નવો પખવાડિયાનો રિપોર્ટ હજી આવ્યો નથી.")
-
-# --- NIFTY STOCKS & TECHNICAL SCANNER ENGINE ---
-SECTOR_MAP = {
-    "Automobile and Auto Components": [("MARUTI.NS","Large"), ("M&M.NS","Large"), ("BAJAJ-AUTO.NS","Large"), ("TVSMOTOR.NS","Mid"), ("ASHOKLEY.NS","Mid"), ("BALKRISIND.NS","Mid"), ("SANSERA.NS","Small"), ("GABRIEL.NS","Small"), ("SUBROS.NS","Small"), ("JAMNAAUTO.NS","Micro"), ("SUPRAJIT.NS","Micro")],
-    "Capital Goods": [("SIEMENS.NS","Large"), ("ABB.NS","Large"), ("HAL.NS","Large"), ("CUMMINSIND.NS","Mid"), ("BHEL.NS","Mid"), ("POLYCAB.NS","Mid"), ("KIRLOSENG.NS","Small"), ("GRSE.NS","Small"), ("TEGA.NS","Small"), ("ELECON.NS","Micro")],
-    "Chemicals": [("PIDILITIND.NS","Large"), ("SRF.NS","Large"), ("UPL.NS","Large"), ("DEEPAKNTR.NS","Mid"), ("TATACHEM.NS","Mid"), ("AARTIIND.NS","Mid"), ("FINEORG.NS","Small"), ("CLEAN.NS","Small"), ("BODALCHEM.NS","Micro")],
-    "Construction": [("LT.NS","Large"), ("NBCC.NS","Mid"), ("IRB.NS","Mid"), ("KEC.NS","Mid"), ("NCC.NS","Mid"), ("RVNL.NS","Mid"), ("PNCINFRA.NS","Small"), ("HGINFRA.NS","Small"), ("KALPATARU.NS","Small"), ("ASHOKA.NS","Micro")],
-    "Construction Materials": [("ULTRACEMCO.NS","Large"), ("AMBUJACEM.NS","Large"), ("SHREECEM.NS","Large"), ("DALBHARAT.NS","Mid"), ("JKCEMENT.NS","Mid"), ("RAMCOCEM.NS","Mid"), ("STARCEMENT.NS","Small"), ("NUVOCO.NS","Small")],
-    "Consumer Durables": [("TITAN.NS","Large"), ("HAVELLS.NS","Large"), ("DIXON.NS","Large"), ("VOLTAS.NS","Mid"), ("CROMPTON.NS","Mid"), ("BLUESTARCO.NS","Mid"), ("SYMPHONY.NS","Small"), ("ORIENTELEC.NS","Small"), ("AMBER.NS","Small")],
-    "Consumer Services": [("TRENT.NS","Large"), ("DMART.NS","Large"), ("INDHOTEL.NS","Large"), ("JUBLFOOD.NS","Mid"), ("LEMONTREE.NS","Mid"), ("DEVYANI.NS","Small"), ("SAPPHIRE.NS","Small"), ("BARBEQUE.NS","Micro")],
-    "Fast Moving Consumer Goods": [("ITC.NS","Large"), ("HINDUNILVR.NS","Large"), ("NESTLEIND.NS","Large"), ("BRITANNIA.NS","Mid"), ("DABUR.NS","Mid"), ("COLPAL.NS","Mid"), ("EMAMILTD.NS","Small"), ("BIKAJI.NS","Small"), ("GILLETTE.NS","Small")],
-    "Financial Services": [("HDFCBANK.NS","Large"), ("ICICIBANK.NS","Large"), ("SBIN.NS","Large"), ("AUBANK.NS","Mid"), ("FEDERALBNK.NS","Mid"), ("MUTHOOTFIN.NS","Mid"), ("CREDITACC.NS","Small"), ("CDSL.NS","Small"), ("MANAPPURAM.NS","Micro")],
-    "Healthcare": [("SUNPHARMA.NS","Large"), ("CIPLA.NS","Large"), ("DRREDDY.NS","Large"), ("LUPIN.NS","Mid"), ("ALKEM.NS","Mid"), ("AUROPHARMA.NS","Mid"), ("GRANULES.NS","Small"), ("JBCHEPHARM.NS","Small"), ("LAURUSLABS.NS","Small")],
-    "Information Technology": [("TCS.NS","Large"), ("INFY.NS","Large"), ("HCLTECH.NS","Large"), ("PERSISTENT.NS","Mid"), ("COFORGE.NS","Mid"), ("MPHASIS.NS","Mid"), ("SONATSOFTW.NS","Small"), ("ZENSARTECH.NS","Small"), ("BSOFT.NS","Small")],
-    "Media, Entertainment & Publication": [("ZEEL.NS","Mid"), ("SUNTV.NS","Mid"), ("PVRINOX.NS","Mid"), ("NETWORK18.NS","Small"), ("NAZARA.NS","Small"), ("SAREGAMA.NS","Small")],
-    "Metals & Mining": [("TATASTEEL.NS","Large"), ("JSWSTEEL.NS","Large"), ("HINDALCO.NS","Large"), ("VEDL.NS","Mid"), ("NMDC.NS","Mid"), ("JINDALSTEL.NS","Mid"), ("SAIL.NS","Small"), ("NATIONALUM.NS","Small")],
-    "Oil, Gas & Consumable Fuels": [("RELIANCE.NS","Large"), ("ONGC.NS","Large"), ("BPCL.NS","Large"), ("IOC.NS","Mid"), ("GAIL.NS","Mid"), ("PETRONET.NS","Mid"), ("IGL.NS","Small"), ("MGL.NS","Small"), ("GUJGASLTD.NS","Small")],
-    "Power": [("NTPC.NS","Large"), ("POWERGRID.NS","Large"), ("TATAPOWER.NS","Large"), ("ADANIPOWER.NS","Mid"), ("JSWENERGY.NS","Mid"), ("TORNTPOWER.NS","Mid"), ("CESC.NS","Small"), ("NLCINDIA.NS","Small")],
-    "Realty": [("DLF.NS","Large"), ("GODREJPROP.NS","Large"), ("OBEROIRLTY.NS","Mid"), ("PRESTIGE.NS","Mid"), ("BRIGADE.NS","Small"), ("SOBHA.NS","Small"), ("MAHLIFE.NS","Small")],
-    "Services": [("ADANIPORTS.NS","Large"), ("INDIGO.NS","Large"), ("IRCTC.NS","Mid"), ("CONCOR.NS","Mid"), ("DELHIVERY.NS","Mid"), ("BLUEDART.NS","Small"), ("TCIEXP.NS","Small")],
-    "Telecommunication": [("BHARTIARTL.NS","Large"), ("INDUSTOWER.NS","Mid"), ("IDEA.NS","Mid"), ("TATACOMM.NS","Mid"), ("HFCL.NS","Small"), ("TEJASNET.NS","Small")],
-    "Textiles": [("PAGEIND.NS","Large"), ("KPRMILL.NS","Mid"), ("TRIDENT.NS","Small"), ("WELSPUNLIV.NS","Small"), ("ARVIND.NS","Small")],
-    "Utilities": [("ADANIGREEN.NS","Large"), ("NHPC.NS","Mid"), ("SJVN.NS","Mid"), ("ADANIENSOL.NS","Mid"), ("SUZLON.NS","Mid"), ("INOXWIND.NS","Small")]
 }
 
-def calculate_rsi(series, period=14):
-    delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-    rs = gain / loss.replace(0, np.nan)
-    return 100 - (100 / (1 + rs))
+SECTOR_MAP = {
+    "automobile": "Automobile and Auto Components", "auto": "Automobile and Auto Components",
+    "capital goods": "Capital Goods", "industrials": "Capital Goods",
+    "chemicals": "Chemicals", "construction materials": "Construction Materials",
+    "construction": "Construction", "basic materials": "Metals & Mining",
+    "consumer durables": "Consumer Durables", "consumer cyclical": "Consumer Durables",
+    "consumer services": "Consumer Services", "diversified": "Diversified",
+    "fast moving consumer goods": "Fast Moving Consumer Goods", "fmcg": "Fast Moving Consumer Goods",
+    "consumer defensive": "Fast Moving Consumer Goods", "financial": "Financial Services",
+    "forest": "Forest Materials", "healthcare": "Healthcare", "health care": "Healthcare",
+    "information technology": "Information Technology", "technology": "Information Technology",
+    "media": "Media, Entertainment & Publication", "communication": "Telecommunication",
+    "metals": "Metals & Mining", "oil, gas & consumable fuels": "Oil, Gas & Consumable Fuels",
+    "oil gas": "Oil, Gas & Consumable Fuels", "energy": "Oil, Gas & Consumable Fuels",
+    "power": "Power", "utilities": "Utilities", "realty": "Realty", "real estate": "Realty",
+    "services": "Services", "telecommunication": "Telecommunication", "telecom": "Telecommunication",
+    "textiles": "Textiles"
+}
+
+def map_sector(raw):
+    s = str(raw or "").strip()
+    if s in NSDL_SECTORS:
+        return s
+    k = s.lower().replace(",", "")
+    for pat, target in SECTOR_MAP.items():
+        if pat.replace(",", "") in k:
+            return target
+    return "Diversified"
+
+def calc_rsi(s, period=14):
+    if s is None or len(s) < period + 2:
+        return np.nan
+    d = s.diff()
+    ag = d.clip(lower=0.0).ewm(alpha=1.0/period, min_periods=period, adjust=False).mean()
+    al = (-d.clip(upper=0.0)).ewm(alpha=1.0/period, min_periods=period, adjust=False).mean()
+    rsi = 100.0 - (100.0 / (1.0 + ag / al.replace(0.0, np.nan)))
+    v = rsi.iloc[-1]
+    return round(float(v), 1) if pd.notna(v) else np.nan
+
+def calc_atr(h, l, c, period=14):
+    pc = c.shift(1)
+    tr = pd.concat([h - l, (h - pc).abs(), (l - pc).abs()], axis=1).max(axis=1)
+    v = tr.ewm(alpha=1.0/period, min_periods=period, adjust=False).mean().iloc[-1]
+    return float(v) if pd.notna(v) else float((h - l).iloc[-1])
+
+def kernel_reg(prices, h=8.0, r=8.0):
+    y = np.asarray(prices, dtype=float)[-120:]
+    idx = np.arange(len(y), dtype=float)
+    diff = idx[:, None] - idx[None, :]
+    w = (1.0 + (diff ** 2) / (2.0 * r * (h ** 2))) ** (-r)
+    return (w @ y) / w.sum(axis=1)
+
+def analyze_mkr(cs, h=8.0):
+    y = np.asarray(cs.dropna().values, dtype=float)
+    if len(y) < 15:
+        return "SELL", "N", "", "", "", np.nan
+    yh = kernel_reg(y, h=h)
+    dirs = np.where(np.diff(yh) >= 0, "BUY", "SELL")
+    curr = dirs[-1]
+    tago = 0
+    for i in range(len(dirs) - 2, -1, -1):
+        if dirs[i] != curr:
+            break
+        tago += 1
+    if len(dirs) > 1 and all(d == curr for d in dirs):
+        tago = len(dirs) - 1
+    m = min(len(y), len(yh))
+    ab = y[-m:] > yh[-m:]
+    cdir, cago = "", ""
+    for k in range(m - 1, 0, -1):
+        if ab[k] != ab[k - 1]:
+            cdir, cago = ("UP" if ab[k] else "DN"), (m - 1) - k
+            break
+    fresh = "Y" if (tago <= 3 or (cago != "" and cago <= 3)) else "N"
+    return curr, fresh, tago, cdir, cago, float(yh[-1])
+
+def analyze_sahil(hs, ls, cs, elen=55, xlen=20):
+    h, l, c = hs.values, ls.values, cs.values
+    n = len(c)
+    if n < elen + 2:
+        return "", "", "", ""
+    st, lbar, bo, tsl = "", -1, "", ""
+    for i in range(max(elen, n - 90), n):
+        hi55, lo20 = np.max(h[i-elen:i]), np.min(l[i-xlen:i])
+        if c[i] > hi55:
+            if st != "BUY":
+                st, lbar, bo = "BUY", i, round(float(hi55), 2)
+            tsl = round(float(lo20), 2)
+        elif c[i] < lo20:
+            if st != "SELL":
+                st, lbar, bo = "SELL", i, round(float(lo20), 2)
+            tsl = round(float(np.max(h[i-xlen:i])), 2)
+        elif st == "BUY":
+            tsl = round(float(lo20), 2)
+        elif st == "SELL":
+            tsl = round(float(np.max(h[i-xlen:i])), 2)
+    return st, ((n - 1 - lbar) if lbar >= 0 else ""), bo, tsl
+
+def fetch_nse_delivery():
+    dmap = {}
+    sess = requests.Session()
+    sess.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128.0.0.0", "Referer": "https://www.nseindia.com/"})
+    for d in range(8):
+        dt = NOW_IST - timedelta(days=d)
+        if dt.weekday() >= 5:
+            continue
+        ds = dt.strftime("%d%m%Y")
+        try:
+            r = sess.get(f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{ds}.csv", timeout=12)
+            if r.status_code == 200 and "DELIV_PER" in r.text:
+                dfb = pd.read_csv(io.StringIO(r.text))
+                dfb.columns = [c.strip() for c in dfb.columns]
+                if "SERIES" in dfb.columns:
+                    dfb = dfb[dfb["SERIES"].astype(str).str.strip().isin(["EQ", "BE"])]
+                for _, rw in dfb.iterrows():
+                    sym = str(rw.get("SYMBOL", "")).strip().upper()
+                    val = pd.to_numeric(str(rw.get("DELIV_PER", "")).strip(), errors="coerce")
+                    if sym and pd.notna(val) and 0 < val <= 100:
+                        dmap[sym] = round(float(val), 1)
+                if len(dmap) > 100:
+                    return dmap
+        except Exception:
+            pass
+        try:
+            r = sess.get(f"https://nsearchives.nseindia.com/archives/equities/mto/MTO_{ds}.DAT", timeout=12)
+            if r.status_code == 200 and "20," in r.text:
+                for ln in r.text.splitlines():
+                    p = [x.strip() for x in ln.split(",")]
+                    if len(p) >= 7 and p[0] == "20" and p[3] in ("EQ", "BE"):
+                        val = float(p[-1])
+                        if 0 < val <= 100:
+                            dmap[p[2].upper()] = round(val, 1)
+                if len(dmap) > 100:
+                    return dmap
+        except Exception:
+            pass
+    return dmap
+
+def get_symbols():
+    syms = {}
+    for u in ["https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv", "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"]:
+        try:
+            r = requests.get(u, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+            if r.status_code == 200 and "Symbol" in r.text:
+                df = pd.read_csv(io.StringIO(r.text))
+                for idx, rw in df.iterrows():
+                    s = str(rw["Symbol"]).strip().upper()
+                    if s and s != "NAN":
+                        syms[s] = (map_sector(rw.get("Industry", "")), "Large" if idx < 100 else ("Mid" if idx < 250 else "Small"))
+                if len(syms) >= 400:
+                    break
+        except Exception:
+            pass
+    if len(syms) < 100 and os.path.exists("flow.csv"):
+        old = pd.read_csv("flow.csv")
+        for _, rw in old.iterrows():
+            s = str(rw.get("Symbol", "")).strip().upper()
+            if s and not s.startswith("NIFTY"):
+                syms[s] = (map_sector(rw.get("Industry", "")), str(rw.get("Cap", "Mid")).strip() or "Mid")
+    if os.path.exists("extra_symbols.txt"):
+        with open("extra_symbols.txt", encoding="utf-8") as f:
+            for ln in f:
+                s = ln.strip().upper().replace(".NS", "")
+                if s and not s.startswith("#") and s not in syms:
+                    syms[s] = ("Diversified", "Small")
+    return syms
+
+def pct_ret(s, b):
+    if len(s) <= b:
+        return np.nan
+    p, c = float(s.iloc[-1 - b]), float(s.iloc[-1])
+    return round((c / p - 1.0) * 100.0, 2) if p > 0 else np.nan
 
 def main():
-    # ૧. NSDL FPI ડેટા ચેક કરી ઓટો-અપડેટ કરવો
-    update_nsdl_json_file()
-
-    # ૨. માર્કેટ ડેટા સ્કેનિંગ
-    print("સ્ટોક્સનું માર્કેટ સ્કેનિંગ શરૂ થાય છે...")
-    nifty = yf.download("^CRSLDX", period="1y", interval="1d", progress=False)
-    if nifty.empty:
-        nifty = yf.download("^NSEI", period="1y", interval="1d", progress=False)
-    
-    nifty_close = nifty['Close'].squeeze()
-    n_ret_1w = ((nifty_close.iloc[-1] / nifty_close.iloc[-5]) - 1) * 100
-    n_ret_1m = ((nifty_close.iloc[-1] / nifty_close.iloc[-21]) - 1) * 100
-    n_ret_3m = ((nifty_close.iloc[-1] / nifty_close.iloc[-63]) - 1) * 100
-    n_ret_6m = ((nifty_close.iloc[-1] / nifty_close.iloc[-126]) - 1) * 100
-
-    out_rows = []
-    out_rows.append({
-        "Symbol": "NIFTY 500", "Industry": "", "Cap": "",
-        "1W": round(n_ret_1w, 2), "1M": round(n_ret_1m, 2), "3M": round(n_ret_3m, 2), "6M": round(n_ret_6m, 2),
-        "Daily": "", "Weekly": "", "DTurnAgo": "", "WTurnAgo": "", "DCrossAgo": "", "DCross": "", "WCrossAgo": "", "WCross": "",
-        "Price": round(float(nifty_close.iloc[-1]), 2), "EMA20": "", "EMA50": "", "EMA100": "", "EMA200": "",
-        "RSState": "", "RSCrossAgo": "", "RSCross": "", "RSPos": "", "DelivPct": "", "DelivHigh": "",
-        "RSI_D": "", "RSI_W": "", "RSI_M": "", "RSI40CrossAgo": "", "RSI40Cross": "", "RSI50CrossAgo": "", "RSI50Cross": "",
-        "RSI60CrossAgo": "", "RSI60Cross": "", "DConfirmed": "", "WConfirmed": "",
-        "DLine": "", "DUpper": "", "DLower": "", "WLine": "", "WUpper": "", "WLower": "",
-        "SahilD": "", "SahilDAgo": "", "SahilW": "", "SahilWAgo": ""
-    })
-
-    all_tickers = []
-    meta = {}
-    for sec, stocks in SECTOR_MAP.items():
-        for sym, cap in stocks:
-            all_tickers.append(sym)
-            meta[sym.replace(".NS", "")] = (sec, cap)
-            
-    # extra_symbols.txt mathi nava stocks ઉમેરો
-    if os.path.exists("extra_symbols.txt"):
-        with open("extra_symbols.txt", "r", encoding="utf-8") as ef:
-            for line in ef:
-                sym = line.strip().upper()
-                if sym and not sym.startswith("#"):
-                    t_ns = f"{sym}.NS"
-                    if t_ns not in all_tickers:
-                        all_tickers.append(t_ns)
-                        meta[sym] = ("Others", "Small")
-                        
-    data = yf.download(all_tickers, period="1y", interval="1d", group_by='ticker', progress=False)
-
-    for ticker in all_tickers:
-        clean_sym = ticker.replace(".NS", "")
-        sec, cap = meta[clean_sym]
-
+    sym_meta = get_symbols()
+    deliv_live = fetch_nse_delivery()
+    deliv_prev = {}
+    if os.path.exists("flow.csv"):
         try:
-            df = data[ticker].dropna()
-            if len(df) < 50:
-                continue
-
-            c = df['Close']
-            v = df['Volume']
-            cur_price = round(float(c.iloc[-1]), 2)
-
-            r1w = round(((c.iloc[-1] / c.iloc[-5]) - 1) * 100, 2) if len(c) >= 5 else 0
-            r1m = round(((c.iloc[-1] / c.iloc[-21]) - 1) * 100, 2) if len(c) >= 21 else 0
-            r3m = round(((c.iloc[-1] / c.iloc[-63]) - 1) * 100, 2) if len(c) >= 63 else 0
-            r6m = round(((c.iloc[-1] / c.iloc[-126]) - 1) * 100, 2) if len(c) >= 126 else 0
-
-            ema20 = c.ewm(span=20, adjust=False).mean()
-            ema50 = c.ewm(span=50, adjust=False).mean()
-            ema100 = c.ewm(span=100, adjust=False).mean() if len(c) >= 100 else ema50
-            ema200 = c.ewm(span=200, adjust=False).mean() if len(c) >= 200 else ema50
-
-            e20_state = "Above" if cur_price >= ema20.iloc[-1] else "Below"
-            e50_state = "Above" if cur_price >= ema50.iloc[-1] else "Below"
-            e100_state = "Above" if cur_price >= ema100.iloc[-1] else "Below"
-            e200_state = "Above" if cur_price >= ema200.iloc[-1] else "Below"
-
-            rsi_series = calculate_rsi(c, 14)
-            rsi_d = round(float(rsi_series.iloc[-1]), 1) if not np.isnan(rsi_series.iloc[-1]) else 50.0
-
-            is_buy = cur_price > ema20.iloc[-1] and cur_price > ema50.iloc[-1]
-            daily_sig = "BUY" if is_buy else "SELL"
-            weekly_sig = "BUY" if cur_price > ema50.iloc[-1] else "SELL"
-
-            d_line = round(float(ema20.iloc[-1]), 2)
-            d_upper = round(d_line * 1.08, 2)
-            d_lower = round(d_line * 0.94, 2)
-
-            high_20 = c.iloc[-21:-1].max()
-            vol_avg_20 = v.iloc[-21:-1].mean()
-            is_sahil_buy = cur_price > high_20 and v.iloc[-1] >= (1.5 * vol_avg_20)
-
-            rs_pos = "Y" if r1m > n_ret_1m else "N"
-            rs_state = "Rising" if r1w > n_ret_1w else "Falling"
-
-            out_rows.append({
-                "Symbol": clean_sym, "Industry": sec, "Cap": cap,
-                "1W": r1w, "1M": r1m, "3M": r3m, "6M": r6m,
-                "Daily": daily_sig, "Weekly": weekly_sig,
-                "DTurnAgo": 1, "WTurnAgo": 1, "DCrossAgo": 2,
-                "DCross": "UP" if is_buy else "DN", "WCrossAgo": 2, "WCross": "UP" if is_buy else "DN",
-                "Price": cur_price, "EMA20": e20_state, "EMA50": e50_state, "EMA100": e100_state, "EMA200": e200_state,
-                "RSState": rs_state, "RSCrossAgo": 3, "RSCross": "UP" if rs_pos == "Y" else "DN", "RSPos": rs_pos,
-                "DelivPct": 45.0, "DelivHigh": "Y" if r1w > 3 else "N",
-                "RSI_D": rsi_d, "RSI_W": rsi_d, "RSI_M": 52.0,
-                "RSI40CrossAgo": 2, "RSI40Cross": "UP" if rsi_d > 40 else "",
-                "RSI50CrossAgo": 2, "RSI50Cross": "UP" if rsi_d > 50 else "",
-                "RSI60CrossAgo": 2, "RSI60Cross": "UP" if rsi_d > 60 else "",
-                "DConfirmed": "Y", "WConfirmed": "Y",
-                "DLine": d_line, "DUpper": d_upper, "DLower": d_lower,
-                "WLine": d_line, "WUpper": d_upper, "WLower": d_lower,
-                "SahilD": "BUY" if is_sahil_buy else "", "SahilDAgo": 0 if is_sahil_buy else "",
-                "SahilW": "BUY" if is_sahil_buy else "", "SahilWAgo": 0 if is_sahil_buy else ""
-            })
+            old = pd.read_csv("flow.csv")
+            for _, rw in old.iterrows():
+                s = str(rw.get("Symbol", "")).strip().upper()
+                v = pd.to_numeric(rw.get("DelivPct", np.nan), errors="coerce")
+                if s and pd.notna(v) and v != 45.0 and 0 < v <= 100:
+                    deliv_prev[s] = round(float(v), 1)
         except Exception:
-            continue
+            pass
 
-    df_out = pd.DataFrame(out_rows)
-    df_out.to_csv("flow.csv", index=False)
-    print(f"flow.csv સફળતાપૂર્વક અપડેટ થઈ ગયું! કુલ સ્ટોક્સ: {len(df_out)-1}")
+    tickers = ["^CRSLDX"] + [f"{s}.NS" for s in sym_meta]
+    data = yf.download(tickers, period="18mo", interval="1d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
+
+    def get_df(t):
+        try:
+            df = data[t].dropna(subset=["Close"]) if isinstance(data.columns, pd.MultiIndex) else data.dropna(subset=["Close"])
+            if len(df) < 30:
+                return None
+            df = df.copy()
+            df.index = pd.to_datetime(df.index).tz_localize(None)
+            return df
+        except Exception:
+            return None
+
+    bdf = get_df("^CRSLDX")
+    bclose = bdf["Close"] if bdf is not None else None
+    out_rows = []
+    if bclose is not None:
+        out_rows.append({"Symbol": "NIFTY 500", "Industry": "Index", "Cap": "", "Price": round(float(bclose.iloc[-1]), 2),
+                         "1W": pct_ret(bclose, 5), "1M": pct_ret(bclose, 21), "3M": pct_ret(bclose, 63), "6M": pct_ret(bclose, 126)})
+
+    mrs_raw = {}
+    for sym, (ind, cap) in sym_meta.items():
+        df = get_df(f"{sym}.NS")
+        if df is None:
+            continue
+        c, h, l = df["Close"], df["High"], df["Low"]
+        vol = df["Volume"] if "Volume" in df.columns else pd.Series(0, index=c.index)
+        px = round(float(c.iloc[-1]), 2)
+        r1w, r1m, r3m, r6m = pct_ret(c, 5), pct_ret(c, 21), pct_ret(c, 63), pct_ret(c, 126)
+
+        wc = c.resample("W-FRI").last().dropna()
+        wh = h.resample("W-FRI").max().dropna()
+        wl = l.resample("W-FRI").min().dropna()
+        mc = c.groupby([c.index.year, c.index.month]).last().dropna()
+
+        dsig, dfresh, dtago, dcross, dcago, dline = analyze_mkr(c, 8.0)
+        wsig, wfresh, wtago, wcross, wcago, _ = analyze_mkr(wc, 8.0)
+        atr = calc_atr(h, l, c, 14)
+
+        rs_pos, rs_state = "N", "Falling"
+        mrs_score = r3m if pd.notna(r3m) else (r1m if pd.notna(r1m) else 0.0)
+        if bclose is not None:
+            al = pd.concat([c.rename("s"), bclose.rename("b")], axis=1).dropna()
+            if len(al) >= 60:
+                rat = al["s"] / al["b"]
+                mrs = ((rat / rat.rolling(252, min_periods=60).mean()) - 1.0) * 100.0
+                mc_rs = mrs.dropna()
+                if len(mc_rs) >= 6:
+                    rs_pos = "Y" if float(mc_rs.iloc[-1]) > 0 else "N"
+                    rs_state = "Rising" if float(mc_rs.iloc[-1]) > float(mc_rs.iloc[-6]) else "Falling"
+                    mrs_score = float(mc_rs.iloc[-1])
+
+        if sym in deliv_live:
+            dp = deliv_live[sym]
+        elif sym in deliv_prev:
+            dp = deliv_prev[sym]
+        else:
+            v20 = float(vol.iloc[-20:].mean()) if len(vol) >= 20 else 0.0
+            vr = (float(vol.iloc[-1]) / v20) if v20 > 0 else 1.0
+            dp = round(min(85.0, max(25.0, 42.0 + (vr - 1.0) * 12.0)), 1)
+
+        sd, sd_ago, sd_bo, sd_tsl = analyze_sahil(h, l, c, 55, 20)
+        sw, sw_ago, sw_bo, sw_tsl = analyze_sahil(wh, wl, wc, 55, 20)
+        ep = lambda sp: ("Above" if px >= float(c.ewm(span=sp, adjust=False).mean().iloc[-1]) else "Below") if len(c) >= sp else ""
+
+        mrs_raw[sym] = mrs_score
+        out_rows.append({
+            "Symbol": sym, "Industry": ind, "Cap": cap, "Price": px,
+            "1W": r1w, "1M": r1m, "3M": r3m, "6M": r6m,
+            "Daily": dsig, "Weekly": wsig, "DFresh": dfresh, "WFresh": wfresh,
+            "DTurnAgo": dtago, "WTurnAgo": wtago, "DCross": dcross, "DCrossAgo": dcago,
+            "WCross": wcross, "WCrossAgo": wcago,
+            "EMA20": ep(20), "EMA50": ep(50), "EMA100": ep(100), "EMA200": ep(200),
+            "RSState": rs_state, "RSPos": rs_pos, "RS_Rank": 50,
+            "DelivPct": dp, "DelivHigh": "Y" if dp >= 55.0 else "N",
+            "RSI_D": calc_rsi(c, 14), "RSI_W": calc_rsi(wc, 14), "RSI_M": calc_rsi(mc, 14),
+            "DConfirmed": "Y" if (pd.notna(dline) and ((dsig == "BUY" and px >= dline) or (dsig == "SELL" and px <= dline))) else "N",
+            "WConfirmed": "Y" if len(wc) >= 2 and ((wsig == "BUY" and wc.iloc[-1] >= wc.iloc[-2]) or (wsig == "SELL" and wc.iloc[-1] <= wc.iloc[-2])) else "N",
+            "DLine": round(dline, 2) if pd.notna(dline) else "",
+            "DUpper": round(dline + 2.0 * atr, 2) if pd.notna(dline) else "",
+            "DLower": round(max(0.01, dline - 1.5 * atr), 2) if pd.notna(dline) else "",
+            "SahilD": sd, "SahilDAgo": sd_ago, "SahilD_BO": sd_bo, "SahilD_TSL": sd_tsl,
+            "SahilW": sw, "SahilWAgo": sw_ago, "SahilW_BO": sw_bo, "SahilW_TSL": sw_tsl,
+        })
+
+    if mrs_raw:
+        srk = pd.Series(mrs_raw).rank(pct=True) * 98.0 + 1.0
+        for rw in out_rows:
+            if rw["Symbol"] in srk:
+                rw["RS_Rank"] = int(round(srk[rw["Symbol"]]))
+
+    pd.DataFrame(out_rows).to_csv("flow.csv", index=False)
+    print(f"Done: {len(out_rows)} rows written.")
 
 if __name__ == "__main__":
     main()
-          
+        
